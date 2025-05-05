@@ -1,0 +1,83 @@
+/* 
+ * WHITE BACKGROUND OVERRIDE
+ * File này chứa các ghi đè CSS để đảm bảo nền trắng hoàn toàn trên dashboard
+ */
+
+/* Đảm bảo nền trắng cho các phần tử cơ bản */
+html, 
+body,
+#app,
+.admin-container,
+.wrapper,
+.wrapper-content,
+.content-wrapper,
+.main-content,
+#page-wrapper,
+#wrapper,
+.container-fluid,
+.sidebar-content,
+.dashboard-content {
+    background-color: #ffffff !important;
+}
+
+/* Các phần CSS chung */
+body {
+    background-color: #ffffff !important;
+    background-image: none !important;
+}
+
+/* Reset lại bất kỳ nền nào khác thành màu trắng */
+.container, 
+.container-fluid,
+.row,
+.col,
+.col-md-12,
+.col-lg-12,
+.content {
+    background-color: #ffffff !important;
+}
+
+/* Loại bỏ các hiệu ứng gradient nền */
+body:before,
+body:after,
+.wrapper:before,
+.wrapper:after,
+.main-content:before,
+.main-content:after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+/* Đảm bảo header và footer cố định */
+.admin-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: var(--sidebar-width) !important;
+    right: 0 !important;
+    z-index: 999 !important;
+    background-color: #ffffff !important;
+}
+
+.sidebar.collapsed ~ .admin-header {
+    left: 50px !important;
+}
+
+.admin-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: var(--sidebar-width) !important;
+    right: 0 !important;
+    z-index: 50 !important;
+    background-color: #ffffff !important;
+}
+
+.sidebar.collapsed ~ .admin-footer {
+    left: 50px !important;
+}
+
+/* Điều chỉnh padding cho main content để tránh bị che bởi header và footer */
+.main-content {
+    padding-top: calc(var(--header-height) + 20px) !important;
+    padding-bottom: calc(var(--footer-height) + 20px) !important;
+} 

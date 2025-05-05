@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexCharts Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        #chart-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #f58cba;
+        }
+        
+        .btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #f58cba;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .log-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>ApexCharts Test Page</h1>
+    
+    <div id="chart-container">
+        <div id="test-chart" style="height: 350px;"></div>
+        <button id="refresh-btn" class="btn">Làm mới biểu đồ</button>
+    </div>
+    
+    <div class="log-container" id="log"></div>
+    
+    <!-- CDN links for ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <script>
+        // Function to log messages
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const logItem = document.createElement('div');
+            logItem.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            logElement.appendChild(logItem);
+            console.log(message);
+        }
+        
+        // Check if ApexCharts is loaded
+        if (typeof ApexCharts === 'undefined') {
+            log('ERROR: ApexCharts không được tải!');
+        } else {
+            log('SUCCESS: ApexCharts đã được tải thành công.');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM Content Loaded');
+            
+            const chartElement = document.getElementById('test-chart');
+            
+            if (!chartElement) {
+                log('ERROR: Không tìm thấy phần tử biểu đồ');
+                return;
+            }
+            
+            log('Chart element found');
+            
+            // Sample data
+            const monthlyData = [3500000, 4200000, 5100000, 4800000, 6100000, 
+                          7200000, 5700000, 6800000, 8100000, 7600000, 
+                          9100000, 8500000];
+            
+            const months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+            
+            log('Data prepared');
+            
+            // Chart configuration
+            const options = {
+                series: [{
+                    name: 'Doanh thu',
+                    data: monthlyData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    fontFamily: 'Arial, sans-serif',
+                    toolbar: {
+                        show: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2,
+                    colors: ['#f58cba'] 
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100]
+                    }
+                },
+                colors: ['#f58cba'],
+                xaxis: {
+                    categories: months
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+                        }
+                    }
+                }
+            };
+            
+            log('Options prepared');
+            
+            try {
+                log('Attempting to create chart...');
+                const chart = new ApexCharts(chartElement, options);
+                log('Chart object created, rendering...');
+                chart.render();
+                log('Chart rendered successfully');
+                
+                // Add refresh button functionality
+                document.getElementById('refresh-btn').addEventListener('click', function() {
+                    log('Refreshing chart...');
+                    chart.updateOptions({
+                        series: [{
+                            name: 'Doanh thu',
+                            data: Array.from({length: 12}, () => Math.floor(Math.random() * 10000000) + 1000000)
+                        }]
+                    });
+                    log('Chart refreshed with new random data');
+                });
+            } catch (error) {
+                log('ERROR: ' + error.message);
+                log('Stack trace: ' + error.stack);
+                chartElement.innerHTML = `
+                    <div style="height: 350px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                        <p style="color: #f58cba; font-size: 18px;">Không thể tải biểu đồ</p>
+                        <p>Lỗi: ${error.message}</p>
+                        <p>Vui lòng kiểm tra console để biết thêm chi tiết</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 
