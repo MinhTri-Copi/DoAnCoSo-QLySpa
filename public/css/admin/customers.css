@@ -1,0 +1,547 @@
+/* ==============================================
+   Spa-themed Customer Management Styling
+   ============================================== */
+
+:root {
+  --spa-primary: #83c5be;
+  --spa-primary-light: #a2d5ce;
+  --spa-primary-dark: #3d7068;
+  --spa-secondary: #ffddd2;
+  --spa-secondary-dark: #e29578;
+  --spa-light: #edf6f9;
+  --spa-dark: #006d77;
+  --spa-text: #2c3e50;
+  --spa-gray: #8d99ae;
+  --spa-success: #57cc99;
+  --spa-warning: #ffcb77;
+  --spa-danger: #e56b6f;
+  --spa-info: #4cc9f0;
+  --spa-card-shadow: 0 8px 20px rgba(0, 109, 119, 0.1);
+  --spa-card-shadow-hover: 0 12px 30px rgba(0, 109, 119, 0.2);
+  --spa-transition: all 0.3s ease;
+}
+
+/* ===== Core Layout Elements ===== */
+
+body {
+  color: var(--spa-text);
+  background-color: #f8fafc;
+}
+
+.spa-container {
+  padding: 2rem 0;
+}
+
+.spa-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: var(--spa-card-shadow);
+  transition: var(--spa-transition);
+  overflow: hidden;
+  background-color: white;
+}
+
+.spa-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--spa-card-shadow-hover);
+}
+
+.spa-card-header {
+  background-color: var(--spa-light);
+  border-bottom: none;
+  padding: 1.5rem;
+  color: var(--spa-dark);
+  font-weight: 600;
+}
+
+.spa-card-header h5, 
+.spa-card-header h6 {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.page-heading {
+  background: linear-gradient(120deg, var(--spa-primary), var(--spa-primary-dark));
+  border-radius: 16px;
+  padding: 2rem;
+  color: white;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-heading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-image: url('/img/zen-pattern.png');
+  background-size: cover;
+  opacity: 0.1;
+}
+
+/* ===== Customer Table Styling ===== */
+
+.spa-table {
+  margin-bottom: 0;
+}
+
+.spa-table thead th {
+  background-color: var(--spa-light);
+  border: none;
+  color: var(--spa-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 1.25rem 1.5rem;
+  vertical-align: middle;
+}
+
+.spa-table tbody tr {
+  transition: var(--spa-transition);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.spa-table tbody tr:hover {
+  background-color: rgba(131, 197, 190, 0.05);
+  transform: scale(1.01);
+}
+
+.spa-table tbody td {
+  vertical-align: middle;
+  padding: 1.2rem 1.5rem;
+  border-top: none;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: var(--spa-dark);
+  display: flex;
+  align-items: center;
+}
+
+.customer-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.75rem;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Stats Cards ===== */
+
+.stat-card-spa {
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: white;
+  box-shadow: var(--spa-card-shadow);
+  transition: var(--spa-transition);
+  border-left: 4px solid var(--spa-primary);
+}
+
+.stat-card-spa:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--spa-card-shadow-hover);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  background: linear-gradient(120deg, var(--spa-primary), var(--spa-primary-dark));
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 109, 119, 0.2);
+}
+
+.stat-icon i {
+  font-size: 1.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--spa-dark);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  color: var(--spa-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ===== Profile section ===== */
+
+.customer-profile-spa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--spa-light);
+  background-image: linear-gradient(120deg, rgba(131, 197, 190, 0.1), rgba(0, 109, 119, 0.05));
+  border-radius: 16px;
+}
+
+.customer-profile-avatar-spa {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 8px 20px rgba(0, 109, 119, 0.15);
+  margin-bottom: 1.5rem;
+}
+
+.customer-profile-name-spa {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--spa-dark);
+  margin-bottom: 0.5rem;
+}
+
+/* ===== Membership badges ===== */
+
+.spa-badge {
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.membership-regular {
+  background-color: var(--spa-light);
+  color: var(--spa-text);
+}
+
+.membership-vip {
+  background: linear-gradient(120deg, #ffd700, #daa520);
+  color: white;
+}
+
+.membership-platinum {
+  background: linear-gradient(120deg, #e0e0e0, #a9a9a9);
+  color: white;
+}
+
+.membership-diamond {
+  background: linear-gradient(120deg, #b3e5fc, #4fc3f7);
+  color: white;
+}
+
+/* ===== Forms ===== */
+
+.form-control-spa {
+  border-radius: 50px;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: var(--spa-transition);
+}
+
+.form-control-spa:focus {
+  border-color: var(--spa-primary);
+  box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.25);
+}
+
+.search-filter-spa {
+  position: relative;
+}
+
+.search-filter-spa .search-icon {
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--spa-primary-dark);
+}
+
+.search-filter-spa .form-control {
+  padding-left: 3rem;
+}
+
+/* ===== Buttons ===== */
+
+.btn-spa {
+  border-radius: 50px;
+  padding: 0.7rem 1.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  transition: var(--spa-transition);
+}
+
+.btn-spa-primary {
+  background: linear-gradient(120deg, var(--spa-primary), var(--spa-primary-dark));
+  border: none;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 109, 119, 0.2);
+}
+
+.btn-spa-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 109, 119, 0.3);
+  color: white;
+}
+
+.btn-spa-outline {
+  background: transparent;
+  border: 2px solid var(--spa-primary);
+  color: var(--spa-primary-dark);
+}
+
+.btn-spa-outline:hover {
+  background-color: var(--spa-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-action {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: var(--spa-transition);
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Tabs ===== */
+
+.spa-tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+}
+
+.spa-tabs .nav-item {
+  margin-bottom: 0;
+}
+
+.spa-tabs .nav-link {
+  border: none;
+  font-weight: 600;
+  color: var(--spa-gray);
+  padding: 1rem 1.5rem;
+  border-bottom: 3px solid transparent;
+  transition: var(--spa-transition);
+  white-space: nowrap;
+}
+
+.spa-tabs .nav-link:hover {
+  color: var(--spa-primary);
+}
+
+.spa-tabs .nav-link.active {
+  background-color: transparent;
+  color: var(--spa-primary-dark);
+  border-bottom: 3px solid var(--spa-primary);
+}
+
+.spa-tabs .nav-link i {
+  margin-right: 0.5rem;
+}
+
+/* ===== Pagination ===== */
+
+.paging-custom .page-link {
+  border-radius: 50%;
+  margin: 0 3px;
+  color: var(--spa-dark);
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: var(--spa-transition);
+}
+
+.paging-custom .page-link:hover {
+  background-color: var(--spa-light);
+  color: var(--spa-primary-dark);
+}
+
+.paging-custom .page-item.active .page-link {
+  background-color: var(--spa-primary);
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 109, 119, 0.2);
+}
+
+/* ===== Timeline Component ===== */
+
+.timeline-spa {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 0 0 0 1.5rem;
+}
+
+.timeline-spa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 2px;
+  background: var(--spa-primary-light);
+}
+
+.timeline-item-spa {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item-spa:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker-spa {
+  position: absolute;
+  left: -1.5rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--spa-primary);
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px var(--spa-primary-light);
+}
+
+.timeline-content-spa {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-left: 0.75rem;
+  transition: var(--spa-transition);
+}
+
+.timeline-content-spa:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Animation Classes ===== */
+
+.fade-in {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-in-out;
+}
+
+.slide-right {
+  animation: slideRight 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== Responsive Adaptations ===== */
+
+@media (max-width: 768px) {
+  .spa-table thead {
+    display: none;
+  }
+  
+  .spa-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .spa-table tbody td {
+    display: block;
+    text-align: right;
+    position: relative;
+    padding: 0.75rem 1rem 0.75rem 50%;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .spa-table tbody td:last-child {
+    border-bottom: none;
+  }
+  
+  .spa-table tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: var(--spa-dark);
+  }
+  
+  .customer-name {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  
+  .customer-name div {
+    text-align: right;
+  }
+  
+  .customer-avatar {
+    margin-right: 0;
+    margin-left: 0.75rem;
+  }
+  
+  .search-filter-container {
+    flex-direction: column;
+  }
+} 

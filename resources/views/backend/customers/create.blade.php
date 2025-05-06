@@ -1,68 +1,161 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Thêm khách hàng')
+@section('styles')
+<link href="{{ asset('css/admin/customers.css') }}" rel="stylesheet">
+@endsection
 
 @section('content')
-    <div class="container-fluid">
-        <h1>Thêm khách hàng</h1>
-
-        <!-- Thông báo lỗi -->
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        <!-- Form thêm khách hàng -->
-        <form action="{{ route('admin.customers.store') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="Manguoidung" class="form-label">Mã người dùng <span class="text-danger">*</span></label>
-                <input type="number" name="Manguoidung" class="form-control" value="{{ $suggestedManguoidung }}" readonly>
-                <small class="form-text text-muted">Mã người dùng được sinh tự động.</small>
-            </div>
-            <div class="mb-3">
-                <label for="MaTK" class="form-label">Mã tài khoản <span class="text-danger">*</span></label>
-                <select name="MaTK" class="form-control" required>
-                    @foreach ($accounts as $account)
-                        <option value="{{ $account->MaTK }}">{{ $account->MaTK }} - {{ $account->username }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="Hoten" class="form-label">Họ tên <span class="text-danger">*</span></label>
-                <input type="text" name="Hoten" class="form-control" value="{{ old('Hoten') }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="SDT" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                <input type="text" name="SDT" class="form-control" value="{{ old('SDT') }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="DiaChi" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
-                <input type="text" name="DiaChi" class="form-control" value="{{ old('DiaChi') }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="Email" class="form-label">Email <span class="text-danger">*</span></label>
-                <input type="email" name="Email" class="form-control" value="{{ old('Email') }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="Ngaysinh" class="form-label">Ngày sinh <span class="text-danger">*</span></label>
-                <input type="date" name="Ngaysinh" class="form-control" value="{{ old('Ngaysinh') }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="Gioitinh" class="form-label">Giới tính <span class="text-danger">*</span></label>
-                <select name="Gioitinh" class="form-control" required>
-                    <option value="Nam" {{ old('Gioitinh') == 'Nam' ? 'selected' : '' }}>Nam</option>
-                    <option value="Nữ" {{ old('Gioitinh') == 'Nữ' ? 'selected' : '' }}>Nữ</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Thêm khách hàng</button>
-            <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary">Quay lại</a>
-        </form>
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Thêm Khách Hàng Mới</h1>
+        <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-arrow-left"></i>
+            </span>
+            <span class="text">Quay Lại</span>
+        </a>
     </div>
+
+    <!-- Create Customer Form -->
+    <div class="card shadow mb-4 animate__animated animate__fadeIn">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Thông Tin Khách Hàng</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.customers.store') }}" method="POST" id="createCustomerForm">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Manguoidung">Mã Khách Hàng <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control @error('Manguoidung') is-invalid @enderror" 
+                                    id="Manguoidung" name="Manguoidung" value="{{ $suggestedManguoidung }}" readonly>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="generateId">
+                                        <i class="fas fa-random"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            @error('Manguoidung')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Mã khách hàng được tạo tự động</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="MaTK">Tài Khoản <span class="text-danger">*</span></label>
+                            <select class="form-control select2 @error('MaTK') is-invalid @enderror" id="MaTK" name="MaTK">
+                                <option value="">-- Chọn Tài Khoản --</option>
+                                @foreach($accounts as $account)
+                                    <option value="{{ $account->MaTK }}">
+                                        {{ $account->Tendangnhap }} ({{ $account->MaTK }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('MaTK')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Hoten">Họ Tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('Hoten') is-invalid @enderror" 
+                                id="Hoten" name="Hoten" value="{{ old('Hoten') }}">
+                            @error('Hoten')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="SDT">Số Điện Thoại <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                </div>
+                                <input type="text" class="form-control @error('SDT') is-invalid @enderror" 
+                                    id="SDT" name="SDT" value="{{ old('SDT') }}">
+                            </div>
+                            @error('SDT')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div id="SDTFeedback" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Email">Email <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="email" class="form-control @error('Email') is-invalid @enderror" 
+                                    id="Email" name="Email" value="{{ old('Email') }}">
+                            </div>
+                            @error('Email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="DiaChi">Địa Chỉ <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('DiaChi') is-invalid @enderror" 
+                                id="DiaChi" name="DiaChi" rows="3">{{ old('DiaChi') }}</textarea>
+                            @error('DiaChi')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Ngaysinh">Ngày Sinh <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('Ngaysinh') is-invalid @enderror" 
+                                id="Ngaysinh" name="Ngaysinh" value="{{ old('Ngaysinh') }}">
+                            @error('Ngaysinh')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div id="NgaysinhFeedback" class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Giới Tính <span class="text-danger">*</span></label>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="genderMale" name="Gioitinh" value="Nam" 
+                                    class="custom-control-input @error('Gioitinh') is-invalid @enderror"
+                                    {{ old('Gioitinh') == 'Nam' ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="genderMale">Nam</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="genderFemale" name="Gioitinh" value="Nữ" 
+                                    class="custom-control-input @error('Gioitinh') is-invalid @enderror"
+                                    {{ old('Gioitinh') == 'Nữ' ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="genderFemale">Nữ</label>
+                            </div>
+                            @error('Gioitinh')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save mr-1"></i> Lưu Khách Hàng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script src="{{ asset('js/admin/customers.js') }}"></script>
+<script src="{{ asset('js/admin/customers/create.js') }}"></script>
 @endsection

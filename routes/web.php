@@ -60,7 +60,8 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
 
 
     Route::resource('customers', CustomerController::class, ['names' => 'admin.customers']);
-    Route::get('customers/{id}/confirm-destroy', [CustomerController::class, 'confirmDestroy'])->name('admin.customers.confirm-destroy');
+    Route::get('customers/{id}/confirm-destroy', [CustomerController::class, 'confirmDestroy'])->name('admin.customers.confirmDestroy');
+    Route::post('customers/{id}/add-points', [CustomerController::class, 'addPoints'])->name('admin.customers.addPoints');
 
     // Routes cho quản lý quảng cáo
     Route::resource('advertisements', AdvertisementController::class, ['names' => 'admin.advertisements']);
