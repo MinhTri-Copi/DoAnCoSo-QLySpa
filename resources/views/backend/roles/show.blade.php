@@ -950,7 +950,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -1271,9 +1271,9 @@
                     @endif
                 </div>
             </div>
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('scripts')

@@ -366,7 +366,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -393,38 +393,38 @@
         </div>
 
         <div class="spa-content-body">
-            <!-- Thông báo lỗi -->
-            @if ($errors->any())
+        <!-- Thông báo lỗi -->
+        @if ($errors->any())
                 <div class="spa-alert spa-alert-danger">
                     <i class="fas fa-exclamation-circle"></i>
                     <div>
                         <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
                     </div>
-                </div>
-            @endif
+            </div>
+        @endif
 
             <!-- Form chỉnh sửa trạng thái -->
             <form action="{{ route('admin.ad-statuses.update', $status->MaTTQC) }}" method="POST" class="spa-form">
-                @csrf
-                @method('PUT')
+            @csrf
+            @method('PUT')
                 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Mã Trạng Thái</label>
-                            <input type="text" class="form-control" value="{{ $status->MaTTQC }}" disabled>
+                <input type="text" class="form-control" value="{{ $status->MaTTQC }}" disabled>
                             <div class="help-text">Mã trạng thái không thể thay đổi sau khi đã tạo</div>
                         </div>
-                    </div>
+            </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Tên Trạng Thái <span class="required">*</span></label>
-                            <input type="text" name="TenTT" class="form-control" value="{{ old('TenTT', $status->TenTT) }}" required>
+                <input type="text" name="TenTT" class="form-control" value="{{ old('TenTT', $status->TenTT) }}" required>
                             <div class="help-text">Nhập tên mô tả trạng thái quảng cáo</div>
                         </div>
                     </div>
@@ -443,9 +443,9 @@
                         <i class="fas fa-arrow-left"></i>
                         Quay Lại
                     </a>
-                </div>
-            </form>
+            </div>
+        </form>
         </div>
     </div>
-</div>
+    </div>
 @endsection

@@ -527,22 +527,22 @@
             </div>
 
             <!-- Thông báo -->
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                </div>
-            @endif
+        </div>
+    @endif
 
             @if($trangThaiPhongs->isEmpty())
                 <div class="spa-empty-state">
@@ -556,14 +556,14 @@
                 </div>
             @else
                 <table class="spa-status-table">
-                    <thead>
-                        <tr>
+        <thead>
+            <tr>
                             <th class="text-center">Mã</th>
-                            <th>Tên Trạng Thái</th>
+                <th>Tên Trạng Thái</th>
                             <th class="text-center">Thao Tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            </tr>
+        </thead>
+        <tbody>
                         @foreach($trangThaiPhongs as $trangThaiPhong)
                             <tr>
                                 <td class="text-center">
@@ -585,11 +585,11 @@
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
             @endif
         </div>
     </div>

@@ -560,7 +560,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -628,16 +628,16 @@
                             Thêm Vai Trò Mới
                         </a>
                     </div>
-                @else
+        @else
                     <table class="spa-role-table">
-                        <thead>
-                            <tr>
+                <thead>
+                    <tr>
                                 <th class="text-center">Mã</th>
                                 <th>Tên Vai Trò</th>
                                 <th class="text-center">Thao Tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                             @foreach($roles as $role)
                                 <tr>
                                     <td class="text-center">
@@ -668,12 +668,12 @@
                                                 </a>
                                             @endif
                                         </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
             </form>
         </div>
     </div>

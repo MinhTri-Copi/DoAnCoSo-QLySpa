@@ -52,6 +52,7 @@
                 <li><a href="{{ route('admin.dichvu.index') }}"><i class="fas fa-list-alt"></i> Dịch vụ</a></li>
                 <li><a href="{{ route('admin.datlich.index') }}"><i class="fas fa-calendar-check"></i> Đặt lịch</a></li>
                 <li><a href="{{ route('admin.phong.index') }}"><i class="fas fa-door-open"></i> Phòng</a></li>
+                <li><a href="{{ route('admin.trangthaiphong.index') }}"><i class="fas fa-door-closed"></i> Trạng thái phòng</a></li>
             </ul>
         </li>
         
@@ -96,6 +97,13 @@
             <a href="{{ route('admin.danhgia.index') }}" class="menu-link">
                 <i class="fas fa-star"></i>
                 <span>Quản lý đánh giá</span>
+            </a>
+        </li>
+        
+        <li class="menu-item">
+            <a href="{{ route('admin.trangthai.index') }}" class="menu-link">
+                <i class="fas fa-tags"></i>
+                <span>Trạng thái</span>
             </a>
         </li>
         

@@ -499,7 +499,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -566,7 +566,7 @@
                             <small class="spa-help-text">Tên vai trò không được vượt quá 50 ký tự</small>
                         </div>
                     </div>
-                </div>
+            </div>
                 
                 <div class="spa-template-card mt-4">
                     <h3 class="spa-template-title">
@@ -603,7 +603,7 @@
                             </label>
                         </div>
                     </div>
-                </div>
+            </div>
                 
                 <div class="spa-btn-row">
                     <button type="button" class="spa-btn spa-btn-secondary" onclick="window.history.back();">
@@ -612,8 +612,8 @@
                     <button type="submit" class="spa-btn spa-btn-primary" id="submitBtn">
                         <i class="fas fa-save"></i> Lưu Vai Trò
                     </button>
-                </div>
-            </form>
+            </div>
+        </form>
         </div>
     </div>
 </div>

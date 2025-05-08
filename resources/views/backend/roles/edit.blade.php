@@ -510,7 +510,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -535,7 +535,7 @@
                 Quay Lại
             </a>
         </div>
-    </div>
+            </div>
 
     <div class="row">
         <!-- Role Edit Form -->
@@ -563,14 +563,14 @@
                                     <i class="fas fa-trash fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Xóa Vai Trò
                                 </a>
-                            @endif
+        @endif
                         </div>
                     </div>
                 </div>
                 <div class="spa-panel-body">
                     <form action="{{ route('admin.roles.update', $role->RoleID) }}" method="POST" id="editRoleForm">
-                        @csrf
-                        @method('PUT')
+            @csrf
+            @method('PUT')
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">

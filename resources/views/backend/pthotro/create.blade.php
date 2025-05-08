@@ -410,7 +410,7 @@
                 Tạo phương thức hỗ trợ mới trong hệ thống
             </p>
         </div>
-    </div>
+        </div>
 
     <!-- Main Content Wrapper -->
     <div class="spa-content-wrapper">
@@ -478,8 +478,8 @@
                         Quay Lại
                     </a>
                 </div>
-            </form>
+    </form>
         </div>
     </div>
-    </div>
+</div>
 @endsection

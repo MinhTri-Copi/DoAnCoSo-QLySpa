@@ -410,7 +410,7 @@
                 Cập nhật thông tin phương thức hỗ trợ: {{ $pthotro->TenPT }}
             </p>
         </div>
-    </div>
+        </div>
 
     <!-- Main Content Wrapper -->
     <div class="spa-content-wrapper">
@@ -479,8 +479,8 @@
                         Quay Lại
                     </a>
                 </div>
-            </form>
+    </form>
         </div>
     </div>
-    </div>
+</div>
 @endsection

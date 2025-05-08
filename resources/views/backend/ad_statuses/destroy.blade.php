@@ -380,7 +380,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Modern SPA Dashboard Header -->
     <div class="spa-dashboard-header">
         <div class="header-shimmer"></div>
@@ -433,8 +433,8 @@
             </div>
 
             <form action="{{ route('admin.ad-statuses.destroy', $status->MaTTQC) }}" method="POST">
-                @csrf
-                @method('DELETE')
+            @csrf
+            @method('DELETE')
                 <div class="spa-btn-group">
                     <button type="submit" class="spa-btn spa-btn-danger">
                         <i class="fas fa-trash-alt"></i>
@@ -445,8 +445,8 @@
                         Hủy Và Quay Lại
                     </a>
                 </div>
-            </form>
+        </form>
         </div>
     </div>
-</div>
+    </div>
 @endsection
