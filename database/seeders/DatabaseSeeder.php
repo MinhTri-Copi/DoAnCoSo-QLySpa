@@ -12,6 +12,7 @@ use App\Models\TrangThaiPhong;
 use App\Models\Phong;
 use App\Models\PhuongThuc;
 use App\Models\TrangThai;
+use App\Models\TrangThaiQC;
 
 use Illuminate\Support\Facades\Hash;
 
@@ -136,19 +137,25 @@ class DatabaseSeeder extends Seeder
 //         ['MaPT' => 2, 'TenPT' => 'Momo', 'Mota' => 'Thanh toán qua ví điện tử Momo'],
 //     ]);
 
-        TrangThai::insert([
-            ['Matrangthai' => 1, 'Tentrangthai' => 'Chờ xử lý'],
-            ['Matrangthai' => 2, 'Tentrangthai' => 'Đang xử lý'],
-            ['Matrangthai' => 3, 'Tentrangthai' => 'Hoàn tất'],
-            ['Matrangthai' => 4, 'Tentrangthai' => 'Đã thanh toán'],
-            ['Matrangthai' => 5, 'Tentrangthai' => 'Hủy'],
-            ['Matrangthai' => 6, 'Tentrangthai' => 'Chờ thanh toán'],
-            ['Matrangthai' => 7, 'Tentrangthai' => 'Chờ phản hồi'],
-            ['Matrangthai' => 8, 'Tentrangthai' => 'Đã phản hồi'],
-        ]);
+        // TrangThai::insert([
+        //     ['Matrangthai' => 1, 'Tentrangthai' => 'Chờ xử lý'],
+        //     ['Matrangthai' => 2, 'Tentrangthai' => 'Đang xử lý'],
+        //     ['Matrangthai' => 3, 'Tentrangthai' => 'Hoàn tất'],
+        //     ['Matrangthai' => 4, 'Tentrangthai' => 'Đã thanh toán'],
+        //     ['Matrangthai' => 5, 'Tentrangthai' => 'Hủy'],
+        //     ['Matrangthai' => 6, 'Tentrangthai' => 'Chờ thanh toán'],
+        //     ['Matrangthai' => 7, 'Tentrangthai' => 'Chờ phản hồi'],
+        //     ['Matrangthai' => 8, 'Tentrangthai' => 'Đã phản hồi'],
+        // ]);
 
-        $this->call([
-            UpdateDichVuSeeder::class,
-        ]);
+        // TrangThaiQC::insert([
+        //     ['MaTTQC' => 1, 'TenTT' => 'Đang hoạt động'],
+        //     ['MaTTQC' => 2, 'TenTT' => 'Ngưng hoạt động'],
+        //     ['MaTTQC' => 3, 'TenTT' => 'Đã hết hạn'],
+        // ]);
+
+        // $this->call([
+        //     UpdateDichVuSeeder::class,
+        // ]);
     }
 }

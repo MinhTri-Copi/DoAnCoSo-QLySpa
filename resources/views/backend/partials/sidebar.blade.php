@@ -57,6 +57,19 @@
         
         <li class="menu-item has-submenu">
             <a href="#" class="menu-link">
+                <i class="fas fa-bullhorn"></i>
+                <span>Quản lý quảng cáo</span>
+                <i class="fas fa-chevron-right submenu-icon"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="{{ route('admin.advertisements.index') }}"><i class="fas fa-ad"></i> Quảng cáo</a></li>
+                <li><a href="{{ route('admin.ad-statuses.index') }}"><i class="fas fa-tag"></i> Trạng thái quảng cáo</a></li>
+                <li><a href="{{ route('admin.ad-statuses.statistics') }}"><i class="fas fa-chart-pie"></i> Thống kê quảng cáo</a></li>
+            </ul>
+        </li>
+        
+        <li class="menu-item has-submenu">
+            <a href="#" class="menu-link">
                 <i class="fas fa-headset"></i>
                 <span>Quản lý hỗ trợ</span>
                 <i class="fas fa-chevron-right submenu-icon"></i>

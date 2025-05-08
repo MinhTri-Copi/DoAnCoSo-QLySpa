@@ -1,0 +1,161 @@
+/* Role Management Styles */
+.role-badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+}
+
+.role-card {
+    transition: transform 0.2s;
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.role-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #4e73df;
+}
+
+.role-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #4e73df;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.role-actions {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s linear;
+}
+
+.role-card:hover .role-actions {
+    visibility: visible;
+    opacity: 1;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item-marker {
+    position: absolute;
+    left: -1.5rem;
+    width: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-item-marker-text {
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-item-marker-indicator {
+    height: 0.75rem;
+    width: 0.75rem;
+    border-radius: 100%;
+    background-color: #4e73df;
+}
+
+.timeline-item-content {
+    padding-left: 0.75rem;
+    border-left: 1px solid #e3e6f0;
+    padding-bottom: 1rem;
+}
+
+.timeline-item:last-child .timeline-item-content {
+    padding-bottom: 0;
+}
+
+.info-item {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.info-label {
+    font-weight: 600;
+    min-width: 140px;
+    color: #5a5c69;
+}
+
+.info-value {
+    flex: 1;
+}
+
+.stat-item {
+    padding: 1rem;
+    border-radius: 0.35rem;
+    background-color: #f8f9fc;
+    transition: all 0.2s;
+}
+
+.stat-item:hover {
+    background-color: #eaecf4;
+}
+
+.stat-icon {
+    color: #4e73df;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5a5c69;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #5a5c69;
+}
+
+/* Animation for role cards */
+.animate__fadeIn {
+    animation-duration: 0.5s;
+}
+
+.animate__fadeInUp {
+    animation-duration: 0.5s;
+}
+
+.animate__fadeInRight {
+    animation-duration: 0.5s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .info-item {
+        flex-direction: column;
+    }
+    
+    .info-label {
+        min-width: auto;
+        margin-bottom: 0.25rem;
+    }
+}

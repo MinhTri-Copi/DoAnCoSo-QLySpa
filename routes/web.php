@@ -55,9 +55,10 @@ Route::get('/customer/home', function () {
 
 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
-    Route::resource('ad-statuses', AdStatusController::class);
-    Route::get('ad-statuses/{id}/confirm-destroy', [AdStatusController::class, 'confirmDestroy'])->name('ad-statuses.confirm-destroy');
-
+    // Routes cho quản lý trạng thái quảng cáo
+    Route::resource('ad-statuses', AdStatusController::class, ['names' => 'admin.ad-statuses']);
+    Route::get('ad-statuses/{id}/confirm-destroy', [AdStatusController::class, 'confirmDestroy'])->name('admin.ad-statuses.confirm-destroy');
+    Route::get('ad-statuses-statistics', [AdStatusController::class, 'statistics'])->name('admin.ad-statuses.statistics');
 
     Route::resource('customers', CustomerController::class, ['names' => 'admin.customers']);
     Route::get('customers/{id}/confirm-destroy', [CustomerController::class, 'confirmDestroy'])->name('admin.customers.confirmDestroy');
@@ -67,7 +68,14 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
     Route::resource('advertisements', AdvertisementController::class, ['names' => 'admin.advertisements']);
     Route::get('advertisements/{id}/confirm-destroy', [AdvertisementController::class, 'confirmDestroy'])->name('admin.advertisements.confirm-destroy');
     Route::resource('roles', RoleController::class, ['names' => 'admin.roles']);
-    Route::get('roles/{id}/confirm-destroy', [RoleController::class, 'confirmDestroy'])->name('admin.roles.confirm-destroy');
+    Route::get('roles/{id}/confirm-destroy', [RoleController::class, 'confirmDestroy'])->name('admin.roles.confirmDestroy');
+    Route::post('roles/bulk-action', [RoleController::class, 'bulkAction'])->name('admin.roles.bulkAction');
+    
+    // API Routes for role statistics
+    Route::get('roles/{id}/stats/department', [RoleController::class, 'getDepartmentDistribution'])->name('admin.roles.stats.department');
+    Route::get('roles/{id}/stats/permissions/{period?}', [RoleController::class, 'getPermissionsComparison'])->name('admin.roles.stats.permissions');
+    Route::get('roles/{id}/stats/performance/{period?}', [RoleController::class, 'getPerformanceMetrics'])->name('admin.roles.stats.performance');
+    Route::get('roles/{id}/stats/topstaff/{period?}', [RoleController::class, 'getTopStaff'])->name('admin.roles.stats.topstaff');
 
     // Routes cho quản lý tài khoản
     Route::resource('accounts', AccountController::class, ['names' => 'admin.accounts']);
