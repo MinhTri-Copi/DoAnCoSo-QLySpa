@@ -52,11 +52,93 @@
         background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
         border-radius: 50%;
         z-index: 1;
+        animation: pulse 6s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.1) 20%, 
+            rgba(255,255,255,0.2) 40%, 
+            rgba(255,255,255,0.1) 60%, 
+            rgba(255,255,255,0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 5s infinite linear;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glitter-dot {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 3;
+        box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
+        animation: glitter 8s infinite;
+    }
+
+    .glitter-dot:nth-child(1) {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .glitter-dot:nth-child(2) {
+        width: 6px;
+        height: 6px;
+        top: 40%;
+        left: 30%;
+        animation-delay: 2s;
+    }
+
+    .glitter-dot:nth-child(3) {
+        width: 3px;
+        height: 3px;
+        top: 20%;
+        right: 25%;
+        animation-delay: 4s;
+    }
+
+    .glitter-dot:nth-child(4) {
+        width: 5px;
+        height: 5px;
+        bottom: 30%;
+        right: 15%;
+        animation-delay: 6s;
+    }
+
+    @keyframes glitter {
+        0% { transform: scale(0); opacity: 0; }
+        10% { transform: scale(1); opacity: 0.8; }
+        20% { transform: scale(0.2); opacity: 0.2; }
+        30% { transform: scale(1.2); opacity: 0.7; }
+        40% { transform: scale(0.5); opacity: 0.5; }
+        50% { transform: scale(1); opacity: 0.9; }
+        60% { transform: scale(0.3); opacity: 0.3; }
+        100% { transform: scale(0); opacity: 0; }
     }
 
     .header-content {
         position: relative;
-        z-index: 2;
+        z-index: 4;
     }
 
     .header-title {
@@ -74,7 +156,7 @@
         display: flex;
         gap: 1rem;
         position: relative;
-        z-index: 2;
+        z-index: 4;
     }
 
     /* Button Styles */
@@ -717,21 +799,35 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.4rem 1rem;
-        background: var(--light-pink);
-        color: var(--primary-pink);
+        padding: 0.6rem 1rem;
+        background: #e8f5e9;
+        color: #2e7d32;
         border-radius: 50px;
         font-size: 0.85rem;
         font-weight: 600;
+        border: 1px solid #4caf50;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
     }
 
     .active-filter-tag i {
         cursor: pointer;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
+        color: #4caf50;
+        background: rgba(76, 175, 80, 0.1);
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
     }
 
     .active-filter-tag i:hover {
-        opacity: 0.8;
+        background: rgba(76, 175, 80, 0.2);
+        transform: scale(1.1);
     }
 
     .highlight {
@@ -761,6 +857,11 @@
 <div class="container-fluid">
     <!-- Modern Dashboard Header -->
     <div class="room-dashboard-header">
+        <div class="header-shimmer"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
         <div class="header-content">
             <h1 class="header-title">Quản Lý Phòng</h1>
             <p class="header-subtitle">
@@ -987,7 +1088,7 @@
                                 <div class="stats-value">{{ $soLuong }}</div>
                             </div>
                         </li>
-            @endforeach
+                    @endforeach
                 </ul>
             </div>
         </div>
@@ -1187,6 +1288,10 @@
                     if (foundCard) {
                         // If found, scroll to and highlight the room
                         scrollToRoom(foundCard);
+                    } else {
+                        console.log("Không tìm thấy phòng nào phù hợp với từ khóa:", searchTerm);
+                        // Thông báo cho người dùng khi không tìm thấy kết quả
+                        alert(`Không tìm thấy phòng nào phù hợp với từ khóa: "${searchTerm}"`);
                     }
                     
                     // Apply filters normally
@@ -1195,6 +1300,17 @@
             }
         });
         
+        // Extract numeric value from string with better error handling
+        function extractNumericValue(text, defaultValue = 0) {
+            if (!text) return defaultValue;
+            // Tìm tất cả các số trong chuỗi
+            const matches = text.match(/\d[\d\s,.]*\d|\d+/);
+            if (!matches || matches.length === 0) return defaultValue;
+            
+            // Loại bỏ tất cả ký tự không phải số (giữ lại dấu thập phân nếu có)
+            return parseInt(matches[0].replace(/[^\d]/g, ''));
+        }
+        
         // Apply filters function
         function applyFilters() {
             console.log("Đang áp dụng bộ lọc...");
@@ -1202,14 +1318,22 @@
             // Clear active filters display
             activeFilters.innerHTML = '';
             
-            // Get filter values
-            const status = statusFilter.value;
-            const type = typeFilter.value;
+            // Add to the start of the function, add a normalize function for Vietnamese text
+            function normalizeVietnameseText(text) {
+                if (!text) return '';
+                // Chuyển về chữ thường và loại bỏ khoảng trắng thừa
+                return text.toLowerCase().trim()
+                    .replace(/\s+/g, ' ');
+            }
+            
+            // Get filter values and normalize them
+            const status = normalizeVietnameseText(statusFilter.value);
+            const type = normalizeVietnameseText(typeFilter.value);
             const minUsage = usageMin.value ? parseInt(usageMin.value) : 0;
             const maxUsage = usageMax.value ? parseInt(usageMax.value) : Infinity;
             const minRevenue = revenueMin.value ? parseInt(revenueMin.value) : 0;
             const maxRevenue = revenueMax.value ? parseInt(revenueMax.value) : Infinity;
-            const searchTerm = searchInput.value.toLowerCase().trim();
+            const searchTerm = normalizeVietnameseText(searchInput.value);
             
             console.log("Giá trị bộ lọc:", {
                 trạngThái: status,
@@ -1222,15 +1346,15 @@
             });
             
             // Add active filter tags
-            if (status) {
-                addFilterTag('Trạng thái: ' + status, function() {
+            if (statusFilter.value) {
+                addFilterTag('Trạng thái: ' + statusFilter.value, function() {
                     statusFilter.value = '';
                     applyFilters();
                 });
             }
             
-            if (type) {
-                addFilterTag('Loại phòng: ' + type, function() {
+            if (typeFilter.value) {
+                addFilterTag('Loại phòng: ' + typeFilter.value, function() {
                     typeFilter.value = '';
                     applyFilters();
                 });
@@ -1281,68 +1405,169 @@
             
             // Apply filters to cards
             roomCards.forEach(card => {
-                // Get card data
-                const roomName = card.getAttribute('data-name').toLowerCase();
-                const roomId = card.getAttribute('data-id').toLowerCase();
-                const roomType = card.getAttribute('data-type').toLowerCase();
-                const roomStatus = card.querySelector('.room-status').textContent.trim().toLowerCase();
-                const usageText = card.querySelector('.room-info-value:nth-of-type(3)').textContent.trim();
-                const revenueText = card.querySelector('.room-info-value:nth-of-type(4)').textContent.trim();
-                
-                // Parse usage and revenue values
-                const usage = parseInt(usageText.match(/\d+/)[0] || 0);
-                const revenue = parseInt(revenueText.replace(/\D/g, '') || 0);
-                
-                // So sánh chính xác hơn đối với trạng thái - sử dụng toLowerCase() và trim() cho cả hai bên
-                const matchesStatus = status === '' || 
-                    roomStatus.includes(status.toLowerCase().trim());
-                
-                // So sánh chính xác hơn đối với loại phòng
-                const matchesType = type === '' || 
-                    roomType.trim() === type.toLowerCase().trim() || 
-                    roomType.includes(type.toLowerCase().trim());
-                
-                // Check against filters
-                const matchesSearch = searchTerm === '' || 
-                    roomName.includes(searchTerm) || 
-                    roomId.includes(searchTerm) || 
-                    roomType.includes(searchTerm);
-                
-                const matchesUsage = (usageMin.value === '' || usage >= minUsage) && 
-                                    (usageMax.value === '' || usage <= maxUsage);
-                
-                const matchesRevenue = (revenueMin.value === '' || revenue >= minRevenue) && 
-                                      (revenueMax.value === '' || revenue <= maxRevenue);
-                
-                // Debug info cho phòng này
-                console.log(`Phòng: ${roomName} (${roomStatus})`, {
-                    "Trạng thái phòng": roomStatus,
-                    "Trạng thái đang lọc": status.toLowerCase(),
-                    "Khớp trạng thái": matchesStatus,
-                    "Khớp loại": matchesType,
-                    "Khớp lượt sử dụng": matchesUsage,
-                    "Khớp doanh thu": matchesRevenue,
-                    "Khớp từ khóa": matchesSearch
-                });
-                
-                // Show/hide based on all filters
-                if (matchesSearch && matchesStatus && matchesType && matchesUsage && matchesRevenue) {
-                    card.style.display = '';
-                    visibleCount++;
+                try {
+                    // Get card data with better error handling
+                    const roomName = normalizeVietnameseText(card.getAttribute('data-name'));
+                    const roomId = normalizeVietnameseText(card.getAttribute('data-id'));
+                    const roomType = normalizeVietnameseText(card.getAttribute('data-type'));
                     
-                    // Highlight search term if present
-                    if (searchTerm) {
-                        highlightSearchTerm(card, searchTerm);
-                    } else {
-                        // Remove any existing highlights
-                        removeHighlights(card);
+                    // Get status with error handling
+                    const statusElement = card.querySelector('.room-status');
+                    const roomStatus = normalizeVietnameseText(statusElement ? statusElement.textContent : '');
+                    
+                    // Get info values with better selector specificity
+                    const infoItems = card.querySelectorAll('.room-info-item');
+                    let usageText = '0 lần';
+                    let revenueText = '0 VNĐ';
+                    
+                    // Lấy giá trị sử dụng từ item thứ 3 (index 2)
+                    if (infoItems.length >= 3) {
+                        const usageValue = infoItems[2].querySelector('.room-info-value');
+                        if (usageValue) usageText = usageValue.textContent.trim();
                     }
-                } else {
-                    card.style.display = 'none';
+                    
+                    // Lấy giá trị doanh thu từ item thứ 4 (index 3)
+                    if (infoItems.length >= 4) {
+                        const revenueValue = infoItems[3].querySelector('.room-info-value');
+                        if (revenueValue) revenueText = revenueValue.textContent.trim();
+                    }
+                    
+                    // Parse usage và revenue values với hàm trích xuất cải tiến
+                    const usage = extractNumericValue(usageText);
+                    const revenue = extractNumericValue(revenueText);
+                    
+                    // So sánh chính xác hơn đối với trạng thái - sau khi đã chuẩn hóa
+                    let matchesStatus = true;
+                    if (status !== '') {
+                        matchesStatus = roomStatus === status || roomStatus.includes(status);
+                        console.log(`So sánh trạng thái: '${roomStatus}' với '${status}' => ${matchesStatus}`);
+                    }
+                    
+                    // So sánh chính xác hơn đối với loại phòng - sau khi đã chuẩn hóa
+                    let matchesType = true;
+                    if (type !== '') {
+                        matchesType = roomType === type || roomType.includes(type);
+                    }
+                    
+                    // Check against filters
+                    const matchesSearch = searchTerm === '' || 
+                                         roomName.includes(searchTerm) || 
+                                         roomId.includes(searchTerm) || 
+                                         roomType.includes(searchTerm);
+                    
+                    const matchesUsage = (usageMin.value === '' || usage >= minUsage) && 
+                                        (usageMax.value === '' || usage <= maxUsage);
+                    
+                    const matchesRevenue = (revenueMin.value === '' || revenue >= minRevenue) && 
+                                          (revenueMax.value === '' || revenue <= maxRevenue);
+                    
+                    // Debug info chi tiết hơn cho phòng này
+                    console.log(`Phòng: ${roomName} (${roomStatus})`, {
+                        "Trạng thái phòng (chuẩn hóa)": roomStatus,
+                        "Trạng thái đang lọc (chuẩn hóa)": status,
+                        "Khớp trạng thái": matchesStatus,
+                        "Loại phòng (chuẩn hóa)": roomType,
+                        "Loại đang lọc (chuẩn hóa)": type, 
+                        "Khớp loại": matchesType,
+                        "Lượt sử dụng": usage,
+                        "Khớp lượt sử dụng": matchesUsage,
+                        "Doanh thu": revenue,
+                        "Khớp doanh thu": matchesRevenue,
+                        "Khớp từ khóa": matchesSearch
+                    });
+                    
+                    // Show/hide based on all filters
+                    if (matchesSearch && matchesStatus && matchesType && matchesUsage && matchesRevenue) {
+                        card.style.display = '';
+                        visibleCount++;
+                        
+                        // Highlight search term if present
+                        if (searchTerm) {
+                            highlightSearchTerm(card, searchTerm);
+                        } else {
+                            // Remove any existing highlights
+                            removeHighlights(card);
+                        }
+                    } else {
+                        card.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi xử lý phòng:", error, error.stack);
+                    // Hiển thị phòng nếu có lỗi (để không bỏ sót phòng do lỗi)
+                    card.style.display = '';
+                    visibleCount++; // Đảm bảo phòng này vẫn được tính
                 }
             });
             
             console.log(`Tổng cộng: ${visibleCount} phòng được hiển thị sau khi lọc`);
+            
+            // Thêm thông báo vào grid với màu xanh lá và dấu tick
+            if (!document.getElementById('filterResultsMessage')) {
+                const filterResults = document.createElement('div');
+                filterResults.id = 'filterResultsMessage';
+                filterResults.className = 'col-12 text-center py-5';
+                filterResults.innerHTML = `
+                    <div class="alert alert-success" role="alert" style="display: inline-block; background-color: #e8f5e9; border-color: #4caf50; color: #2e7d32; border-radius: 10px; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.1);">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h4 class="text-success">Lọc áp dụng thành công</h4>
+                        <p class="text-muted">Các phòng phù hợp đã được hiển thị</p>
+                        <button class="btn mt-3" id="clearAllFilters" style="background-color: #4caf50; color: white; border-radius: 50px; padding: 8px 20px;">
+                            <i class="fas fa-sync-alt"></i>
+                            Đặt lại bộ lọc
+                        </button>
+                    </div>
+                `;
+                roomGrid.appendChild(filterResults);
+                
+                // Thêm sự kiện cho nút xóa tất cả bộ lọc
+                document.getElementById('clearAllFilters').addEventListener('click', function() {
+                    resetFilterBtn.click();
+                });
+                
+                // Tự động ẩn thông báo sau 5 giây
+                setTimeout(function() {
+                    const message = document.getElementById('filterResultsMessage');
+                    if (message) {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 1s ease';
+                        setTimeout(function() {
+                            if (message.parentNode) {
+                                message.parentNode.removeChild(message);
+                            }
+                        }, 1000);
+                    }
+                }, 5000);
+            }
+            
+            // Hiển thị kết quả tìm thấy 0 phòng
+            if (visibleCount === 0) {
+                if (!document.getElementById('noResultsMessage')) {
+                    const noResults = document.createElement('div');
+                    noResults.id = 'noResultsMessage';
+                    noResults.className = 'col-12 text-center py-5';
+                    noResults.innerHTML = `
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>Không tìm thấy phòng phù hợp</h4>
+                        <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+                        <button class="btn-room btn-primary-room mt-3" id="clearAllFiltersNoResults">
+                            <i class="fas fa-times"></i>
+                            Xóa tất cả bộ lọc
+                        </button>
+                    `;
+                    roomGrid.appendChild(noResults);
+                    
+                    // Thêm sự kiện cho nút xóa tất cả bộ lọc
+                    document.getElementById('clearAllFiltersNoResults').addEventListener('click', function() {
+                        resetFilterBtn.click();
+                    });
+                }
+            } else {
+                // Xóa thông báo không tìm thấy kết quả nếu có
+                const noResults = document.getElementById('noResultsMessage');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
         }
         
         // Highlight search term in card text
@@ -1352,7 +1577,10 @@
             
             // Find text nodes in the card and highlight the term
             const titleElement = card.querySelector('.room-card-title');
-            const headerText = titleElement.childNodes[0];
+            if (!titleElement) return;
+            
+            const headerText = Array.from(titleElement.childNodes)
+                .find(node => node.nodeType === Node.TEXT_NODE);
             
             if (headerText && headerText.nodeType === Node.TEXT_NODE) {
                 const text = headerText.nodeValue;
@@ -1404,9 +1632,15 @@
         function addFilterTag(text, removeCallback) {
             const tag = document.createElement('div');
             tag.className = 'active-filter-tag';
-            tag.innerHTML = `${text} <i class="fas fa-times"></i>`;
+            tag.innerHTML = `${text}`; // Bỏ icon check ở đầu
             
-            tag.querySelector('i').addEventListener('click', removeCallback);
+            // Thêm nút xóa riêng ở cuối
+            const removeBtn = document.createElement('i');
+            removeBtn.className = 'fas fa-times';
+            removeBtn.style.marginLeft = 'auto';
+            removeBtn.addEventListener('click', removeCallback);
+            tag.appendChild(removeBtn);
+            
             activeFilters.appendChild(tag);
         }
         
@@ -1416,11 +1650,30 @@
         // Đảm bảo cập nhật ngay lập tức khi người dùng thay đổi các bộ lọc
         statusFilter.addEventListener('change', function() {
             console.log("Đã thay đổi bộ lọc trạng thái:", this.value);
-            applyFilters();
         });
         
         typeFilter.addEventListener('change', function() {
             console.log("Đã thay đổi bộ lọc loại phòng:", this.value);
+        });
+        
+        // Thêm sự kiện input cho các ô nhập số
+        usageMin.addEventListener('input', function() {
+            console.log("Đã thay đổi lượt sử dụng tối thiểu:", this.value);
+            applyFilters();
+        });
+        
+        usageMax.addEventListener('input', function() {
+            console.log("Đã thay đổi lượt sử dụng tối đa:", this.value);
+            applyFilters();
+        });
+        
+        revenueMin.addEventListener('input', function() {
+            console.log("Đã thay đổi doanh thu tối thiểu:", this.value);
+            applyFilters();
+        });
+        
+        revenueMax.addEventListener('input', function() {
+            console.log("Đã thay đổi doanh thu tối đa:", this.value);
             applyFilters();
         });
         
@@ -1428,6 +1681,24 @@
         applyFilterBtn.addEventListener('click', function() {
             console.log("Đã nhấn nút áp dụng bộ lọc");
             applyFilters();
+            
+            // Tự động cuộn xuống danh sách phòng sau khi lọc
+            setTimeout(() => {
+                const roomGrid = document.getElementById('roomGrid');
+                if (roomGrid) {
+                    roomGrid.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start'
+                    });
+                    
+                    // Thêm hiệu ứng highlight cho roomGrid
+                    roomGrid.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.5)';
+                    setTimeout(() => {
+                        roomGrid.style.boxShadow = '';
+                        roomGrid.style.transition = 'box-shadow 0.5s ease';
+                    }, 1500);
+                }
+            }, 200); // Chờ một chút để đảm bảo bộ lọc đã được áp dụng
         });
         
         resetFilterBtn.addEventListener('click', function() {
@@ -1450,6 +1721,12 @@
             
             // Clear active filters
             activeFilters.innerHTML = '';
+            
+            // Xóa thông báo không tìm thấy kết quả nếu có
+            const noResults = document.getElementById('noResultsMessage');
+            if (noResults) {
+                noResults.remove();
+            }
             
             console.log("Đã đặt lại bộ lọc hoàn tất");
         });
@@ -1487,6 +1764,8 @@
             option.textContent = status;
             statusSelect.appendChild(option);
         });
+        
+        // KHÔNG tự động áp dụng bộ lọc khi trang tải xong
     });
 </script>
 @endsection

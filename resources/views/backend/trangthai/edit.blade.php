@@ -458,8 +458,8 @@
                             <input type="text" name="Matrangthai" class="form-control" value="{{ old('Matrangthai', $trangThai->Matrangthai) }}" readonly>
                             <div class="help-text">Mã trạng thái hiện tại (không thể thay đổi)</div>
                         </div>
-                    </div>
-                    
+        </div>
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Tên Trạng Thái <span class="required">*</span></label>
@@ -479,7 +479,7 @@
                         Quay Lại
                     </a>
                 </div>
-            </form>
+    </form>
         </div>
     </div>
 </div>
