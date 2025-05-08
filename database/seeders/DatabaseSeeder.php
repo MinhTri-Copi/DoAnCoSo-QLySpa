@@ -146,5 +146,9 @@ class DatabaseSeeder extends Seeder
             ['Matrangthai' => 7, 'Tentrangthai' => 'Chờ phản hồi'],
             ['Matrangthai' => 8, 'Tentrangthai' => 'Đã phản hồi'],
         ]);
+
+        $this->call([
+            UpdateDichVuSeeder::class,
+        ]);
     }
 }

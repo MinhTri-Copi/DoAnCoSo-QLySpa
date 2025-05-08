@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DichVu;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DichVuController extends Controller
 {
@@ -25,6 +26,8 @@ class DichVuController extends Controller
             'Tendichvu' => 'required|string|max:255',
             'Gia' => 'required|numeric|min:0',
             'MoTa' => 'nullable|string|max:500',
+            'Image' => 'nullable|string|max:255',
+            'Thoigian' => 'required|date_format:H:i',
         ], [
             'MaDV.required' => 'Mã dịch vụ không được để trống.',
             'MaDV.unique' => 'Mã dịch vụ đã tồn tại.',
@@ -34,13 +37,22 @@ class DichVuController extends Controller
             'Gia.numeric' => 'Giá phải là số.',
             'Gia.min' => 'Giá không được nhỏ hơn 0.',
             'MoTa.max' => 'Mô tả không được vượt quá 500 ký tự.',
+            'Image.max' => 'Đường dẫn hình ảnh không được vượt quá 255 ký tự.',
+            'Thoigian.required' => 'Thời gian không được để trống.',
+            'Thoigian.date_format' => 'Thời gian không đúng định dạng (HH:mm).',
         ]);
+
+        // Chuyển đổi thời gian thành datetime
+        $thoigian = Carbon::createFromFormat('H:i', $request->Thoigian);
+        $thoigian->setDate(Carbon::now()->year, Carbon::now()->month, Carbon::now()->day);
 
         DichVu::create([
             'MaDV' => $request->MaDV,
             'Tendichvu' => $request->Tendichvu,
             'Gia' => $request->Gia,
             'MoTa' => $request->MoTa,
+            'Image' => $request->Image,
+            'Thoigian' => $thoigian,
         ]);
 
         return redirect()->route('admin.dichvu.index')->with('success', 'Thêm dịch vụ thành công!');
@@ -67,6 +79,8 @@ class DichVuController extends Controller
             'Tendichvu' => 'required|string|max:255',
             'Gia' => 'required|numeric|min:0',
             'MoTa' => 'nullable|string|max:500',
+            'Image' => 'nullable|string|max:255',
+            'Thoigian' => 'required|date_format:H:i',
         ], [
             'MaDV.required' => 'Mã dịch vụ không được để trống.',
             'MaDV.unique' => 'Mã dịch vụ đã tồn tại.',
@@ -76,13 +90,22 @@ class DichVuController extends Controller
             'Gia.numeric' => 'Giá phải là số.',
             'Gia.min' => 'Giá không được nhỏ hơn 0.',
             'MoTa.max' => 'Mô tả không được vượt quá 500 ký tự.',
+            'Image.max' => 'Đường dẫn hình ảnh không được vượt quá 255 ký tự.',
+            'Thoigian.required' => 'Thời gian không được để trống.',
+            'Thoigian.date_format' => 'Thời gian không đúng định dạng (HH:mm).',
         ]);
+
+        // Chuyển đổi thời gian thành datetime
+        $thoigian = Carbon::createFromFormat('H:i', $request->Thoigian);
+        $thoigian->setDate(Carbon::now()->year, Carbon::now()->month, Carbon::now()->day);
 
         $dichVu->update([
             'MaDV' => $request->MaDV,
             'Tendichvu' => $request->Tendichvu,
             'Gia' => $request->Gia,
             'MoTa' => $request->MoTa,
+            'Image' => $request->Image,
+            'Thoigian' => $thoigian,
         ]);
 
         return redirect()->route('admin.dichvu.index')->with('success', 'Cập nhật dịch vụ thành công!');

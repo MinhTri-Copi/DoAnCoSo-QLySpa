@@ -9,8 +9,13 @@ class DichVu extends Model
     protected $table = 'DICHVU';
     protected $primaryKey = 'MaDV';
     public $incrementing = false;
-    protected $fillable = ['MaDV', 'Tendichvu', 'Gia', 'MoTa'];
+    protected $fillable = ['MaDV', 'Tendichvu', 'Gia', 'MoTa', 'Image', 'Thoigian'];
     public $timestamps = false;
+
+    protected $casts = [
+        'Thoigian' => 'datetime',
+        'Gia' => 'decimal:4'
+    ];
 
     public function datLich()
     {
