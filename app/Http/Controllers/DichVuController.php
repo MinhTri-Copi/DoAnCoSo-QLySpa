@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DichVu;
+use App\Models\TrangThai;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -10,8 +11,9 @@ class DichVuController extends Controller
 {
     public function index()
     {
-        $dichVus = DichVu::all();
-        return view('backend.dichvu.index', compact('dichVus'));
+        $dichVus = DichVu::with('trangThai')->get();
+        $trangThais = TrangThai::all();
+        return view('backend.dichvu.index', compact('dichVus', 'trangThais'));
     }
 
     public function create()
@@ -127,5 +129,23 @@ class DichVuController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('admin.dichvu.index')->with('error', 'Không thể xóa dịch vụ vì có dữ liệu liên quan!');
         }
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $dichVu = DichVu::findOrFail($id);
+
+        $request->validate([
+            'Matrangthai' => 'required|exists:TRANGTHAI,Matrangthai',
+        ], [
+            'Matrangthai.required' => 'Vui lòng chọn trạng thái.',
+            'Matrangthai.exists' => 'Trạng thái không hợp lệ.',
+        ]);
+
+        $dichVu->update([
+            'Matrangthai' => $request->Matrangthai,
+        ]);
+
+        return redirect()->route('admin.dichvu.index')->with('success', 'Cập nhật trạng thái dịch vụ thành công!');
     }
 }

@@ -103,6 +103,7 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
    // Route cho quản lý dịch vụ (DICHVU)
    Route::resource('dichvu', DichVuController::class, ['names' => 'admin.dichvu']);
    Route::get('dichvu/{id}/confirm-destroy', [DichVuController::class, 'confirmDestroy'])->name('admin.dichvu.confirm-destroy');
+   Route::put('dichvu/{id}/update-status', [DichVuController::class, 'updateStatus'])->name('admin.dichvu.update-status');
 
 
    //Route cho quản lý đặt lịch (DATLICH)
