@@ -43,7 +43,7 @@ a:focus {
 }
 
 body {
-  font-family: "Quicksand", sans-serif;
+  font-family: "Roboto", "Noto Sans", sans-serif;
   background-color: #ffffff !important;
   color: #333;
   line-height: 1.6;

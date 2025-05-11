@@ -104,7 +104,10 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
    Route::resource('dichvu', DichVuController::class, ['names' => 'admin.dichvu']);
    Route::get('dichvu/{id}/confirm-destroy', [DichVuController::class, 'confirmDestroy'])->name('admin.dichvu.confirm-destroy');
    Route::put('dichvu/{id}/update-status', [DichVuController::class, 'updateStatus'])->name('admin.dichvu.update-status');
-
+   Route::get('dichvu/analytics/data', [DichVuController::class, 'analytics'])->name('admin.dichvu.analytics');
+   Route::get('dichvu/export/csv', [DichVuController::class, 'export'])->name('admin.dichvu.export');
+   Route::post('dichvu/{id}/toggle-featured', [DichVuController::class, 'toggleFeatured'])->name('admin.dichvu.toggle-featured');
+   Route::get('api/services', [DichVuController::class, 'apiServices'])->name('api.services');
 
    //Route cho quản lý đặt lịch (DATLICH)
    Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich']);
