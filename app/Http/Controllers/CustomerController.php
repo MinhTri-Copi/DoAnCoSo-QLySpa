@@ -56,19 +56,20 @@ class CustomerController extends Controller
             // Sorting
             $sortField = $request->input('sort_by', 'Manguoidung');
             $sortDirection = $request->input('sort_direction', 'asc');
-            $query->orderBy($sortField, $sortDirection);
             
             // Eager loading to reduce DB queries
-            $query->with(['account', 'hangThanhVien']);
+            $query->with(['account', 'hangThanhVien', 'hoaDon', 'datLich', 'datLich.dichVu']);
             
-            // Pagination with remembered state
-            $perPage = $request->input('per_page', 10);
-            $customers = $query->paginate($perPage)->withQueryString();
+            // Get all customers for statistics
+            $allCustomers = $query->get();
+            
+            // Paginate results for display
+            $customers = $query->orderBy($sortField, $sortDirection)->paginate(10)->withQueryString();
             
             // Get membership levels for filter dropdown
             $membershipLevels = HangThanhVien::select('Tenhang')->distinct()->pluck('Tenhang');
             
-            return view('backend.customers.index', compact('customers', 'membershipLevels'));
+            return view('backend.customers.index', compact('customers', 'membershipLevels', 'allCustomers'));
         } catch (\Exception $e) {
             Log::error('Error in customer index: ' . $e->getMessage());
             return back()->with('error', 'Có lỗi xảy ra khi tải danh sách khách hàng: ' . $e->getMessage());

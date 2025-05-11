@@ -33,6 +33,27 @@
             --header-height: 60px;
             --footer-height: 50px;
         }
+        
+        /* Override sidebar colors for consistent pink theme */
+        .sidebar {
+            --primary-color: #ff6b95;
+            --primary-light: #ffdbe9;
+            --primary-dark: #e84a78;
+        }
+        
+        .menu-link:hover {
+            background-color: #ff6b95 !important;
+        }
+        
+        .submenu li a:hover {
+            background-color: #ff6b95 !important;
+        }
+        
+        .menu-item.active .menu-link, 
+        .menu-link.active {
+            color: white !important;
+            background-color: #ff6b95 !important;
+        }
     </style>
 </head>
 <body>

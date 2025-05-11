@@ -3,15 +3,178 @@
 @section('styles')
 <link href="{{ asset('css/admin/customers.css') }}" rel="stylesheet">
 <style>
+    :root {
+        --primary-pink: #ff6b95;
+        --dark-pink: #e84a78;
+        --light-pink: #ffdbe9;
+        --light-pink-hover: #ffd0e1;
+        --pink-gradient: linear-gradient(135deg, #ff6b95 0%, #ff4778 100%);
+        --text-color: #455a64;
+        --border-color: #e0e0e0;
+        --bg-light: #f9f9f9;
+    }
+    
+    /* Additional fix for select boxes */
+    select.form-control, 
+    select.form-control-spa,
+    #MaTK {
+        text-indent: 0 !important;
+        padding-left: 15px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
+    
+    /* Ensure the text in options is fully visible */
+    select option {
+        padding: 10px !important;
+        text-overflow: unset !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        width: 100% !important;
+    }
+    
     /* Spa-themed styles for edit page */
+    .customer-dashboard-header {
+        background: linear-gradient(135deg, #ff6b95 0%, #ff4778 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 8px 25px rgba(255, 107, 149, 0.25);
+        color: white;
+    }
+
+    .customer-dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: pulse 6s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.1) 20%, 
+            rgba(255,255,255,0.2) 40%, 
+            rgba(255,255,255,0.1) 60%, 
+            rgba(255,255,255,0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 5s infinite linear;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glitter-dot {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 3;
+        box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
+        animation: glitter 8s infinite;
+    }
+
+    .glitter-dot:nth-child(1) {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .glitter-dot:nth-child(2) {
+        width: 6px;
+        height: 6px;
+        top: 40%;
+        left: 30%;
+        animation-delay: 2s;
+    }
+
+    .glitter-dot:nth-child(3) {
+        width: 3px;
+        height: 3px;
+        top: 20%;
+        right: 25%;
+        animation-delay: 4s;
+    }
+
+    .glitter-dot:nth-child(4) {
+        width: 5px;
+        height: 5px;
+        bottom: 30%;
+        right: 15%;
+        animation-delay: 6s;
+    }
+
+    @keyframes glitter {
+        0% { transform: scale(0); opacity: 0; }
+        10% { transform: scale(1); opacity: 0.8; }
+        20% { transform: scale(0.2); opacity: 0.2; }
+        30% { transform: scale(1.2); opacity: 0.7; }
+        40% { transform: scale(0.5); opacity: 0.5; }
+        50% { transform: scale(1); opacity: 0.9; }
+        60% { transform: scale(0.3); opacity: 0.3; }
+        100% { transform: scale(0); opacity: 0; }
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 4;
+    }
+
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .header-subtitle {
+        font-size: 1rem;
+        opacity: 0.85;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 4;
+    }
+    
     .page-heading {
-        background: linear-gradient(120deg, var(--spa-primary), var(--spa-primary-dark));
+        background: linear-gradient(135deg, #ff6b95 0%, #ff4778 100%);
         border-radius: 10px;
         padding: 2rem;
         color: white;
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 8px 25px rgba(255, 107, 149, 0.25);
     }
     
     .page-heading::after {
@@ -26,17 +189,56 @@
         opacity: 0.1;
     }
     
-    .form-control-spa {
+    .form-group label {
+        font-weight: 600;
+        color: var(--primary-pink);
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .text-danger {
+        color: var(--primary-pink) !important;
+    }
+    
+    .form-group small {
+        color: #8a94a6;
+    }
+    
+    .form-control-spa, .form-control {
         border-radius: 50px;
-        padding: 0.75rem 1.5rem;
+        padding: 0.85rem 1.5rem;
         border: 1px solid #e2e8f0;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
         transition: all 0.3s ease;
+        height: calc(2.5rem + 2px);
+        font-size: 1rem;
     }
     
-    .form-control-spa:focus {
-        border-color: var(--spa-primary);
-        box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.25);
+    textarea.form-control-spa, textarea.form-control {
+        height: auto;
+        min-height: 100px;
+        padding-left: 1.5rem;
+    }
+    
+    .input-group-spa {
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    
+    .input-group-spa .form-control {
+        padding-left: 1.5rem;
+        height: calc(2.5rem + 2px);
+        border-radius: 50px;
+    }
+    
+    .row {
+        margin-bottom: 1.5rem;
+    }
+    
+    hr {
+        margin: 2rem 0;
+        border-color: rgba(255, 107, 149, 0.1);
+        opacity: 0.5;
     }
     
     .btn-spa {
@@ -67,21 +269,22 @@
         box-shadow: 0 6px 15px rgba(0, 109, 119, 0.3);
     }
     
-    .form-group label {
-        font-weight: 600;
-        color: var(--spa-dark);
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-group small {
-        color: var(--spa-gray);
+    .input-group-spa i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-pink);
+        z-index: 10;
+        font-size: 1rem;
     }
     
     .radio-spa {
-        margin-right: 1rem;
-        cursor: pointer;
-        display: inline-flex;
+        margin-right: 2rem;
+        margin-bottom: 0.5rem;
+        display: flex;
         align-items: center;
+        cursor: pointer;
     }
     
     .radio-spa input {
@@ -93,8 +296,8 @@
     .radio-spa-checkmark {
         position: relative;
         display: inline-block;
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         margin-right: 8px;
         background-color: #fff;
         border: 2px solid #e2e8f0;
@@ -103,7 +306,7 @@
     }
     
     .radio-spa input:checked ~ .radio-spa-checkmark {
-        border-color: var(--spa-primary);
+        border-color: var(--primary-pink);
     }
     
     .radio-spa-checkmark:after {
@@ -112,32 +315,324 @@
         display: none;
         top: 3px;
         left: 3px;
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        background: var(--spa-primary);
+        background: var(--primary-pink);
     }
     
     .radio-spa input:checked ~ .radio-spa-checkmark:after {
         display: block;
     }
     
-    .membership-select {
-        background-color: white;
-        border-radius: 50px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-        padding: 0.75rem 1.5rem;
+    .membership-display {
+        padding: 1.5rem;
+        background: rgba(255, 107, 149, 0.05);
+        border-radius: 16px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
     }
     
-    .membership-select option {
+    .spa-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .membership-regular {
+        background-color: var(--light-pink);
+        color: var(--dark-pink);
+    }
+    
+    .membership-vip {
+        background: linear-gradient(120deg, #ffd700, #daa520);
+        color: white;
+        box-shadow: 0 3px 10px rgba(218, 165, 32, 0.3);
+    }
+    
+    .membership-platinum {
+        background: linear-gradient(120deg, #e0e0e0, #a9a9a9);
+        color: white;
+        box-shadow: 0 3px 10px rgba(169, 169, 169, 0.3);
+    }
+    
+    .membership-diamond {
+        background: linear-gradient(120deg, #b3e5fc, #4fc3f7);
+        color: white;
+        box-shadow: 0 3px 10px rgba(79, 195, 247, 0.3);
+    }
+
+    .spa-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .spa-card-header {
+        padding: 1.5rem 2rem;
+        background: rgba(255, 107, 149, 0.05);
+        border-bottom: 1px solid rgba(255, 107, 149, 0.1);
+    }
+
+    .spa-card-body {
+        padding: 2.5rem;
+    }
+
+    /* Form styling */
+    .form-section-title {
+        color: var(--primary-pink);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px dashed rgba(255, 107, 149, 0.2);
+        padding-bottom: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.8rem;
+        position: relative;
+    }
+
+    /* Đảm bảo select box đủ rộng để hiển thị nội dung */
+    .form-group select {
+        width: 100%;
+        display: block;
+        overflow: visible !important;
+        text-overflow: unset !important;
+    }
+
+    /* Loại bỏ cơ chế truncate text */
+    select option {
+        white-space: normal;
+        overflow: visible;
+        width: auto;
         padding: 10px;
     }
     
-    .timeline-spa {
+    /* Fix cho #MaTK dropdown */
+    #MaTK {
+        padding-left: 1.5rem !important;
+        text-overflow: unset !important;
+        overflow: visible !important;
+        border-radius: 50px;
+        background-position: right 1rem center !important;
+    }
+
+    /* Đảm bảo select box hiển thị full text khi được chọn */
+    select:focus option:checked {
+        font-weight: bold;
+        display: block;
+    }
+
+    /* Đặc biệt cho #MaTK */
+    #MaTK {
+        width: 100% !important;
+        padding-right: 2.5rem !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        text-overflow: unset !important;
+        height: auto !important;
+        min-height: calc(2.5rem + 2px);
+        word-break: normal !important;
+        text-indent: 0 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: -0.2px;
+    }
+
+    /* Larger padding for dropdown to fit text */
+    .form-group select#MaTK option {
+        padding: 10px 15px !important;
+        white-space: normal !important;
+        font-size: 0.95rem !important;
+    }
+    
+    /* Adjust text rendering in form controls */
+    .form-control, .form-control-spa {
+        text-rendering: optimizeLegibility;
+    }
+
+    .form-control-spa:focus, .form-control:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 149, 0.25);
+    }
+
+    .input-group-spa {
+        margin-bottom: 0.5rem;
         position: relative;
-        padding-left: 1.5rem;
-        margin: 0 0 0 1rem;
+    }
+
+    .input-group-spa i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-pink);
+        z-index: 10;
+        font-size: 1rem;
+    }
+
+    .row {
+        margin-bottom: 1.5rem;
+    }
+
+    hr {
+        margin: 2rem 0;
+        border-color: rgba(255, 107, 149, 0.1);
+        opacity: 0.5;
+    }
+
+    /* Gender selector */
+    .gender-selector {
+        display: flex;
+        gap: 2rem;
+        margin-top: 0.5rem;
+    }
+    
+    .radio-spa {
+        margin-right: 2rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .radio-spa input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .radio-spa-checkmark {
+        position: relative;
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        margin-right: 8px;
+        background-color: #fff;
+        border: 2px solid #e2e8f0;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+    
+    .radio-spa input:checked ~ .radio-spa-checkmark {
+        border-color: var(--primary-pink);
+    }
+    
+    .radio-spa-checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        top: 3px;
+        left: 3px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary-pink);
+    }
+    
+    .radio-spa input:checked ~ .radio-spa-checkmark:after {
+        display: block;
+    }
+    
+    /* Buttons */
+    .header-actions {
+        display: flex;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 4;
+    }
+
+    .btn-light {
+        background-color: white;
+        color: var(--primary-pink);
+        border-radius: 50px;
+        padding: 0.8rem 1.8rem;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-light:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        background-color: white;
+        color: var(--dark-pink);
+    }
+
+    .btn-icon-inner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+    }
+
+    .btn-text {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-cancel {
+        background-color: white;
+        color: var(--primary-pink);
+        border-radius: 50px;
+        padding: 0.8rem 1.8rem;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,107,149,0.3);
+        display: inline-flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        background-color: #FFF0F5;
+        color: var(--dark-pink);
+        border-color: rgba(255,107,149,0.5);
+    }
+
+    .btn-save-changes {
+        background: linear-gradient(135deg, #ff6b95 0%, #ff4778 100%);
+        color: white;
+        border-radius: 50px;
+        padding: 0.8rem 1.8rem;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(255,107,149,0.3);
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 1rem;
+        font-size: 1rem;
+    }
+
+    .btn-save-changes:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255,107,149,0.4);
+        background: linear-gradient(135deg, #ff6b95 10%, #e84a78 100%);
+    }
+
+    /* Timeline styling with pink color */
+    .timeline-spa {
+        padding-left: 2rem;
+        margin: 1rem 0 0 1.5rem;
+        position: relative;
     }
     
     .timeline-spa::before {
@@ -147,12 +642,12 @@
         left: 0;
         height: 100%;
         width: 2px;
-        background: var(--spa-primary-light);
+        background: var(--light-pink);
     }
     
     .timeline-item-spa {
+        padding-bottom: 2rem;
         position: relative;
-        padding-bottom: 1.5rem;
     }
     
     .timeline-marker-spa {
@@ -161,9 +656,9 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background: var(--spa-primary);
+        background: var(--primary-pink);
         border: 3px solid white;
-        box-shadow: 0 0 0 2px var(--spa-primary-light);
+        box-shadow: 0 0 0 2px var(--light-pink);
     }
     
     .timeline-date-spa {
@@ -173,29 +668,270 @@
     }
     
     .timeline-content-spa {
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
         background: white;
         border-radius: 12px;
-        padding: 1rem;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1rem;
     }
-    
-    .input-group-spa {
-        position: relative;
+
+    .invalid-feedback {
+        color: var(--dark-pink);
+        margin-top: 0.5rem;
+        margin-left: 1rem;
     }
-    
-    .input-group-spa i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--spa-gray);
-        z-index: 10;
+
+    .form-buttons {
+        margin-top: 3rem;
+        text-align: right;
     }
-    
-    .input-group-spa .form-control {
-        padding-left: 40px;
+
+    body {
+        color: var(--text-color);
+    }
+
+    /* Select and dropdown styling */
+    select.form-control, 
+    select.form-control-spa,
+    .membership-select {
+        background-color: white;
         border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        padding: 0.85rem 1.5rem;
+        height: calc(2.5rem + 2px);
+        font-size: 1rem;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff6b95'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 1rem center !important;
+        background-size: 1.2rem !important;
+        padding-right: 2.5rem !important; /* Ensure space for dropdown arrow */
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    /* Fix specifically for the MaTK select dropdown */
+    #MaTK {
+        width: 100%;
+        padding-right: 2.5rem !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        text-overflow: unset !important;
+        height: auto !important;
+        min-height: calc(2.5rem + 2px);
+        word-break: normal !important;
+    }
+
+    /* Ensure dropdown width is enough for content */
+    select.form-control option, 
+    select.form-control-spa option,
+    .membership-select option {
+        padding: 10px;
+        font-size: 1rem;
+        white-space: normal;
+        width: auto;
+    }
+
+    /* Fix for select boxes to prevent text truncation */
+    .form-control, 
+    .form-control-spa, 
+    select.membership-select,
+    select.form-control {
+        padding-right: 2.5rem !important;
+        text-overflow: unset !important;
+        overflow: visible !important;
+        white-space: normal !important;
+    }
+    
+    /* Fix dropdown arrow positioning */
+    select.form-control, 
+    select.form-control-spa,
+    .membership-select {
+        background-position: right 0.75rem center !important;
+        padding-right: 2rem !important;
+    }
+    
+    /* Fix for select dropdown options */
+    select option {
+        padding: 10px !important;
+        white-space: normal !important;
+    }
+    
+    /* Enhanced styling for membership select */
+    .membership-select {
+        width: 100% !important;
+        overflow: visible !important;
+        border-radius: 50px !important;
+    }
+
+    /* Adjust text clipping in all selects */
+    .form-group select,
+    .form-group .form-control,
+    .form-group .form-control-spa,
+    .form-group .membership-select {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        width: 100% !important;
+        display: block !important;
+        padding-right: 2.5rem !important;
+    }
+    
+    /* Fix specifically for the dropdown appearance when clicked */
+    .form-group select:focus,
+    .form-group select:active {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+    
+    /* Fix dropdown option display */
+    .form-group select option {
+        white-space: normal !important;
+        overflow: visible !important;
+        padding: 8px 12px !important;
+    }
+
+    /* Reset any overflow or text clipping for dropdowns */
+    #membership_level, #MaTK {
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        padding-left: 20px !important;
+        padding-right: 32px !important;
+        appearance: auto !important;
+        -webkit-appearance: auto !important;
+        -moz-appearance: auto !important;
+    }
+    
+    /* Ensure text is not cut off */
+    .form-control option, 
+    #membership_level option, 
+    #MaTK option {
+        padding: 8px !important;
+        white-space: normal !important;
+    }
+    
+    /* Clean up conflicting styles */
+    .form-group select {
+        background-image: none !important;
+    }
+
+    /* Complete reset for select elements */
+    #membership_level {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        padding: 10px 40px 10px 20px !important;
+        font-size: 16px !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 50px !important;
+        background-color: white !important;
+        text-align: left !important;
+        /* Remove all text clipping properties */
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        /* Override appearance */
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        /* Custom dropdown arrow */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23ff6b95'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E") !important;
+        background-position: right 15px center !important;
+        background-repeat: no-repeat !important;
+        background-size: 16px !important;
+    }
+    
+    /* Make sure dropdown options are normal */
+    #membership_level option {
+        font-size: 16px !important;
+        padding: 10px !important;
+        white-space: normal !important;
+    }
+    
+    /* Fix dropdown containers */
+    .position-relative {
+        position: relative !important;
+        width: 100% !important;
+    }
+
+    /* Custom Pink Dropdown Styling */
+    .custom-pink-dropdown {
+        position: relative;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .custom-pink-dropdown-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .custom-pink-dropdown-toggle:hover {
+        border-color: var(--primary-pink);
+    }
+
+    .custom-pink-dropdown-text {
+        font-size: 16px;
+        color: var(--text-color);
+    }
+
+    .custom-pink-dropdown-arrow {
+        color: var(--primary-pink);
+        font-size: 14px;
+        transition: transform 0.2s ease;
+    }
+
+    .custom-pink-dropdown-toggle.active .custom-pink-dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .custom-pink-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        overflow: visible !important;
+        display: none;
+        border: 1px solid rgba(255, 107, 149, 0.2);
+    }
+
+    .custom-pink-dropdown-menu.show {
+        display: block;
+    }
+
+    .custom-pink-dropdown-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .custom-pink-dropdown-item:hover {
+        background-color: var(--light-pink-hover);
+    }
+    
+    .custom-pink-dropdown-item.selected {
+        background-color: white;
+        color: var(--text-color);
+        font-weight: 400;
+    }
+
+    .row, .col-md-6, .form-group {
+        overflow: visible !important;
     }
 </style>
 @endsection
@@ -203,22 +939,33 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
-    <div class="page-heading mb-4">
-        <div class="row">
-            <div class="col-md-6">
-                <h1 class="h3 mb-2 text-white font-weight-bold">Chỉnh Sửa Khách Hàng</h1>
-                <p class="mb-0 text-white opacity-75">
+    <div class="customer-dashboard-header">
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="header-shimmer"></div>
+        
+        <div class="header-content">
+            <h1 class="header-title">Chỉnh Sửa Khách Hàng</h1>
+            <p class="header-subtitle">
                     <i class="fas fa-user-edit mr-1"></i> Cập nhật và quản lý thông tin khách hàng của bạn
                 </p>
             </div>
-            <div class="col-md-6 text-right">
-                <a href="{{ route('admin.customers.show', $customer->Manguoidung) }}" class="btn btn-spa btn-spa-secondary mr-2">
-                    <i class="fas fa-eye mr-1"></i> Xem Chi Tiết
-                </a>
-                <a href="{{ route('admin.customers.index') }}" class="btn btn-spa btn-spa-secondary">
-                    <i class="fas fa-arrow-left mr-1"></i> Quay Lại
-                </a>
-            </div>
+        
+        <div class="header-actions">
+            <a href="{{ route('admin.customers.show', $customer->Manguoidung) }}" class="btn btn-light" style="margin-right: 10px;">
+                <span class="btn-icon-inner">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <span class="btn-text">XEM CHI TIẾT</span>
+            </a>
+            <a href="{{ route('admin.customers.index') }}" class="btn btn-light">
+                <span class="btn-icon-inner">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span class="btn-text">QUAY LẠI</span>
+            </a>
         </div>
     </div>
 
@@ -256,13 +1003,17 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="Manguoidung">Mã Khách Hàng</label>
+                                    <label for="Manguoidung">
+                                        <i class="fas fa-fingerprint"></i> Mã Khách Hàng
+                                    </label>
                                     <input type="text" class="form-control form-control-spa" id="Manguoidung" value="{{ $customer->Manguoidung }}" readonly>
                                     <small class="form-text text-muted">Mã khách hàng không thể thay đổi</small>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="MaTK">Tài Khoản <span class="text-danger">*</span></label>
+                                    <label for="MaTK">
+                                        <i class="fas fa-user-lock"></i> Tài Khoản <span class="text-danger">*</span>
+                                    </label>
                                     <select class="form-control form-control-spa @error('MaTK') is-invalid @enderror" id="MaTK" name="MaTK">
                                         <option value="">-- Chọn Tài Khoản --</option>
                                         @foreach($accounts as $account)
@@ -277,7 +1028,9 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="Hoten">Họ Tên <span class="text-danger">*</span></label>
+                                    <label for="Hoten">
+                                        <i class="fas fa-user"></i> Họ Tên <span class="text-danger">*</span>
+                                    </label>
                                     <input type="text" class="form-control form-control-spa @error('Hoten') is-invalid @enderror" 
                                         id="Hoten" name="Hoten" value="{{ old('Hoten', $customer->Hoten) }}">
                                     @error('Hoten')
@@ -286,9 +1039,10 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="SDT">Số Điện Thoại <span class="text-danger">*</span></label>
+                                    <label for="SDT">
+                                        <i class="fas fa-phone-alt"></i> Số Điện Thoại <span class="text-danger">*</span>
+                                    </label>
                                     <div class="input-group-spa">
-                                        <i class="fas fa-phone"></i>
                                         <input type="text" class="form-control @error('SDT') is-invalid @enderror" 
                                             id="SDT" name="SDT" value="{{ old('SDT', $customer->SDT) }}">
                                     </div>
@@ -300,9 +1054,10 @@
                             
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="Email">Email <span class="text-danger">*</span></label>
+                                    <label for="Email">
+                                        <i class="fas fa-envelope"></i> Email <span class="text-danger">*</span>
+                                    </label>
                                     <div class="input-group-spa">
-                                        <i class="fas fa-envelope"></i>
                                         <input type="email" class="form-control @error('Email') is-invalid @enderror" 
                                             id="Email" name="Email" value="{{ old('Email', $customer->Email) }}">
                                     </div>
@@ -312,7 +1067,9 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="DiaChi">Địa Chỉ <span class="text-danger">*</span></label>
+                                    <label for="DiaChi">
+                                        <i class="fas fa-map-marker-alt"></i> Địa Chỉ <span class="text-danger">*</span>
+                                    </label>
                                     <textarea class="form-control form-control-spa @error('DiaChi') is-invalid @enderror" 
                                         id="DiaChi" name="DiaChi" rows="3" style="border-radius: 20px;">{{ old('DiaChi', $customer->DiaChi) }}</textarea>
                                     @error('DiaChi')
@@ -321,9 +1078,10 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="Ngaysinh">Ngày Sinh <span class="text-danger">*</span></label>
+                                    <label for="Ngaysinh">
+                                        <i class="fas fa-birthday-cake"></i> Ngày Sinh <span class="text-danger">*</span>
+                                    </label>
                                     <div class="input-group-spa">
-                                        <i class="fas fa-calendar-alt"></i>
                                         <input type="date" class="form-control @error('Ngaysinh') is-invalid @enderror" 
                                             id="Ngaysinh" name="Ngaysinh" value="{{ old('Ngaysinh', $customer->Ngaysinh) }}">
                                     </div>
@@ -333,8 +1091,10 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label>Giới Tính <span class="text-danger">*</span></label>
-                                    <div style="margin-top: 8px;">
+                                    <label>
+                                        <i class="fas fa-venus-mars"></i> Giới Tính <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="gender-selector">
                                         <label class="radio-spa">
                                             <input type="radio" name="Gioitinh" value="Nam" 
                                                 {{ old('Gioitinh', $customer->Gioitinh) == 'Nam' ? 'checked' : '' }}>
@@ -357,52 +1117,13 @@
                         
                         <hr class="mt-0 mb-4" style="opacity: 0.1;">
                         
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <label for="membership_level">Hạng Thành Viên</label>
-                                    <select class="form-control membership-select" id="membership_level" name="membership_level">
-                                        <option value="Thường" {{ $customer->hangThanhVien->first() && $customer->hangThanhVien->first()->Tenhang == 'Thường' ? 'selected' : '' }}>Thường</option>
-                                        <option value="VIP" {{ $customer->hangThanhVien->first() && $customer->hangThanhVien->first()->Tenhang == 'VIP' ? 'selected' : '' }}>VIP</option>
-                                        <option value="Platinum" {{ $customer->hangThanhVien->first() && $customer->hangThanhVien->first()->Tenhang == 'Platinum' ? 'selected' : '' }}>Platinum</option>
-                                        <option value="Diamond" {{ $customer->hangThanhVien->first() && $customer->hangThanhVien->first()->Tenhang == 'Diamond' ? 'selected' : '' }}>Diamond</option>
-                                    </select>
-                                    <small class="form-text text-muted mt-2"><i class="fas fa-info-circle mr-1"></i> Nâng cấp hạng thành viên sẽ tự động thêm điểm thưởng</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="membership-display text-center">
-                                    @php
-                                        $hangName = $customer->hangThanhVien->first() ? $customer->hangThanhVien->first()->Tenhang : 'Thường';
-                                        $badgeClass = 'membership-regular';
-                                        
-                                        if($hangName == 'VIP') {
-                                            $badgeClass = 'membership-vip';
-                                        } elseif($hangName == 'Platinum') {
-                                            $badgeClass = 'membership-platinum';
-                                        } elseif($hangName == 'Diamond') {
-                                            $badgeClass = 'membership-diamond';
-                                        }
-                                    @endphp
-                                    <div class="spa-badge {{ $badgeClass }}" style="margin: 0 auto; display: inline-flex; transform: scale(1.2);">
-                                        @if($hangName != 'Thường')
-                                            <i class="fas fa-crown mr-1"></i>
-                                        @endif
-                                        {{ $hangName }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-5">
-                            <div class="col-md-12 text-right">
-                                <a href="{{ route('admin.customers.index') }}" class="btn btn-spa btn-spa-secondary mr-2">
+                        <div class="form-buttons">
+                            <a href="{{ route('admin.customers.index') }}" class="btn btn-cancel">
                                     <i class="fas fa-times mr-1"></i> Hủy
                                 </a>
-                                <button type="submit" class="btn btn-spa btn-spa-primary" id="submitBtn">
+                            <button type="submit" class="btn btn-save-changes" id="submitBtn">
                                     <i class="fas fa-save mr-1"></i> Lưu Thay Đổi
                                 </button>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -424,19 +1145,19 @@
                         <h4 class="customer-profile-name-spa">{{ $customer->Hoten }}</h4>
                         @php
                             $hangTV = $customer->hangThanhVien->first();
-                            $hangName = $hangTV ? $hangTV->Tenhang : 'Thường';
+                            $hangName = $hangTV ? $hangTV->Tenhang : 'Thành viên Bạc';
                             $badgeClass = 'membership-regular';
                             
-                            if($hangName == 'VIP') {
+                            if($hangName == 'Thành viên Vàng') {
                                 $badgeClass = 'membership-vip';
-                            } elseif($hangName == 'Platinum') {
+                            } elseif($hangName == 'Thành viên Bạch Kim') {
                                 $badgeClass = 'membership-platinum';
-                            } elseif($hangName == 'Diamond') {
+                            } elseif($hangName == 'Thành viên Kim Cương') {
                                 $badgeClass = 'membership-diamond';
                             }
                         @endphp
                         <div class="spa-badge {{ $badgeClass }}" style="margin-bottom: 1.5rem;">
-                            @if($hangName != 'Thường')
+                            @if($hangName != 'Thành viên Bạc')
                                 <i class="fas fa-crown mr-1"></i>
                             @endif
                             {{ $hangName }}
@@ -598,4 +1319,58 @@ function hexToRgb($hex) {
 
 @section('scripts')
 <script src="{{ asset('js/admin/customers/edit.js') }}"></script>
+<script>
+    // Custom dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize membership level dropdown
+        const membershipToggle = document.getElementById('membership_level_toggle');
+        const membershipMenu = document.getElementById('membership_level_menu');
+        const membershipItems = membershipMenu.querySelectorAll('.custom-pink-dropdown-item');
+        const membershipInput = document.getElementById('membership_level_hidden');
+        const membershipText = membershipToggle.querySelector('.custom-pink-dropdown-text');
+        
+        // Mark current selection as selected
+        const currentValue = membershipInput.value;
+        membershipItems.forEach(item => {
+            if(item.dataset.value === currentValue) {
+                item.classList.add('selected');
+            }
+        });
+        
+        // Toggle dropdown on click
+        membershipToggle.addEventListener('click', function() {
+            membershipToggle.classList.toggle('active');
+            membershipMenu.classList.toggle('show');
+        });
+        
+        // Handle item selection
+        membershipItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const value = item.dataset.value;
+                
+                // Update hidden input
+                membershipInput.value = value;
+                
+                // Update displayed text
+                membershipText.textContent = value;
+                
+                // Update selected item
+                membershipItems.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                // Close dropdown
+                membershipToggle.classList.remove('active');
+                membershipMenu.classList.remove('show');
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!membershipToggle.contains(event.target) && !membershipMenu.contains(event.target)) {
+                membershipToggle.classList.remove('active');
+                membershipMenu.classList.remove('show');
+            }
+        });
+    });
+</script>
 @endsection
