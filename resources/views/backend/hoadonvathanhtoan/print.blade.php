@@ -315,12 +315,12 @@
         
         <div class="invoice-header">
             <div class="company-info">
-                <div class="company-name">SPA BEAUTY</div>
+                <div class="company-name">Rosa Spa Beauty</div>
                 <div class="company-details">
                     123 Đường Nguyễn Huệ, Quận 1, TP.HCM<br>
                     Điện thoại: (028) 1234 5678<br>
-                    Email: info@spabeauty.com<br>
-                    Website: www.spabeauty.com
+                    Email: info@rosaspabeauty.com<br>
+                    Website: www.rosaspabeauty.com
                 </div>
             </div>
             <div>
@@ -414,7 +414,7 @@
                 </div>
                 <div class="summary-row">
                     <div class="total-label">Tổng thanh toán:</div>
-                    <div class="total-value">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
+                    <div class="total-value">{{ number_format($hoaDon->Tongtien * 1.1, 0, ',', '.') }} VNĐ</div>
                 </div>
             </div>
             
@@ -440,7 +440,7 @@
                 <div class="signature-box">
                     <div class="signature-title">Người lập hóa đơn</div>
                     <div class="signature-line"></div>
-                    <div>Nhân viên SPA BEAUTY</div>
+                    <div>Nhân viên Rosa Spa Beauty</div>
                 </div>
                 
                 <div class="signature-box">
@@ -458,9 +458,9 @@
         
         <div class="invoice-footer">
             <div class="footer-thanks">Cảm ơn quý khách đã sử dụng dịch vụ!</div>
-            <div class="footer-message">Chúc quý khách có những trải nghiệm tuyệt vời tại SPA BEAUTY.</div>
+            <div class="footer-message">Chúc quý khách có những trải nghiệm tuyệt vời tại Rosa Spa Beauty.</div>
             <div class="footer-info">
-                <div>© {{ date('Y') }} SPA BEAUTY. Tất cả các quyền được bảo lưu.</div>
+                <div>© {{ date('Y') }} Rosa Spa Beauty. Tất cả các quyền được bảo lưu.</div>
                 <div>Mã số thuế: 0123456789</div>
             </div>
         </div>
