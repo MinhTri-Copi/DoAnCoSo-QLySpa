@@ -260,9 +260,6 @@
     <form action="{{ route('admin.hoadonvathanhtoan.store') }}" method="POST" id="invoiceForm">
         @csrf
         
-        <div class="form-  }}" method="POST" id="invoiceForm">
-        @csrf
-        
         <div class="form-group">
             <label for="MaHD" class="form-label">Mã Hóa Đơn</label>
             <input type="text" class="form-control" id="MaHD" name="MaHD" value="{{ old('MaHD', $suggestedMaHD) }}" readonly>
@@ -410,33 +407,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cập nhật thông tin đặt lịch khi chọn
     datLichSelect.addEventListener('change', function() {
         if (this.value) {
+            // Hiển thị loading
+            bookingInfo.style.display = 'block';
+            serviceName.textContent = 'Đang tải...';
+            bookingTime.textContent = 'Đang tải...';
+            servicePrice.textContent = 'Đang tải...';
+            bookingStatus.textContent = 'Đang tải...';
+            
             // Gọi API để lấy thông tin chi tiết về đặt lịch
-            fetch(`/admin/datlich/${this.value}`)
+            fetch(`/admin/api/datlich/${this.value}`)
                 .then(response => response.json())
                 .then(data => {
-                    serviceName.textContent = data.dichVu ? data.dichVu.Tendichvu : 'N/A';
-                    bookingTime.textContent = new Date(data.Thoigiandatlich).toLocaleString('vi-VN');
-                    servicePrice.textContent = data.dichVu ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.dichVu.Gia) : 'N/A';
-                    bookingStatus.textContent = data.Trangthai_;
-                    
-                    // Cập nhật tổng tiền dựa trên giá dịch vụ
-                    if (data.dichVu && data.dichVu.Gia) {
-                        tongTienInput.value = data.dichVu.Gia;
+                    if (data.success && data.data) {
+                        const booking = data.data;
+                        
+                        // Log dữ liệu để debug
+                        console.log('Booking data:', booking);
+                        
+                        serviceName.textContent = booking.dich_vu ? booking.dich_vu.Tendichvu : 'N/A';
+                        bookingTime.textContent = new Date(booking.Thoigiandatlich).toLocaleString('vi-VN');
+                        bookingStatus.textContent = booking.Trangthai_;
+                        
+                        // Hiển thị giá dịch vụ và cập nhật tổng tiền
+                        if (booking.dich_vu && booking.dich_vu.Gia) {
+                            // Đảm bảo rằng giá là số
+                            let serviceGia = parseFloat(booking.dich_vu.Gia);
+                            console.log('Service price:', serviceGia);
+                            
+                            if (!isNaN(serviceGia)) {
+                                // Hiển thị giá dịch vụ đã định dạng
+                                servicePrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(serviceGia);
+                                
+                                // Cập nhật tổng tiền
+                                tongTienInput.value = serviceGia;
+                            } else {
+                                servicePrice.textContent = 'Không xác định';
+                            }
+                        } else {
+                            servicePrice.textContent = 'N/A';
+                        }
+                        
+                        // Cập nhật người dùng
+                        if (booking.Manguoidung) {
+                            userSelect.value = booking.Manguoidung;
+                        }
+                    } else {
+                        serviceName.textContent = 'Không thể tải dữ liệu';
+                        bookingTime.textContent = 'Không thể tải dữ liệu';
+                        servicePrice.textContent = 'Không thể tải dữ liệu';
+                        bookingStatus.textContent = 'Không thể tải dữ liệu';
+                        console.error('API error:', data);
                     }
-                    
-                    // Cập nhật người dùng
-                    if (data.Manguoidung) {
-                        userSelect.value = data.Manguoidung;
-                    }
-                    
-                    bookingInfo.style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Error fetching booking details:', error);
-                    bookingInfo.style.display = 'none';
+                    serviceName.textContent = 'Lỗi kết nối';
+                    bookingTime.textContent = 'Lỗi kết nối';
+                    servicePrice.textContent = 'Lỗi kết nối';
+                    bookingStatus.textContent = 'Lỗi kết nối';
                 });
         } else {
             bookingInfo.style.display = 'none';
+            tongTienInput.value = 0;
         }
     });
     

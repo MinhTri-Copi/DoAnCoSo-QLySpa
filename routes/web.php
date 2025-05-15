@@ -155,3 +155,6 @@ Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController
     
 });
 
+// API để lấy thông tin đặt lịch cho hóa đơn
+Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
+
