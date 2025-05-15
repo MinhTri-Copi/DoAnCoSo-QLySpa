@@ -423,7 +423,7 @@
         display: flex;
         justify-content: flex-end;
         margin-top: 20px;
-        gap: 5px;
+        gap: 8px;
     }
 
     .page-item {
@@ -434,24 +434,35 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 35px;
-        height: 35px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background-color: white;
         border: 1px solid var(--border-color);
         color: #495057;
         text-decoration: none;
+        font-weight: 500;
         transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .page-item.active .page-link {
         background-color: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
+        box-shadow: 0 4px 8px rgba(255, 107, 139, 0.3);
     }
 
     .page-link:hover {
         background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        color: #adb5bd;
+        cursor: not-allowed;
     }
 
     .empty-state {
@@ -780,7 +791,50 @@
             Hiển thị {{ $datLichs->firstItem() ?? 0 }} đến {{ $datLichs->lastItem() ?? 0 }} của {{ $datLichs->total() }} bản ghi
         </div>
         <div>
-            {{ $datLichs->appends(request()->query())->links() }}
+            @if ($datLichs->hasPages())
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {{-- Previous Page Link --}}
+                        @if ($datLichs->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $datLichs->appends(request()->except('page'))->previousPageUrl() }}" rel="prev" aria-label="@lang('pagination.previous')">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @foreach ($datLichs->appends(request()->except('page'))->getUrlRange(max(1, $datLichs->currentPage() - 2), min($datLichs->lastPage(), $datLichs->currentPage() + 2)) as $page => $url)
+                            @if ($page == $datLichs->currentPage())
+                                <li class="page-item active">
+                                    <span class="page-link">{{ $page }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                </li>
+                            @endif
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if ($datLichs->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $datLichs->appends(request()->except('page'))->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            @endif
         </div>
     </div>
 </div>
