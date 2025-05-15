@@ -1,6 +1,6 @@
 <footer class="admin-footer">
     <div class="footer-left">
-        <p>© {{ date('Y') }} Rosa Spa. Tất cả quyền được bảo lưu.</p>
+        <p>© {{ date('Y') }} Rosa Spa Beauty. Tất cả quyền được bảo lưu.</p>
     </div>
     
     <div class="footer-center">

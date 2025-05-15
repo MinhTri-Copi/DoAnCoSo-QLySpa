@@ -757,6 +757,7 @@
                     </td>
                     <td>
                         <div style="font-weight: 500; color: var(--primary-color);">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
+                        <div style="font-size: 12px; color: #6c757d;">Đã bao gồm VAT (10%)</div>
                     </td>
                     <td>
                         @if($hoaDon->phuongThuc)
