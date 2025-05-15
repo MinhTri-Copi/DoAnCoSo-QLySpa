@@ -738,6 +738,10 @@
                                 <div>
                                     <div style="font-weight: 500;">{{ $hoaDon->user->Hoten }}</div>
                                     <div style="font-size: 12px; color: #6c757d;">{{ $hoaDon->user->SDT ?? 'N/A' }}</div>
+                                    <div style="font-size: 12px; color: var(--success-color);">
+                                        <i class="fas fa-star"></i> 
+                                        {{ number_format($hoaDon->user->lsDiemThuong->sum('Sodiem')) }} điểm
+                                    </div>
                                 </div>
                             </div>
                         @else

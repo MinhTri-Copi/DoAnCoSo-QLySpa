@@ -133,7 +133,11 @@ Route::get('datlich-dashboard', [DatLichDashboardController::class, 'index'])->n
 
     // Routes cho quản lý lịch sử điểm thưởng (LSDIEMTHUONG)
     Route::resource('lsdiemthuong', PointHistoryController::class, ['names' => 'admin.lsdiemthuong']);
-    Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirm-destroy');
+    Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirmDestroy');
+    Route::get('lsdiemthuong-statistics', [PointHistoryController::class, 'statistics'])->name('admin.lsdiemthuong.statistics');
+    Route::get('lsdiemthuong-export-excel', [PointHistoryController::class, 'exportExcel'])->name('admin.lsdiemthuong.exportExcel');
+    Route::get('lsdiemthuong/get-user-details/{id}', [PointHistoryController::class, 'getUserDetails']);
+    Route::get('lsdiemthuong/get-invoice-details/{id}', [PointHistoryController::class, 'getInvoiceDetails']);
 
 // Route cho quản lý hóa đơn và thanh toán
 Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
