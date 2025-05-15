@@ -2,6 +2,10 @@
 
 @section('title', 'Quản Lý Đặt Lịch')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+@endsection
+
 @section('content')
 <style>
     :root {
@@ -15,6 +19,195 @@
         --danger-color: #dc3545;
         --warning-color: #ffc107;
         --info-color: #17a2b8;
+        --primary-pink: #ff6b95;
+        --light-pink: #ffdbe9;
+        --dark-pink: #e84a78;
+        --shadow-pink: 0 8px 25px rgba(255, 107, 149, 0.14);
+        --transition-fast: all 0.2s ease;
+        --transition-medium: all 0.3s ease;
+        --radius-lg: 24px;
+        --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 5px 25px rgba(0, 0, 0, 0.07);
+    }
+
+    .spa-dashboard-header {
+        background: linear-gradient(135deg, var(--primary-pink) 0%, #ff92b6 100%);
+        border-radius: var(--radius-lg);
+        padding: 2.2rem 3rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-pink);
+        max-height: 160px;
+    }
+
+    .spa-dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: pulse 6s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.1) 20%, 
+            rgba(255,255,255,0.2) 40%, 
+            rgba(255,255,255,0.1) 60%, 
+            rgba(255,255,255,0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 5s infinite linear;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glitter-dot {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 3;
+        box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
+        animation: glitter 8s infinite;
+    }
+
+    .glitter-dot:nth-child(1) {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .glitter-dot:nth-child(2) {
+        width: 6px;
+        height: 6px;
+        top: 40%;
+        left: 30%;
+        animation-delay: 2s;
+    }
+
+    .glitter-dot:nth-child(3) {
+        width: 3px;
+        height: 3px;
+        top: 20%;
+        right: 25%;
+        animation-delay: 4s;
+    }
+
+    .glitter-dot:nth-child(4) {
+        width: 5px;
+        height: 5px;
+        bottom: 30%;
+        right: 15%;
+        animation-delay: 6s;
+    }
+
+    @keyframes glitter {
+        0% { transform: scale(0); opacity: 0; }
+        10% { transform: scale(1); opacity: 0.8; }
+        20% { transform: scale(0.2); opacity: 0.2; }
+        30% { transform: scale(1.2); opacity: 0.7; }
+        40% { transform: scale(0.5); opacity: 0.5; }
+        50% { transform: scale(1); opacity: 0.9; }
+        60% { transform: scale(0.3); opacity: 0.3; }
+        100% { transform: scale(0); opacity: 0; }
+    }
+
+    .spa-header-content {
+        position: relative;
+        z-index: 4;
+    }
+
+    .spa-header-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.5px;
+    }
+
+    .spa-header-subtitle {
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+    }
+
+    .spa-header-subtitle i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .spa-header-action {
+        position: relative;
+        z-index: 4;
+    }
+
+    .spa-btn-add {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-pink);
+        border: none;
+        font-size: 1.05rem;
+        font-weight: 600;
+        padding: 0.8rem 1.7rem;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: var(--transition-fast);
+        text-decoration: none;
+    }
+
+    .spa-btn-add i {
+        font-size: 0.8rem;
+        background: rgba(255, 107, 149, 0.15);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transition-fast);
+    }
+
+    .spa-btn-add:hover {
+        background: white;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        color: var(--dark-pink);
+        text-decoration: none;
+    }
+
+    .spa-btn-add:hover i {
+        background: rgba(255, 107, 149, 0.25);
+        transform: rotate(90deg);
     }
 
     .header-container {
@@ -512,18 +705,32 @@
     }
 </style>
 
-<div class="header-container">
-    <div>
-        <div class="header-title">Quản Lý Đặt Lịch</div>
-        <div class="header-subtitle">Quản lý và theo dõi lịch đặt dịch vụ</div>
+<div class="spa-dashboard-header animate__animated animate__fadeIn">
+    <div class="header-shimmer"></div>
+    <div class="glitter-dot"></div>
+    <div class="glitter-dot"></div>
+    <div class="glitter-dot"></div>
+    <div class="glitter-dot"></div>
+    
+    <div class="spa-header-content">
+        <h1 class="spa-header-title" style="color: #ffffff;">Quản Lý Đặt Lịch</h1>
+        <p class="spa-header-subtitle">
+            <i class="fas fa-calendar-alt"></i>
+            Quản lý và theo dõi lịch đặt dịch vụ
+        </p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.datlich.statistics') }}" class="btn-pink">
-            <i class="fas fa-chart-bar"></i> Thống Kê
-        </a>
-        <a href="{{ route('admin.datlich.create') }}" class="btn-pink">
-            <i class="fas fa-plus"></i> Thêm Lịch Đặt
-        </a>
+    
+    <div class="spa-header-action">
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.datlich.statistics') }}" class="spa-btn-add me-2">
+                <i class="fas fa-chart-bar"></i>
+                <span>Thống Kê</span>
+            </a>
+            <a href="{{ route('admin.datlich.create') }}" class="spa-btn-add">
+                <i class="fas fa-plus"></i>
+                <span>Thêm Lịch Đặt</span>
+            </a>
+        </div>
     </div>
 </div>
 
