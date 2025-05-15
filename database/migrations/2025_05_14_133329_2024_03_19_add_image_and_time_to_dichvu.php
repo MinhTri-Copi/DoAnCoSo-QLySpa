@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('DICHVU', function (Blueprint $table) {
             $table->string('Image', 255)->nullable()->after('MoTa');
-            $table->dateTime('Thoigian')->nullable()->after('Image')->comment('Thời gian thực hiện dịch vụ');
+            $table->Time('Thoigian')->nullable()->after('Image')->comment('Thời gian thực hiện dịch vụ');
         });
     }
 
@@ -20,4 +20,4 @@ return new class extends Migration
             $table->dropColumn(['Image', 'Thoigian']);
         });
     }
-}; 
+};
