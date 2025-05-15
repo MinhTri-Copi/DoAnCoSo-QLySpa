@@ -177,14 +177,22 @@
         flex: 1;
         min-width: 200px;
         position: relative;
+        margin-bottom: 15px;
     }
 
     .search-box input {
         width: 100%;
-        padding: 10px 15px 10px 40px;
+        padding: 12px 15px 12px 40px;
         border: 1px solid var(--border-color);
         border-radius: 50px;
         font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .search-box input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: none;
     }
 
     .search-box i {
@@ -215,6 +223,108 @@
         border-radius: 50px;
         font-size: 14px;
         min-width: 150px;
+    }
+
+    /* CSS cho bộ lọc ngày tháng */
+    .date-filters {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        width: 100%;
+        border: 1px solid var(--border-color);
+    }
+    
+    .date-filter-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .date-filter-title::before {
+        content: '';
+        width: 4px;
+        height: 14px;
+        background-color: var(--primary-color);
+        margin-right: 8px;
+        border-radius: 2px;
+        display: inline-block;
+    }
+    
+    .date-filter-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .date-filter-item {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .date-filter-item label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+        color: #495057;
+    }
+    
+    .date-filter-item input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .date-filter-item input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: none;
+    }
+    
+    /* Màu sắc và style riêng cho từng loại */
+    .single-date label i {
+        color: #28a745; /* Xanh lá */
+    }
+    
+    .from-date label i {
+        color: #007bff; /* Xanh dương */
+    }
+    
+    .to-date label i {
+        color: #fd7e14; /* Cam */
+    }
+    
+    .single-date input {
+        border-left: 4px solid #28a745;
+    }
+    
+    .from-date input {
+        border-left: 4px solid #007bff;
+    }
+    
+    .to-date input {
+        border-left: 4px solid #fd7e14;
+    }
+    
+    .date-range {
+        position: relative;
+    }
+    
+    .date-range::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50px;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 2px;
+        background-color: #dee2e6;
     }
 
     .table-responsive {
@@ -416,6 +526,7 @@
         $pendingBookings = $datLichs->where('Trangthai_', 'Chờ xác nhận')->count();
         $confirmedBookings = $datLichs->where('Trangthai_', 'Đã xác nhận')->count();
         $completedBookings = $datLichs->where('Trangthai_', 'Hoàn thành')->count();
+        $cancelledBookings = $datLichs->where('Trangthai_', 'Đã hủy')->count();
     @endphp
     
     <div class="stat-card">
@@ -461,6 +572,17 @@
             <div class="stat-progress-bar progress-4"></div>
         </div>
     </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <div class="stat-value">{{ $cancelledBookings }}</div>
+        <div class="stat-label">Đã Huỷ</div>
+        <div class="stat-progress">
+            <div class="stat-progress-bar" style="background-color: #dc3545; width: {{ min(100, ($cancelledBookings / 30) * 100) }}%"></div>
+        </div>
+    </div>
 </div>
 
 <div class="content-card">
@@ -477,6 +599,11 @@
     
     <form action="{{ route('admin.datlich.index') }}" method="GET" id="filterForm">
         <div class="search-filter-container" id="filterContainer">
+            <div class="search-box mb-3 w-100">
+                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên người dùng, dịch vụ, mã đặt lịch..." value="{{ request('search') }}">
+                <i class="fas fa-search"></i>
+            </div>
+            
             <div class="filter-box">
                 <select name="user_id" class="filter-select">
                     <option value="">-- Tất cả người dùng --</option>
@@ -506,16 +633,33 @@
                 </select>
             </div>
             
-            <div class="filter-box">
-                <input type="date" name="date" class="filter-date" placeholder="Ngày" value="{{ request('date') }}">
+            <div class="date-filters">
+                <div class="date-filter-title">Lọc theo thời gian</div>
                 
-                <input type="date" name="date_from" class="filter-date" placeholder="Từ ngày" value="{{ request('date_from') }}">
+                <div class="date-filter-group">
+                    <div class="date-filter-item single-date">
+                        <label for="date"><i class="fas fa-calendar-day"></i> Ngày cụ thể</label>
+                        <input type="date" name="date" id="date" class="filter-date" placeholder="Ngày" value="{{ request('date') }}">
+                    </div>
+                </div>
                 
-                <input type="date" name="date_to" class="filter-date" placeholder="Đến ngày" value="{{ request('date_to') }}">
+                <div class="date-filter-title mt-3">Lọc theo khoảng thời gian</div>
+                
+                <div class="date-filter-group date-range">
+                    <div class="date-filter-item from-date">
+                        <label for="date_from"><i class="fas fa-calendar-minus"></i> Từ ngày</label>
+                        <input type="date" name="date_from" id="date_from" class="filter-date" placeholder="Từ ngày" value="{{ request('date_from') }}">
+                    </div>
+                    
+                    <div class="date-filter-item to-date">
+                        <label for="date_to"><i class="fas fa-calendar-plus"></i> Đến ngày</label>
+                        <input type="date" name="date_to" id="date_to" class="filter-date" placeholder="Đến ngày" value="{{ request('date_to') }}">
+                    </div>
+                </div>
             </div>
             
             <div class="filter-box">
-                <button type="submit" class="btn-pink">
+                <button type="submit" class="btn-pink" id="searchBtn">
                     <i class="fas fa-search"></i> Tìm Kiếm
                 </button>
                 
@@ -650,6 +794,97 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleFilters.addEventListener('click', function() {
         filterContainer.style.display = filterContainer.style.display === 'none' ? 'flex' : 'none';
     });
+    
+    // Xử lý form tìm kiếm
+    const filterForm = document.getElementById('filterForm');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    searchBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Loại bỏ các trường không có giá trị để URL gọn hơn
+        const formInputs = filterForm.querySelectorAll('input, select');
+        let hasValue = false;
+        
+        formInputs.forEach(input => {
+            if (!input.value) {
+                input.disabled = true;
+            } else {
+                hasValue = true;
+            }
+        });
+        
+        // Nếu không có điều kiện nào, vẫn submit form để hiển thị tất cả
+        if (!hasValue) {
+            formInputs.forEach(input => {
+                input.disabled = false;
+            });
+        }
+        
+        // Submit form
+        filterForm.submit();
+    });
+    
+    // Khi nhấn Enter trong ô tìm kiếm thì submit form
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchBtn.click();
+            }
+        });
+    }
+    
+    // Xử lý các ô ngày tháng
+    const dateInput = document.getElementById('date');
+    const dateFromInput = document.getElementById('date_from');
+    const dateToInput = document.getElementById('date_to');
+    
+    // Khi chọn ngày cụ thể, xóa khoảng thời gian
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            if (this.value) {
+                // Nếu ngày cụ thể được chọn, reset khoảng thời gian
+                if (dateFromInput) dateFromInput.value = '';
+                if (dateToInput) dateToInput.value = '';
+            }
+        });
+    }
+    
+    // Khi chọn khoảng thời gian, xóa ngày cụ thể
+    const handleRangeChange = function() {
+        if ((dateFromInput && dateFromInput.value) || (dateToInput && dateToInput.value)) {
+            // Nếu một trong hai ô khoảng thời gian được nhập, reset ngày cụ thể
+            if (dateInput) dateInput.value = '';
+        }
+    };
+    
+    if (dateFromInput) {
+        dateFromInput.addEventListener('change', handleRangeChange);
+    }
+    
+    if (dateToInput) {
+        dateToInput.addEventListener('change', handleRangeChange);
+    }
+    
+    // Tự động đặt ngày kết thúc nếu chưa có khi chọn ngày bắt đầu
+    if (dateFromInput && dateToInput) {
+        dateFromInput.addEventListener('change', function() {
+            if (this.value && !dateToInput.value) {
+                // Đặt ngày kết thúc mặc định là 7 ngày sau ngày bắt đầu
+                const startDate = new Date(this.value);
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 7);
+                
+                // Format lại thành YYYY-MM-DD
+                const year = endDate.getFullYear();
+                const month = String(endDate.getMonth() + 1).padStart(2, '0');
+                const day = String(endDate.getDate()).padStart(2, '0');
+                dateToInput.value = `${year}-${month}-${day}`;
+            }
+        });
+    }
     
     // Initialize tooltips if using Bootstrap
     if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {

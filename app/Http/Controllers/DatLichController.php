@@ -15,6 +15,24 @@ class DatLichController extends Controller
     {
         $query = DatLich::with('user', 'dichVu');
         
+        // Tìm kiếm tổng quát
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                // Tìm theo mã đặt lịch
+                $q->where('MaDL', 'like', '%' . $search . '%')
+                // Tìm theo người dùng
+                ->orWhereHas('user', function($query) use ($search) {
+                    $query->where('Hoten', 'like', '%' . $search . '%')
+                        ->orWhere('SDT', 'like', '%' . $search . '%');
+                })
+                // Tìm theo dịch vụ
+                ->orWhereHas('dichVu', function($query) use ($search) {
+                    $query->where('Tendichvu', 'like', '%' . $search . '%');
+                });
+            });
+        }
+        
         // Tìm kiếm theo người dùng
         if ($request->has('user_id') && $request->user_id) {
             $query->where('Manguoidung', $request->user_id);
@@ -52,7 +70,7 @@ class DatLichController extends Controller
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
         
-        $datLichs = $query->paginate(10);
+        $datLichs = $query->paginate(10)->withQueryString();
         
         // Lấy danh sách người dùng và dịch vụ cho bộ lọc
         $users = User::all();
