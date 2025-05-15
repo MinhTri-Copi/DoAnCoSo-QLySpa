@@ -22,6 +22,7 @@ use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatLichDashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Models\HangThanhVien;
 
 
@@ -159,4 +160,12 @@ Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController
 
 // API để lấy thông tin đặt lịch cho hóa đơn
 Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
+
+// Routes cho profile
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('admin.profile.change-password');
+    Route::post('/profile/change-email', [ProfileController::class, 'changeEmail'])->name('admin.profile.change-email');
+});
 
