@@ -9,8 +9,17 @@ class DanhGia extends Model
     protected $table = 'DANHGIA';
     protected $primaryKey = 'MaDG';
     public $incrementing = false;
-    protected $fillable = ['MaDG', 'Danhgiasao', 'Nhanxet', 'Ngaydanhgia', 'Manguoidung', 'MaHD'];
-    public $timestamps = false; // Thêm dòng này để tắt timestamps
+    protected $fillable = [
+        'MaDG', 
+        'Danhgiasao', 
+        'Nhanxet', 
+        'Ngaydanhgia', 
+        'Manguoidung', 
+        'MaHD',
+        'PhanHoi',
+        'NgayPhanHoi'
+    ];
+    public $timestamps = false;
 
     public function user()
     {

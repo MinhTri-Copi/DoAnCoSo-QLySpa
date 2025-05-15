@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Chỉnh Sửa Đánh Giá')
+@section('title', 'Thêm Đánh Giá Mới')
 
 @section('styles')
 <style>
@@ -42,29 +42,40 @@
         background-color: #ff6b95;
         border-color: #ff6b95;
     }
+    .bg-pink-500 {
+        background-color: #ff6b95 !important;
+    }
 </style>
 @endsection
 
 @section('content')
 <div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mt-4">Chỉnh Sửa Đánh Giá</h1>
-        <a href="{{ route('admin.danhgia.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
-        </a>
+    <div class="card bg-pink-500 text-white mb-4 custom-card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mt-2">Thêm Đánh Giá Mới</h1>
+                    <p class="mb-0">
+                        <i class="fas fa-star me-1"></i> Ghi nhận đánh giá và phản hồi từ khách hàng
+                    </p>
+                </div>
+                <a href="{{ route('admin.danhgia.index') }}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="card mb-4 custom-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-                <i class="fas fa-edit me-1 text-primary"></i>
-                <span class="fw-bold">Chỉnh sửa đánh giá #{{ $danhGia->MaDG }}</span>
+                <i class="fas fa-plus-circle me-1 text-pink-500"></i>
+                <span class="fw-bold">Thông tin đánh giá mới</span>
             </div>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.danhgia.update', $danhGia->MaDG) }}" method="POST">
+            <form action="{{ route('admin.danhgia.store') }}" method="POST">
                 @csrf
-                @method('PUT')
                 
                 <div class="row mb-4">
                     <div class="col-md-6">
@@ -75,7 +86,7 @@
                             <select class="form-select @error('Manguoidung') is-invalid @enderror" id="Manguoidung" name="Manguoidung">
                                 <option value="">Chọn người dùng</option>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->Manguoidung }}" {{ old('Manguoidung', $danhGia->Manguoidung) == $user->Manguoidung ? 'selected' : '' }}>
+                                    <option value="{{ $user->Manguoidung }}" {{ old('Manguoidung') == $user->Manguoidung ? 'selected' : '' }}>
                                         {{ $user->Hoten }} ({{ $user->Manguoidung }})
                                     </option>
                                 @endforeach
@@ -94,8 +105,12 @@
                             <select class="form-select @error('MaHD') is-invalid @enderror" id="MaHD" name="MaHD">
                                 <option value="">Chọn hóa đơn</option>
                                 @foreach ($hoaDons as $hoaDon)
-                                    <option value="{{ $hoaDon->MaHD }}" {{ old('MaHD', $danhGia->MaHD) == $hoaDon->MaHD ? 'selected' : '' }}>
-                                        {{ $hoaDon->MaHD }} - {{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ
+                                    <option value="{{ $hoaDon->MaHD }}" {{ old('MaHD') == $hoaDon->MaHD ? 'selected' : '' }}>
+                                        Hóa đơn #{{ $hoaDon->MaHD }} - 
+                                        @if ($hoaDon->phong)
+                                            Phòng: {{ $hoaDon->phong->Tenphong }} - 
+                                        @endif
+                                        {{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ
                                     </option>
                                 @endforeach
                             </select>
@@ -114,7 +129,7 @@
                         <div class="d-flex">
                             @for ($i = 5; $i >= 1; $i--)
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="Danhgiasao" id="star{{ $i }}" value="{{ $i }}" {{ old('Danhgiasao', $danhGia->Danhgiasao) == $i ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="Danhgiasao" id="star{{ $i }}" value="{{ $i }}" {{ old('Danhgiasao', 5) == $i ? 'checked' : '' }}>
                                     <label class="form-check-label" for="star{{ $i }}">
                                         {{ $i }} <i class="fas fa-star text-warning"></i>
                                     </label>
@@ -131,7 +146,7 @@
                     <label for="Nhanxet" class="form-label">
                         <i class="fas fa-comment me-1 text-secondary"></i> Nhận xét
                     </label>
-                    <textarea class="form-control @error('Nhanxet') is-invalid @enderror" id="Nhanxet" name="Nhanxet" rows="4" placeholder="Nhập nhận xét của khách hàng...">{{ old('Nhanxet', $danhGia->Nhanxet) }}</textarea>
+                    <textarea class="form-control @error('Nhanxet') is-invalid @enderror" id="Nhanxet" name="Nhanxet" rows="4" placeholder="Nhập nhận xét của khách hàng...">{{ old('Nhanxet') }}</textarea>
                     @error('Nhanxet')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -139,7 +154,7 @@
                 
                 <div class="d-flex justify-content-between mt-4">
                     <button type="submit" class="btn btn-pink">
-                        <i class="fas fa-save me-1"></i> Lưu thay đổi
+                        <i class="fas fa-plus me-1"></i> Thêm đánh giá
                     </button>
                     <a href="{{ route('admin.danhgia.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times me-1"></i> Hủy
@@ -154,7 +169,58 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        // Thêm các script JavaScript nếu cần
+        // Khi người dùng được chọn, cập nhật danh sách hóa đơn
+        $('#Manguoidung').change(function() {
+            const userId = $(this).val();
+            const invoiceSelect = $('#MaHD');
+            
+            // Xóa tất cả các option hiện tại ngoại trừ option mặc định
+            invoiceSelect.find('option:not(:first)').remove();
+            
+            if (userId) {
+                // Hiển thị thông báo đang tải
+                invoiceSelect.append('<option value="" disabled>Đang tải hóa đơn...</option>');
+                
+                // Gọi API để lấy hóa đơn của người dùng đã chọn
+                $.ajax({
+                    url: '{{ url("admin/danhgia/get-user-invoices") }}/' + userId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        // Xóa thông báo đang tải
+                        invoiceSelect.find('option:disabled').remove();
+                        
+                        if (response.success && response.hoaDons.length > 0) {
+                            // Thêm các option mới
+                            $.each(response.hoaDons, function(index, hoaDon) {
+                                let roomInfo = '';
+                                if (hoaDon.phong) {
+                                    roomInfo = ' - Phòng: ' + hoaDon.phong.Tenphong;
+                                }
+                                
+                                const formattedTotal = new Intl.NumberFormat('vi-VN').format(hoaDon.Tongtien);
+                                
+                                invoiceSelect.append(
+                                    $('<option></option>')
+                                        .attr('value', hoaDon.MaHD)
+                                        .text('Hóa đơn #' + hoaDon.MaHD + roomInfo + ' - ' + formattedTotal + ' VNĐ')
+                                );
+                            });
+                        } else {
+                            // Không có hóa đơn
+                            invoiceSelect.append('<option value="" disabled>Không có hóa đơn nào</option>');
+                        }
+                    },
+                    error: function() {
+                        // Xóa thông báo đang tải
+                        invoiceSelect.find('option:disabled').remove();
+                        
+                        // Hiển thị thông báo lỗi
+                        invoiceSelect.append('<option value="" disabled>Lỗi khi tải hóa đơn</option>');
+                    }
+                });
+            }
+        });
     });
 </script>
-@endsection
+@endsection 
