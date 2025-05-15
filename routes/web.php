@@ -132,9 +132,14 @@ Route::get('datlich/check-availability', [DatLichController::class, 'checkAvaila
     Route::resource('lsdiemthuong', PointHistoryController::class, ['names' => 'admin.lsdiemthuong']);
     Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirm-destroy');
 
-// Routes cho quản lý hóa đơn và thanh toán (HOADON_VA_THANHTOAN)
-    Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
-    Route::get('hoadonvathanhtoan/{id}/confirm-destroy', [HoaDonVaThanhToanController::class, 'confirmDestroy'])->name('admin.hoadonvathanhtoan.confirm-destroy');
+// Route cho quản lý hóa đơn và thanh toán
+Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
+Route::get('hoadonvathanhtoan/{id}/confirmDestroy', [HoaDonVaThanhToanController::class, 'confirmDestroy'])->name('admin.hoadonvathanhtoan.confirmDestroy');
+Route::get('hoadonvathanhtoan/{id}/print', [HoaDonVaThanhToanController::class, 'print'])->name('admin.hoadonvathanhtoan.print');
+Route::get('hoadonvathanhtoan-statistics', [HoaDonVaThanhToanController::class, 'statistics'])->name('admin.hoadonvathanhtoan.statistics');
+Route::get('hoadonvathanhtoan-export-excel', [HoaDonVaThanhToanController::class, 'exportExcel'])->name('admin.hoadonvathanhtoan.exportExcel');
+Route::get('hoadonvathanhtoan/{id}/create-danhgia', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.createDanhGia');
+Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController::class, 'storeDanhGia'])->name('admin.hoadonvathanhtoan.storeDanhGia');
     
     // Routes cho đánh giá hóa đơn
     Route::get('hoadonvathanhtoan/{id}/danhgia/create', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.danhgia.create');

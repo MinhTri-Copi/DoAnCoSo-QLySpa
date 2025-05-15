@@ -1,54 +1,690 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Quản lý hóa đơn và thanh toán')
+@section('title', 'Quản Lý Hóa Đơn và Thanh Toán')
 
 @section('content')
-<div class="container">
-    <h1>Quản lý hóa đơn và thanh toán</h1>
+<style>
+    :root {
+        --primary-color: #ff6b8b;
+        --primary-light: #ffd0d9;
+        --primary-dark: #e84e6f;
+        --text-on-primary: #ffffff;
+        --secondary-color: #f8f9fa;
+        --border-color: #e9ecef;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #17a2b8;
+    }
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    .header-container {
+        background-color: var(--primary-color);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        color: var(--text-on-primary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .header-subtitle {
+        font-size: 14px;
+        margin-top: 5px;
+        opacity: 0.9;
+    }
+
+    .btn-pink {
+        background-color: var(--text-on-primary);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-pink:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-pink i {
+        margin-right: 8px;
+    }
+
+    .stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 200px;
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .stat-progress {
+        height: 4px;
+        background-color: #e9ecef;
+        border-radius: 2px;
+        margin-top: 15px;
+        overflow: hidden;
+    }
+
+    .stat-progress-bar {
+        height: 100%;
+        border-radius: 2px;
+    }
+
+    .progress-1 {
+        background-color: #4cd964;
+        width: 75%;
+    }
+
+    .progress-2 {
+        background-color: var(--primary-color);
+        width: 45%;
+    }
+
+    .progress-3 {
+        background-color: #007bff;
+        width: 60%;
+    }
+
+    .progress-4 {
+        background-color: #ff9500;
+        width: 30%;
+    }
+
+    .content-card {
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 15px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #343a40;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-title i {
+        color: var(--primary-color);
+        margin-right: 10px;
+    }
+
+    .search-filter-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 14px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .filter-box {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 14px;
+        min-width: 150px;
+    }
+
+    .filter-date {
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 14px;
+        min-width: 150px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .badge-pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-confirmed {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-cancelled {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-completed {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-view {
+        background-color: var(--info-color);
+    }
+
+    .btn-edit {
+        background-color: var(--warning-color);
+    }
+
+    .btn-delete {
+        background-color: var(--danger-color);
+    }
+
+    .btn-print {
+        background-color: var(--primary-color);
+    }
+
+    .btn-action:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        gap: 5px;
+    }
+
+    .page-item {
+        list-style: none;
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: white;
+        border: 1px solid var(--border-color);
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .page-link:hover {
+        background-color: #f8f9fa;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: #dee2e6;
+        margin-bottom: 15px;
+    }
+
+    .empty-state h4 {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: #adb5bd;
+        max-width: 400px;
+        margin: 0 auto 20px;
+    }
+
+    @media (max-width: 768px) {
+        .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .btn-pink {
+            margin-top: 15px;
+            align-self: flex-start;
+        }
+        
+        .stats-container {
+            flex-direction: column;
+        }
+        
+        .search-filter-container {
+            flex-direction: column;
+        }
+        
+        .filter-box {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="header-container">
+    <div>
+        <div class="header-title">Quản Lý Hóa Đơn và Thanh Toán</div>
+        <div class="header-subtitle">Quản lý và theo dõi hóa đơn thanh toán dịch vụ</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.hoadonvathanhtoan.statistics') }}" class="btn-pink">
+            <i class="fas fa-chart-bar"></i> Thống Kê
+        </a>
+        <a href="{{ route('admin.hoadonvathanhtoan.create') }}" class="btn-pink">
+            <i class="fas fa-plus"></i> Thêm Hóa Đơn
+        </a>
+    </div>
+</div>
+
+<div class="stats-container">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <div class="stat-value">{{ number_format($hoaDons->count(), 0, ',', '.') }}</div>
+        <div class="stat-label">Tổng Số Hóa Đơn</div>
+        <div class="stat-progress">
+            <div class="stat-progress-bar progress-1"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <div class="stat-value">{{ number_format($totalRevenue, 0, ',', '.') }}</div>
+        <div class="stat-label">Tổng Doanh Thu (VNĐ)</div>
+        <div class="stat-progress">
+            <div class="stat-progress-bar progress-2"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="stat-value">{{ number_format($revenueThisMonth, 0, ',', '.') }}</div>
+        <div class="stat-label">Doanh Thu Tháng Này (VNĐ)</div>
+        <div class="stat-progress">
+            <div class="stat-progress-bar progress-3"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        @php
+            $completedCount = $invoicesByStatus->where('trangThai.Tentrangthai', 'Đã thanh toán')->first()->count ?? 0;
+            $pendingCount = $invoicesByStatus->where('trangThai.Tentrangthai', 'Chờ thanh toán')->first()->count ?? 0;
+        @endphp
+        <div class="stat-value">{{ $completedCount }}</div>
+        <div class="stat-label">Đã Thanh Toán</div>
+        <div class="stat-progress">
+            <div class="stat-progress-bar progress-4" style="width: {{ ($hoaDons->count() > 0) ? ($completedCount / $hoaDons->count() * 100) : 0 }}%"></div>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="fas fa-list"></i> Danh Sách Hóa Đơn
+        </div>
+        <div>
+            <button class="btn-action" style="background-color: var(--primary-color);" id="toggleFilters">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+    </div>
+    
+    <form action="{{ route('admin.hoadonvathanhtoan.index') }}" method="GET" id="filterForm">
+        <div class="search-filter-container" id="filterContainer">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="maHD" placeholder="Tìm kiếm theo mã hóa đơn..." value="{{ request('maHD') }}">
+            </div>
+            
+            <div class="filter-box">
+                <select name="user_id" class="filter-select">
+                    <option value="">-- Tất cả người dùng --</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->Manguoidung }}" {{ request('user_id') == $user->Manguoidung ? 'selected' : '' }}>
+                            {{ $user->Hoten }}
+                        </option>
+                    @endforeach
+                </select>
+                
+                <select name="payment_method" class="filter-select">
+                    <option value="">-- Tất cả phương thức --</option>
+                    @foreach($phuongThucs as $phuongThuc)
+                        <option value="{{ $phuongThuc->MaPT }}" {{ request('payment_method') == $phuongThuc->MaPT ? 'selected' : '' }}>
+                            {{ $phuongThuc->TenPT }}
+                        </option>
+                    @endforeach
+                </select>
+                
+                <select name="status" class="filter-select">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    @foreach($trangThais as $trangThai)
+                        <option value="{{ $trangThai->Matrangthai }}" {{ request('status') == $trangThai->Matrangthai ? 'selected' : '' }}>
+                            {{ $trangThai->Tentrangthai }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="filter-box">
+                <input type="date" name="date_from" class="filter-date" placeholder="Từ ngày" value="{{ request('date_from') }}">
+                
+                <input type="date" name="date_to" class="filter-date" placeholder="Đến ngày" value="{{ request('date_to') }}">
+                
+                <input type="number" name="amount_from" class="filter-date" placeholder="Số tiền từ" value="{{ request('amount_from') }}">
+                
+                <input type="number" name="amount_to" class="filter-date" placeholder="Số tiền đến" value="{{ request('amount_to') }}">
+            </div>
+            
+            <div class="filter-box">
+                <button type="submit" class="btn-pink">
+                    <i class="fas fa-search"></i> Tìm Kiếm
+                </button>
+                
+                <a href="{{ route('admin.hoadonvathanhtoan.index') }}" class="btn-pink" style="background-color: #6c757d;">
+                    <i class="fas fa-sync"></i> Đặt Lại
+                </a>
+                
+                <a href="{{ route('admin.hoadonvathanhtoan.exportExcel') }}" class="btn-pink" style="background-color: #28a745;">
+                    <i class="fas fa-file-excel"></i> Xuất Excel
+                </a>
+            </div>
+        </div>
+    </form>
+    
+    @if(session('success'))
+    <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        {{ session('success') }}
+    </div>
     @endif
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+    
+    @if(session('error'))
+    <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        {{ session('error') }}
+    </div>
     @endif
-
-    <a href="{{ route('admin.hoadonvathanhtoan.create') }}" class="btn btn-primary mb-3">Thêm hóa đơn mới</a>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Mã hóa đơn</th>
-                <th>Ngày thanh toán</th>
-                <th>Tổng tiền</th>
-                <th>Mã đặt lịch</th>
-                <th>Người dùng</th>
-                <th>Phòng</th>
-                <th>Phương thức</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($hoaDons as $hoaDon)
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Mã HĐ</th>
+                    <th>Người Dùng</th>
+                    <th>Dịch Vụ</th>
+                    <th>Ngày Thanh Toán</th>
+                    <th>Tổng Tiền</th>
+                    <th>Phương Thức</th>
+                    <th>Trạng Thái</th>
+                    <th class="text-end">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($hoaDons as $hoaDon)
                 <tr>
                     <td>{{ $hoaDon->MaHD }}</td>
-                    <td>{{ $hoaDon->Ngaythanhtoan }}</td>
-                    <td>{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</td>
-                    <td>{{ $hoaDon->datLich->MaDL ?? 'N/A' }}</td>
-                    <td>{{ $hoaDon->user->name ?? 'N/A' }}</td>
-                    <td>{{ $hoaDon->phong->Tenphong ?? 'N/A' }}</td>
-                    <td>{{ $hoaDon->phuongThuc->TenPT ?? 'N/A' }}</td>
-                    <td>{{ $hoaDon->trangThai->Tentrangthai ?? 'N/A' }}</td>
                     <td>
-                        <a href="{{ route('admin.hoadonvathanhtoan.show', $hoaDon->MaHD) }}" class="btn btn-info btn-sm">Xem</a>
-                        <a href="{{ route('admin.hoadonvathanhtoan.edit', $hoaDon->MaHD) }}" class="btn btn-warning btn-sm">Sửa</a>
-                        <a href="{{ route('admin.hoadonvathanhtoan.confirm-destroy', $hoaDon->MaHD) }}" class="btn btn-danger btn-sm">Xóa</a>
-                        <a href="{{ route('admin.hoadonvathanhtoan.danhgia.create', $hoaDon->MaHD) }}" class="btn btn-success btn-sm">Đánh giá</a>
+                        @if($hoaDon->user)
+                            <div class="d-flex align-items-center">
+                                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary-color); font-weight: bold; margin-right: 10px;">
+                                    {{ substr($hoaDon->user->Hoten, 0, 1) }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 500;">{{ $hoaDon->user->Hoten }}</div>
+                                    <div style="font-size: 12px; color: #6c757d;">{{ $hoaDon->user->SDT ?? 'N/A' }}</div>
+                                </div>
+                            </div>
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($hoaDon->datLich && $hoaDon->datLich->dichVu)
+                            <div>
+                                <div style="font-weight: 500;">{{ $hoaDon->datLich->dichVu->Tendichvu }}</div>
+                                <div style="font-size: 12px; color: #6c757d;">{{ \Carbon\Carbon::parse($hoaDon->datLich->Thoigiandatlich)->format('d/m/Y H:i') }}</div>
+                            </div>
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div>
+                            <div style="font-weight: 500;">{{ \Carbon\Carbon::parse($hoaDon->Ngaythanhtoan)->format('d/m/Y') }}</div>
+                            <div style="font-size: 12px; color: #6c757d;">{{ \Carbon\Carbon::parse($hoaDon->Ngaythanhtoan)->format('H:i') }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500; color: var(--primary-color);">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
+                    </td>
+                    <td>
+                        @if($hoaDon->phuongThuc)
+                            <div style="font-weight: 500;">{{ $hoaDon->phuongThuc->TenPT }}</div>
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($hoaDon->trangThai)
+                            @php
+                                $statusClass = 'badge-pending';
+                                if($hoaDon->trangThai->Tentrangthai == 'Đã thanh toán') {
+                                    $statusClass = 'badge-confirmed';
+                                } elseif($hoaDon->trangThai->Tentrangthai == 'Đã hủy') {
+                                    $statusClass = 'badge-cancelled';
+                                } elseif($hoaDon->trangThai->Tentrangthai == 'Hoàn thành') {
+                                    $statusClass = 'badge-completed';
+                                }
+                            @endphp
+                            <span class="badge {{ $statusClass }}">{{ $hoaDon->trangThai->Tentrangthai }}</span>
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
+                    </td>
+                    <td class="text-end">
+                        <div class="action-buttons">
+                            <a href="{{ route('admin.hoadonvathanhtoan.show', $hoaDon->MaHD) }}" class="btn-action btn-view" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ route('admin.hoadonvathanhtoan.edit', $hoaDon->MaHD) }}" class="btn-action btn-edit" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ route('admin.hoadonvathanhtoan.confirmDestroy', $hoaDon->MaHD) }}" class="btn-action btn-delete" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            <a href="{{ route('admin.hoadonvathanhtoan.print', $hoaDon->MaHD) }}" class="btn-action btn-print" title="In hóa đơn" target="_blank">
+                                <i class="fas fa-print"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+                @empty
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-file-invoice"></i>
+                            <h4>Không có dữ liệu</h4>
+                            <p>Chưa có hóa đơn nào được tạo hoặc không có hóa đơn phù hợp với bộ lọc.</p>
+                            <a href="{{ route('admin.hoadonvathanhtoan.create') }}" class="btn-pink">
+                                <i class="fas fa-plus"></i> Thêm Hóa Đơn
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div>
+            Hiển thị {{ $hoaDons->firstItem() ?? 0 }} đến {{ $hoaDons->lastItem() ?? 0 }} của {{ $hoaDons->total() }} bản ghi
+        </div>
+        <div>
+            {{ $hoaDons->appends(request()->query())->links() }}
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle filters
+    const toggleFilters = document.getElementById('toggleFilters');
+    const filterContainer = document.getElementById('filterContainer');
+    
+    toggleFilters.addEventListener('click', function() {
+        filterContainer.style.display = filterContainer.style.display === 'none' ? 'flex' : 'none';
+    });
+    
+    // Initialize tooltips if using Bootstrap
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+});
+</script>
 @endsection

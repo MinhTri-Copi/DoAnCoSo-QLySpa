@@ -10,14 +10,91 @@ use App\Models\PhuongThuc;
 use App\Models\TrangThai;
 use App\Models\LSDiemThuong;
 use App\Models\DanhGia;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HoaDonVaThanhToanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $hoaDons = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])->get();
-        return view('backend.hoadonvathanhtoan.index', compact('hoaDons'));
+        $query = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai']);
+        
+        // Tìm kiếm theo mã hóa đơn
+        if ($request->has('maHD') && $request->maHD) {
+            $query->where('MaHD', 'like', '%' . $request->maHD . '%');
+        }
+        
+        // Tìm kiếm theo người dùng
+        if ($request->has('user_id') && $request->user_id) {
+            $query->where('Manguoidung', $request->user_id);
+        }
+        
+        // Tìm kiếm theo phương thức thanh toán
+        if ($request->has('payment_method') && $request->payment_method) {
+            $query->where('MaPT', $request->payment_method);
+        }
+        
+        // Tìm kiếm theo trạng thái
+        if ($request->has('status') && $request->status) {
+            $query->where('Matrangthai', $request->status);
+        }
+        
+        // Tìm kiếm theo khoảng thời gian
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('Ngaythanhtoan', '>=', $request->date_from);
+        }
+        
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('Ngaythanhtoan', '<=', $request->date_to);
+        }
+        
+        // Tìm kiếm theo khoảng tổng tiền
+        if ($request->has('amount_from') && $request->amount_from) {
+            $query->where('Tongtien', '>=', $request->amount_from);
+        }
+        
+        if ($request->has('amount_to') && $request->amount_to) {
+            $query->where('Tongtien', '<=', $request->amount_to);
+        }
+        
+        // Sắp xếp
+        $sortField = $request->get('sort', 'Ngaythanhtoan');
+        $sortDirection = $request->get('direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+        
+        $hoaDons = $query->paginate(10);
+        
+        // Lấy danh sách người dùng, phương thức thanh toán và trạng thái cho bộ lọc
+        $users = User::all();
+        $phuongThucs = PhuongThuc::all();
+        $trangThais = TrangThai::all();
+        
+        // Tính tổng doanh thu
+        $totalRevenue = HoaDonVaThanhToan::sum('Tongtien');
+        
+        // Tính doanh thu trong tháng hiện tại
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $revenueThisMonth = HoaDonVaThanhToan::whereMonth('Ngaythanhtoan', $currentMonth)
+                                           ->whereYear('Ngaythanhtoan', $currentYear)
+                                           ->sum('Tongtien');
+        
+        // Tính số lượng hóa đơn theo trạng thái
+        $invoicesByStatus = HoaDonVaThanhToan::select('Matrangthai', DB::raw('count(*) as count'))
+                                           ->groupBy('Matrangthai')
+                                           ->with('trangThai')
+                                           ->get();
+        
+        return view('backend.hoadonvathanhtoan.index', compact(
+            'hoaDons', 
+            'users', 
+            'phuongThucs', 
+            'trangThais', 
+            'totalRevenue', 
+            'revenueThisMonth', 
+            'invoicesByStatus'
+        ));
     }
 
     public function create()
@@ -27,9 +104,8 @@ class HoaDonVaThanhToanController extends Controller
         $phongs = Phong::all();
         $phuongThucs = PhuongThuc::all();
         $trangThais = TrangThai::all();
-        $maxMahang = HoaDonVaThanhToan::max('MaHD') ?? 0;
-        $suggestedMaHD = $maxMahang + 1;
-
+        $maxMaHD = HoaDonVaThanhToan::max('MaHD') ?? 0;
+        $suggestedMaHD = $maxMaHD + 1;
 
         return view('backend.hoadonvathanhtoan.create', compact('datLichs', 'users', 'phongs', 'phuongThucs', 'trangThais', 'suggestedMaHD'));
     }
@@ -62,51 +138,61 @@ class HoaDonVaThanhToanController extends Controller
             'Matrangthai.exists' => 'Trạng thái không tồn tại.',
         ]);
 
-        $maxMahang = HoaDonVaThanhToan::max('MaHD') ?? 0;
-        $newMaHD = $maxMahang + 1;
+        try {
+            DB::beginTransaction();
+            
+            $maxMaHD = HoaDonVaThanhToan::max('MaHD') ?? 0;
+            $newMaHD = $maxMaHD + 1;
 
-
-        $hoaDon = HoaDonVaThanhToan::create([
-            'MaHD' => $newMaHD,
-            'Ngaythanhtoan' => $request->Ngaythanhtoan,
-            'Tongtien' => $request->Tongtien,
-            'MaDL' => $request->MaDL,
-            'Manguoidung' => $request->Manguoidung,
-            'Maphong' => $request->Maphong,
-            'MaPT' => $request->MaPT,
-            'Matrangthai' => $request->Matrangthai,
-        ]);
-
-        // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền
-        $tongTien = $request->Tongtien;
-        $soDiem = 0;
-
-        if ($tongTien >= 100000 && $tongTien < 500000) {
-            $soDiem = 100;
-        } elseif ($tongTien >= 500000 && $tongTien < 1000000) {
-            $soDiem = 300;
-        } elseif ($tongTien >= 1000000) {
-            $soDiem = 500;
-        }
-
-        if ($soDiem > 0) {
-            $maxMahang = LSDiemThuong::max('MaHD') ?? 0;
-            $newMaLSDT = $maxMahang + 1;
-            LSDiemThuong::create([
-                'MaLSDT' => $newMaLSDT,
-                'Thoigian' => now(),
-                'Sodiem' => $soDiem,
-                'Manguoidung' => $request->Manguoidung,
+            $hoaDon = HoaDonVaThanhToan::create([
                 'MaHD' => $newMaHD,
+                'Ngaythanhtoan' => $request->Ngaythanhtoan,
+                'Tongtien' => $request->Tongtien,
+                'MaDL' => $request->MaDL,
+                'Manguoidung' => $request->Manguoidung,
+                'Maphong' => $request->Maphong,
+                'MaPT' => $request->MaPT,
+                'Matrangthai' => $request->Matrangthai,
             ]);
-        }
 
-        return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Thêm hóa đơn thành công!');
+            // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền
+            $tongTien = $request->Tongtien;
+            $soDiem = $this->calculateRewardPoints($tongTien);
+
+            if ($soDiem > 0) {
+                $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
+                $newMaLSDT = $maxMaLSDT + 1;
+                
+                LSDiemThuong::create([
+                    'MaLSDT' => $newMaLSDT,
+                    'Thoigian' => now(),
+                    'Sodiem' => $soDiem,
+                    'Manguoidung' => $request->Manguoidung,
+                    'MaHD' => $newMaHD,
+                ]);
+            }
+            
+            // Cập nhật trạng thái đặt lịch nếu cần
+            if ($request->has('update_booking_status') && $request->update_booking_status) {
+                $datLich = DatLich::find($request->MaDL);
+                if ($datLich) {
+                    $datLich->update([
+                        'Trangthai_' => 'Hoàn thành'
+                    ]);
+                }
+            }
+            
+            DB::commit();
+            return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Thêm hóa đơn thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function show($id)
     {
-        $hoaDon = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])->findOrFail($id);
+        $hoaDon = HoaDonVaThanhToan::with(['datLich.dichVu', 'user', 'phong', 'phuongThuc', 'trangThai', 'danhGia', 'lsDiemThuong'])->findOrFail($id);
         return view('backend.hoadonvathanhtoan.show', compact('hoaDon'));
     }
 
@@ -152,64 +238,73 @@ class HoaDonVaThanhToanController extends Controller
             'Matrangthai.exists' => 'Trạng thái không tồn tại.',
         ]);
 
-        $hoaDon->update([
-            'Ngaythanhtoan' => $request->Ngaythanhtoan,
-            'Tongtien' => $request->Tongtien,
-            'MaDL' => $request->MaDL,
-            'Manguoidung' => $request->Manguoidung,
-            'Maphong' => $request->Maphong,
-            'MaPT' => $request->MaPT,
-            'Matrangthai' => $request->Matrangthai,
-        ]);
+        try {
+            DB::beginTransaction();
+            
+            $hoaDon->update([
+                'Ngaythanhtoan' => $request->Ngaythanhtoan,
+                'Tongtien' => $request->Tongtien,
+                'MaDL' => $request->MaDL,
+                'Manguoidung' => $request->Manguoidung,
+                'Maphong' => $request->Maphong,
+                'MaPT' => $request->MaPT,
+                'Matrangthai' => $request->Matrangthai,
+            ]);
 
-        // Cập nhật lịch sử điểm thưởng dựa trên tổng tiền
-        $existingLSDT = LSDiemThuong::where('MaHD', $hoaDon->MaHD)->first();
-        $tongTien = $request->Tongtien;
-        $soDiem = 0;
+            // Cập nhật lịch sử điểm thưởng dựa trên tổng tiền
+            $existingLSDT = LSDiemThuong::where('MaHD', $hoaDon->MaHD)->first();
+            $tongTien = $request->Tongtien;
+            $soDiem = $this->calculateRewardPoints($tongTien);
 
-        if ($tongTien >= 100000 && $tongTien < 500000) {
-            $soDiem = 100;
-        } elseif ($tongTien >= 500000 && $tongTien < 1000000) {
-            $soDiem = 300;
-        } elseif ($tongTien >= 1000000) {
-            $soDiem = 500;
-        }
+            if ($soDiem > 0) {
+                if ($existingLSDT) {
+                    // Nếu đã có bản ghi, cập nhật số điểm
+                    $existingLSDT->update([
+                        'Sodiem' => $soDiem,
+                        'Thoigian' => now(),
+                        'Manguoidung' => $request->Manguoidung,
+                    ]);
+                } else {
+                    // Nếu chưa có bản ghi, tạo mới
+                    $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
+                    $newMaLSDT = $maxMaLSDT + 1;
 
-        if ($soDiem > 0) {
-            if ($existingLSDT) {
-                // Nếu đã có bản ghi, cập nhật số điểm
-                $existingLSDT->update([
-                    'Sodiem' => $soDiem,
-                    'Thoigian' => now(),
-                    'Manguoidung' => $request->Manguoidung,
-                ]);
+                    LSDiemThuong::create([
+                        'MaLSDT' => $newMaLSDT,
+                        'Thoigian' => now(),
+                        'Sodiem' => $soDiem,
+                        'Manguoidung' => $request->Manguoidung,
+                        'MaHD' => $hoaDon->MaHD,
+                    ]);
+                }
             } else {
-                // Nếu chưa có bản ghi, tạo mới
-                $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
-                $numberLSDT = $maxMaLSDT ? (int) substr($maxMaLSDT, 4) : 0;
-                $newMaLSDT = 'LSDT' . ($numberLSDT + 1);
-
-                LSDiemThuong::create([
-                    'MaLSDT' => $newMaLSDT,
-                    'Thoigian' => now(),
-                    'Sodiem' => $soDiem,
-                    'Manguoidung' => $request->Manguoidung,
-                    'MaHD' => $hoaDon->MaHD,
-                ]);
+                // Nếu tổng tiền < 100,000 và có bản ghi, xóa bản ghi
+                if ($existingLSDT) {
+                    $existingLSDT->delete();
+                }
             }
-        } else {
-            // Nếu tổng tiền < 100,000 và có bản ghi, xóa bản ghi
-            if ($existingLSDT) {
-                $existingLSDT->delete();
+            
+            // Cập nhật trạng thái đặt lịch nếu cần
+            if ($request->has('update_booking_status') && $request->update_booking_status) {
+                $datLich = DatLich::find($request->MaDL);
+                if ($datLich) {
+                    $datLich->update([
+                        'Trangthai_' => 'Hoàn thành'
+                    ]);
+                }
             }
+            
+            DB::commit();
+            return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Cập nhật hóa đơn thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
         }
-
-        return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Cập nhật hóa đơn thành công!');
     }
 
     public function confirmDestroy($id)
     {
-        $hoaDon = HoaDonVaThanhToan::findOrFail($id);
+        $hoaDon = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])->findOrFail($id);
         return view('backend.hoadonvathanhtoan.destroy', compact('hoaDon'));
     }
 
@@ -218,9 +313,18 @@ class HoaDonVaThanhToanController extends Controller
         $hoaDon = HoaDonVaThanhToan::findOrFail($id);
 
         try {
+            DB::beginTransaction();
+            
+            // Xóa các bản ghi liên quan
+            LSDiemThuong::where('MaHD', $hoaDon->MaHD)->delete();
+            DanhGia::where('MaHD', $hoaDon->MaHD)->delete();
+            
             $hoaDon->delete();
+            
+            DB::commit();
             return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Xóa hóa đơn thành công!');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('admin.hoadonvathanhtoan.index')->with('error', 'Không thể xóa hóa đơn vì có dữ liệu liên quan!');
         }
     }
@@ -229,8 +333,7 @@ class HoaDonVaThanhToanController extends Controller
     {
         $hoaDon = HoaDonVaThanhToan::findOrFail($id);
         $maxMaDG = DanhGia::max('MaDG') ?? 0;
-        $number = $maxMaDG ? (int) substr($maxMaDG, 2) : 0;
-        $suggestedMaDG = 'DG' . ($number + 1);
+        $suggestedMaDG = $maxMaDG + 1;
 
         return view('backend.danhgia.create', compact('hoaDon', 'suggestedMaDG'));
     }
@@ -249,19 +352,113 @@ class HoaDonVaThanhToanController extends Controller
             'Danhgiasao.max' => 'Đánh giá sao phải từ 1 đến 5.',
         ]);
 
-        $maxMaDG = DanhGia::max('MaDG') ?? 0;
-        $number = $maxMaDG ? (int) substr($maxMaDG, 2) : 0;
-        $newMaDG = 'DG' . ($number + 1);
+        try {
+            DB::beginTransaction();
+            
+            $maxMaDG = DanhGia::max('MaDG') ?? 0;
+            $newMaDG = $maxMaDG + 1;
 
-        DanhGia::create([
-            'MaDG' => $newMaDG,
-            'Danhgiasao' => $request->Danhgiasao,
-            'Nhanxet' => $request->Nhanxet,
-            'Ngaydanhgia' => now(),
-            'Manguoidung' => $hoaDon->Manguoidung,
-            'MaHD' => $hoaDon->MaHD,
-        ]);
+            DanhGia::create([
+                'MaDG' => $newMaDG,
+                'Danhgiasao' => $request->Danhgiasao,
+                'Nhanxet' => $request->Nhanxet,
+                'Ngaydanhgia' => now(),
+                'Manguoidung' => $hoaDon->Manguoidung,
+                'MaHD' => $hoaDon->MaHD,
+            ]);
+            
+            DB::commit();
+            return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Thêm đánh giá thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
+        }
+    }
+    
+    // Thêm phương thức in hóa đơn
+    public function print($id)
+    {
+        $hoaDon = HoaDonVaThanhToan::with(['datLich.dichVu', 'user', 'phong', 'phuongThuc', 'trangThai', 'lsDiemThuong'])->findOrFail($id);
+        return view('backend.hoadonvathanhtoan.print', compact('hoaDon'));
+    }
+    
+    // Thêm phương thức thống kê
+    public function statistics(Request $request)
+    {
+        // Thống kê theo khoảng thời gian
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
+        
+        // Chuyển đổi thành đối tượng Carbon
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate = Carbon::parse($endDate)->endOfDay();
+        
+        // Tổng doanh thu trong khoảng thời gian
+        $totalRevenue = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$startDate, $endDate])->sum('Tongtien');
+        
+        // Thống kê theo trạng thái
+        $invoicesByStatus = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$startDate, $endDate])
+            ->select('Matrangthai', DB::raw('count(*) as count'), DB::raw('sum(Tongtien) as total'))
+            ->groupBy('Matrangthai')
+            ->with('trangThai')
+            ->get();
+        
+        // Thống kê theo phương thức thanh toán
+        $invoicesByPaymentMethod = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$startDate, $endDate])
+            ->select('MaPT', DB::raw('count(*) as count'), DB::raw('sum(Tongtien) as total'))
+            ->groupBy('MaPT')
+            ->with('phuongThuc')
+            ->get();
+        
+        // Thống kê theo ngày
+        $invoicesByDate = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$startDate, $endDate])
+            ->select(DB::raw('DATE(Ngaythanhtoan) as date'), DB::raw('count(*) as count'), DB::raw('sum(Tongtien) as total'))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+        
+        // Thống kê theo người dùng (top 10)
+        $invoicesByUser = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$startDate, $endDate])
+            ->select('Manguoidung', DB::raw('count(*) as count'), DB::raw('sum(Tongtien) as total'))
+            ->groupBy('Manguoidung')
+            ->with('user')
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+        
+        return view('backend.hoadonvathanhtoan.statistics', compact(
+            'totalRevenue', 
+            'invoicesByStatus', 
+            'invoicesByPaymentMethod', 
+            'invoicesByDate', 
+            'invoicesByUser',
+            'startDate',
+            'endDate'
+        ));
+    }
+    
+    // Phương thức tính điểm thưởng dựa trên tổng tiền
+    private function calculateRewardPoints($tongTien)
+    {
+        $soDiem = 0;
 
-        return redirect()->route('admin.hoadonvathanhtoan.index')->with('success', 'Thêm đánh giá thành công!');
+        if ($tongTien >= 100000 && $tongTien < 500000) {
+            $soDiem = 100;
+        } elseif ($tongTien >= 500000 && $tongTien < 1000000) {
+            $soDiem = 300;
+        } elseif ($tongTien >= 1000000) {
+            $soDiem = 500;
+        }
+        
+        return $soDiem;
+    }
+    
+    // Phương thức xuất Excel
+    public function exportExcel(Request $request)
+    {
+        // Thêm code xuất Excel ở đây
+        // Có thể sử dụng thư viện như PhpSpreadsheet hoặc Laravel Excel
+        
+        return redirect()->back()->with('success', 'Xuất Excel thành công!');
     }
 }

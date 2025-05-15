@@ -86,7 +86,10 @@ class CustomerController extends Controller
             $suggestedManguoidung = $maxManguoidung + 1;
 
             // Get available accounts that aren't already linked to a user
-            $accounts = Account::whereDoesntHave('user')->get();
+            $accounts = Account::all();
+            
+            // Log số lượng tài khoản để debug
+            \Log::info('Accounts available for create customer:', ['count' => $accounts->count()]);
             
             // Get membership ranks for dropdown
             $membershipRanks = ['Thường', 'VIP', 'Platinum', 'Diamond'];
