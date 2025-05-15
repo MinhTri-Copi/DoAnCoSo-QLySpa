@@ -160,15 +160,20 @@
     }
 
     .form-section-title {
-        color: var(--spa-primary-dark);
+        color: var(--dark-pink);
         margin-bottom: 1.5rem;
         font-weight: 600;
         display: flex;
         align-items: center;
+        line-height: 1.2;
     }
 
     .form-section-title i {
-        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+        color: var(--primary-pink);
     }
 
     .form-section-content {
@@ -335,14 +340,14 @@
     .timeline {
         position: relative;
         padding-left: 1.5rem;
-        margin-top: 1rem;
+        margin-bottom: 0;
     }
 
     .timeline::before {
         content: '';
         position: absolute;
         top: 0;
-        left: 20px;
+        left: 9px;
         height: 100%;
         width: 2px;
         background-color: var(--light-pink);
@@ -350,47 +355,77 @@
 
     .timeline-item {
         position: relative;
-        padding-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 
     .timeline-item:last-child {
         padding-bottom: 0;
+        margin-bottom: 0;
     }
 
     .timeline-marker {
         position: absolute;
-        top: 0;
+        top: 4px;
         left: -1.5rem;
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        margin-top: 5px;
-        background-color: var(--spa-primary);
+        background-color: var(--primary-pink);
+        border: 2px solid white;
+        box-shadow: 0 0 0 1px rgba(255, 107, 149, 0.3);
     }
 
     .timeline-content {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
         background-color: white;
         border-radius: var(--radius-sm);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-bottom: 0.5rem;
+        border-left: 3px solid var(--light-pink);
+        transition: all 0.2s ease;
+    }
+
+    .timeline-content:hover {
+        transform: translateX(3px);
+        border-left-color: var(--primary-pink);
+        box-shadow: 0 3px 10px rgba(255, 107, 149, 0.15);
     }
 
     .timeline-date {
+        display: flex;
+        align-items: center;
         font-size: 0.75rem;
         color: var(--text-secondary);
         margin-bottom: 0.25rem;
     }
 
     .timeline-title {
+        display: flex;
+        align-items: flex-start;
         font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 0.25rem;
     }
 
+    .timeline-title span {
+        line-height: 1.2;
+    }
+
     .timeline-body {
+        padding-left: 24px;
         font-size: 0.9rem;
         color: var(--text-primary);
+        line-height: 1.4;
+    }
+
+    .timeline-date i,
+    .timeline-title i {
+        width: 16px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+        color: var(--primary-pink);
     }
 
     /* Card header gradient style */
@@ -419,6 +454,15 @@
         padding: 0.6rem 1.5rem;
         font-weight: 500;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn i {
+        width: 18px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
     }
 
     .btn-primary {
@@ -484,6 +528,54 @@
         background-color: var(--light-pink);
         border-color: var(--border-color);
         color: var(--spa-primary-dark);
+        display: flex;
+        align-items: center;
+        width: 45px;
+        justify-content: center;
+    }
+
+    .input-group-text i {
+        width: 16px;
+        text-align: center;
+        font-size: 16px;
+    }
+    
+    /* Icon alignment fix */
+    .icon-aligned {
+        width: 20px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    /* Button alignment fix */
+    .input-group {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .input-group > .input-group-prepend > .input-group-text {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .input-group > .input-group-append > .input-group-text,
+    .input-group > .input-group-append > .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .input-group-prepend,
+    .input-group-append {
+        display: flex;
+    }
+
+    .input-group > .form-control {
+        position: relative;
+        flex: 1 1 auto;
+        width: 1%;
+        margin-bottom: 0;
     }
 
     label {
@@ -518,7 +610,10 @@
     }
 
     .form-actions .btn i {
-        margin-right: 0.5rem;
+        width: 18px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
     }
 </style>
 @endsection
@@ -536,17 +631,17 @@
         <div class="customer-header-content">
             <div>
                 <h1 class="h3 mb-0 text-white">
-                    <i class="fas fa-user-edit mr-2"></i>Chỉnh Sửa Khách Hàng
+                    <i class="fas fa-user-edit icon-aligned"></i>Chỉnh Sửa Khách Hàng
                 </h1>
                 <p class="text-white-50 mb-0">Cập nhật thông tin khách hàng: {{ $customer->Hoten }}</p>
             </div>
             <div>
                 <a href="{{ route('admin.customers.show', $customer->Manguoidung) }}" class="btn btn-light mr-2">
-                    <i class="fas fa-eye mr-1"></i>
+                    <i class="fas fa-eye"></i>
                     <span>Xem Chi Tiết</span>
                 </a>
                 <a href="{{ route('admin.customers.index') }}" class="btn btn-light">
-                    <i class="fas fa-arrow-left mr-1"></i>
+                    <i class="fas fa-arrow-left"></i>
                     <span>Quay Lại</span>
                 </a>
             </div>
@@ -559,7 +654,7 @@
             <div class="card customer-card animate-fade-in">
                 <div class="card-header-gradient py-3">
                     <h6 class="m-0 font-weight-bold text-white">
-                        <i class="fas fa-user-edit mr-2"></i>Thông Tin Khách Hàng
+                        <i class="fas fa-user-edit icon-aligned"></i>Thông Tin Khách Hàng
                     </h6>
                 </div>
                 <div class="card-body p-4">
@@ -570,7 +665,7 @@
                         <!-- Personal Information -->
                         <div class="form-section">
                             <h5 class="form-section-title">
-                                <i class="fas fa-user-circle"></i> Thông Tin Cá Nhân
+                                <i class="fas fa-user-circle icon-aligned"></i> Thông Tin Cá Nhân
                             </h5>
                             <div class="form-section-content">
                                 <div class="row">
@@ -644,7 +739,7 @@
                         <!-- Contact Information -->
                         <div class="form-section">
                             <h5 class="form-section-title">
-                                <i class="fas fa-address-card"></i> Thông Tin Liên Hệ
+                                <i class="fas fa-address-card icon-aligned"></i> Thông Tin Liên Hệ
                             </h5>
                             <div class="form-section-content">
                                 <div class="row">
@@ -715,7 +810,7 @@
             <div class="card customer-card animate-fade-in">
                 <div class="card-header-gradient py-3">
                     <h6 class="m-0 font-weight-bold text-white">
-                        <i class="fas fa-id-card mr-2"></i>Thông Tin Khách Hàng
+                        <i class="fas fa-id-card icon-aligned"></i>Thông Tin Khách Hàng
                     </h6>
                 </div>
                 <div class="card-body p-0">
@@ -749,7 +844,7 @@
                         
                         <div class="customer-membership-badge {{ $badgeClass }}">
                             @if($hangName != 'Thành viên Bạc')
-                                <i class="fas fa-crown mr-1"></i>
+                                <i class="fas fa-crown icon-aligned"></i>
                             @endif
                             {{ $hangName }}
                         </div>
@@ -798,10 +893,10 @@
             <div class="card customer-card animate-fade-in mt-4">
                 <div class="card-header-gradient py-3">
                     <h6 class="m-0 font-weight-bold text-white">
-                        <i class="fas fa-history mr-2"></i>Hoạt Động Gần Đây
+                        <i class="fas fa-history icon-aligned"></i>Hoạt Động Gần Đây
                     </h6>
                 </div>
-                <div class="card-body p-3">
+                <div class="card-body p-2">
                     <div class="timeline">
                         @php
                             $recentActivities = collect();
@@ -837,16 +932,16 @@
                                 <div class="timeline-marker"></div>
                                 <div class="timeline-content">
                                     <div class="timeline-date">
-                                        <i class="fas fa-clock mr-1"></i>
+                                        <i class="fas fa-clock"></i>
                                         {{ \Carbon\Carbon::parse($activity['date'])->format('d/m/Y H:i') }}
                                     </div>
                                     <div class="timeline-title">
                                         @if($activity['type'] == 'order')
-                                            <i class="fas fa-shopping-cart mr-1 text-primary"></i>
+                                            <i class="fas fa-shopping-cart text-primary"></i>
                                         @else
-                                            <i class="fas fa-calendar-check mr-1 text-primary"></i>
+                                            <i class="fas fa-calendar-check text-primary"></i>
                                         @endif
-                                        {{ $activity['title'] }}
+                                        <span>{{ $activity['title'] }}</span>
                                     </div>
                                     <div class="timeline-body">
                                         {{ $activity['content'] }}
