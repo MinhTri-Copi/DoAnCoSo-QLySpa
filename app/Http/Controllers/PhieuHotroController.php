@@ -5,20 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\PhieuHoTro;
 use App\Models\TrangThai;
 use App\Models\User;
-use App\Models\PTHoTro;
+use App\Models\Pthotro;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class PhieuHoTroController extends Controller
 {
     public function index()
     {
-        $phieuHoTros = PhieuHoTro::with('trangThai', 'user', 'ptHoTro')->get();
-        $users = User::all();
-        $ptHoTros = PTHoTro::all();
-        $trangThais = TrangThai::all();
-        
-        return view('backend.phieuhotro.index', compact('phieuHoTros', 'users', 'ptHoTros', 'trangThais'));
+        $phieuHoTros = PhieuHoTro::with('trangThai', 'user')->get();
+        return view('backend.phieuhotro.index', compact('phieuHoTros'));
     }
 
     public function create()
@@ -27,7 +22,7 @@ class PhieuHoTroController extends Controller
         $suggestedMaphieuHT = $maxMaphieuHT + 1;
         $trangThais = TrangThai::all();
         $users = User::all();
-        $pthotros = PTHoTro::all(); // Load danh sách phương thức hỗ trợ
+        $pthotros = Pthotro::all(); // Load danh sách phương thức hỗ trợ
         return view('backend.phieuhotro.create', compact('suggestedMaphieuHT', 'trangThais', 'users', 'pthotros'));
     }
 
@@ -74,7 +69,7 @@ class PhieuHoTroController extends Controller
         $phieuHoTro = PhieuHoTro::findOrFail($id);
         $trangThais = TrangThai::all();
         $users = User::all();
-        $pthotros = PTHoTro::all(); // Load danh sách phương thức hỗ trợ
+        $pthotros = Pthotro::all(); // Load danh sách phương thức hỗ trợ
         return view('backend.phieuhotro.edit', compact('phieuHoTro', 'trangThais', 'users', 'pthotros'));
     }
 

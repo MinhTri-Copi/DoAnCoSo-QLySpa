@@ -21,7 +21,6 @@ use App\Http\Controllers\HoaDonVaThanhToanController;
 use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
-use App\Models\HangThanhVien;
 
 
 
@@ -56,27 +55,18 @@ Route::get('/customer/home', function () {
 
 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
-    // Routes cho quản lý trạng thái quảng cáo
-    Route::resource('ad-statuses', AdStatusController::class, ['names' => 'admin.ad-statuses']);
-    Route::get('ad-statuses/{id}/confirm-destroy', [AdStatusController::class, 'confirmDestroy'])->name('admin.ad-statuses.confirm-destroy');
-    Route::get('ad-statuses-statistics', [AdStatusController::class, 'statistics'])->name('admin.ad-statuses.statistics');
+    Route::resource('ad-statuses', AdStatusController::class);
+    Route::get('ad-statuses/{id}/confirm-destroy', [AdStatusController::class, 'confirmDestroy'])->name('ad-statuses.confirm-destroy');
+
 
     Route::resource('customers', CustomerController::class, ['names' => 'admin.customers']);
-    Route::get('customers/{id}/confirm-destroy', [CustomerController::class, 'confirmDestroy'])->name('admin.customers.confirmDestroy');
-    Route::post('customers/{id}/add-points', [CustomerController::class, 'addPoints'])->name('admin.customers.addPoints');
+    Route::get('customers/{id}/confirm-destroy', [CustomerController::class, 'confirmDestroy'])->name('admin.customers.confirm-destroy');
 
     // Routes cho quản lý quảng cáo
     Route::resource('advertisements', AdvertisementController::class, ['names' => 'admin.advertisements']);
     Route::get('advertisements/{id}/confirm-destroy', [AdvertisementController::class, 'confirmDestroy'])->name('admin.advertisements.confirm-destroy');
     Route::resource('roles', RoleController::class, ['names' => 'admin.roles']);
-    Route::get('roles/{id}/confirm-destroy', [RoleController::class, 'confirmDestroy'])->name('admin.roles.confirmDestroy');
-    Route::post('roles/bulk-action', [RoleController::class, 'bulkAction'])->name('admin.roles.bulkAction');
-    
-    // API Routes for role statistics
-    Route::get('roles/{id}/stats/department', [RoleController::class, 'getDepartmentDistribution'])->name('admin.roles.stats.department');
-    Route::get('roles/{id}/stats/permissions/{period?}', [RoleController::class, 'getPermissionsComparison'])->name('admin.roles.stats.permissions');
-    Route::get('roles/{id}/stats/performance/{period?}', [RoleController::class, 'getPerformanceMetrics'])->name('admin.roles.stats.performance');
-    Route::get('roles/{id}/stats/topstaff/{period?}', [RoleController::class, 'getTopStaff'])->name('admin.roles.stats.topstaff');
+    Route::get('roles/{id}/confirm-destroy', [RoleController::class, 'confirmDestroy'])->name('admin.roles.confirm-destroy');
 
     // Routes cho quản lý tài khoản
     Route::resource('accounts', AccountController::class, ['names' => 'admin.accounts']);
@@ -104,17 +94,11 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
    // Route cho quản lý dịch vụ (DICHVU)
    Route::resource('dichvu', DichVuController::class, ['names' => 'admin.dichvu']);
    Route::get('dichvu/{id}/confirm-destroy', [DichVuController::class, 'confirmDestroy'])->name('admin.dichvu.confirm-destroy');
-   Route::put('dichvu/{id}/update-status', [DichVuController::class, 'updateStatus'])->name('admin.dichvu.update-status');
-   Route::get('dichvu/analytics/data', [DichVuController::class, 'analytics'])->name('admin.dichvu.analytics');
-   Route::get('dichvu/export/csv', [DichVuController::class, 'export'])->name('admin.dichvu.export');
-   Route::post('dichvu/{id}/toggle-featured', [DichVuController::class, 'toggleFeatured'])->name('admin.dichvu.toggle-featured');
-   Route::get('api/services', [DichVuController::class, 'apiServices'])->name('api.services');
 
-   // Route cho quản lý đặt lịch (DATLICH)
-Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich']);
-Route::get('datlich/{id}/confirmDestroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirmDestroy');
-Route::get('datlich-statistics', [DatLichController::class, 'statistics'])->name('admin.datlich.statistics');
-Route::get('datlich/check-availability', [DatLichController::class, 'checkAvailability'])->name('admin.datlich.checkAvailability');
+
+   //Route cho quản lý đặt lịch (DATLICH)
+   Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich']);
+    Route::get('datlich/{id}/confirm-destroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirm-destroy');
 
     // Route cho quản lý trạng thái phòng (TRANGTHAIPHONG)
     Route::resource('trangthaiphong', TrangThaiPhongController::class, ['names' => 'admin.trangthaiphong']);
@@ -126,20 +110,15 @@ Route::get('datlich/check-availability', [DatLichController::class, 'checkAvaila
 
     // Route cho quản lý phương thức (PHUONGTHUC)
     Route::resource('phuongthuc', PhuongThucController::class, ['names' => 'admin.phuongthuc']);
-    Route::get('phuongthuc/{id}/confirm-destroy', [PhuongThucController::class, 'confirmDestroy'])->name('admin.phuongthuc.confirmDestroy');
+    Route::get('phuongthuc/{id}/confirm-destroy', [PhuongThucController::class, 'confirmDestroy'])->name('admin.phuongthuc.confirm-destroy');
 
     // Routes cho quản lý lịch sử điểm thưởng (LSDIEMTHUONG)
     Route::resource('lsdiemthuong', PointHistoryController::class, ['names' => 'admin.lsdiemthuong']);
     Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirm-destroy');
 
-// Route cho quản lý hóa đơn và thanh toán
-Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
-Route::get('hoadonvathanhtoan/{id}/confirmDestroy', [HoaDonVaThanhToanController::class, 'confirmDestroy'])->name('admin.hoadonvathanhtoan.confirmDestroy');
-Route::get('hoadonvathanhtoan/{id}/print', [HoaDonVaThanhToanController::class, 'print'])->name('admin.hoadonvathanhtoan.print');
-Route::get('hoadonvathanhtoan-statistics', [HoaDonVaThanhToanController::class, 'statistics'])->name('admin.hoadonvathanhtoan.statistics');
-Route::get('hoadonvathanhtoan-export-excel', [HoaDonVaThanhToanController::class, 'exportExcel'])->name('admin.hoadonvathanhtoan.exportExcel');
-Route::get('hoadonvathanhtoan/{id}/create-danhgia', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.createDanhGia');
-Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController::class, 'storeDanhGia'])->name('admin.hoadonvathanhtoan.storeDanhGia');
+// Routes cho quản lý hóa đơn và thanh toán (HOADON_VA_THANHTOAN)
+    Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
+    Route::get('hoadonvathanhtoan/{id}/confirm-destroy', [HoaDonVaThanhToanController::class, 'confirmDestroy'])->name('admin.hoadonvathanhtoan.confirm-destroy');
     
     // Routes cho đánh giá hóa đơn
     Route::get('hoadonvathanhtoan/{id}/danhgia/create', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.danhgia.create');
@@ -152,9 +131,5 @@ Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController
 
     // Routes cho tìm kiếm
     Route::get('/search', [SearchController::class, 'searchByFunction'])->name('admin.search');
-    
 });
-
-// API để lấy thông tin đặt lịch cho hóa đơn
-Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
 

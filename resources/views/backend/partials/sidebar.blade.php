@@ -52,20 +52,6 @@
                 <li><a href="{{ route('admin.dichvu.index') }}"><i class="fas fa-list-alt"></i> Dịch vụ</a></li>
                 <li><a href="{{ route('admin.datlich.index') }}"><i class="fas fa-calendar-check"></i> Đặt lịch</a></li>
                 <li><a href="{{ route('admin.phong.index') }}"><i class="fas fa-door-open"></i> Phòng</a></li>
-                <li><a href="{{ route('admin.trangthaiphong.index') }}"><i class="fas fa-door-closed"></i> Trạng thái phòng</a></li>
-            </ul>
-        </li>
-        
-        <li class="menu-item has-submenu">
-            <a href="#" class="menu-link">
-                <i class="fas fa-bullhorn"></i>
-                <span>Quản lý quảng cáo</span>
-                <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-                <li><a href="{{ route('admin.advertisements.index') }}"><i class="fas fa-ad"></i> Quảng cáo</a></li>
-                <li><a href="{{ route('admin.ad-statuses.index') }}"><i class="fas fa-tag"></i> Trạng thái quảng cáo</a></li>
-                <li><a href="{{ route('admin.ad-statuses.statistics') }}"><i class="fas fa-chart-pie"></i> Thống kê quảng cáo</a></li>
             </ul>
         </li>
         
@@ -90,7 +76,6 @@
             <ul class="submenu">
                 <li><a href="{{ route('admin.hoadonvathanhtoan.index') }}"><i class="fas fa-file-invoice-dollar"></i> Hóa đơn & thanh toán</a></li>
                 <li><a href="{{ route('admin.lsdiemthuong.index') }}"><i class="fas fa-coins"></i> Lịch sử điểm thưởng</a></li>
-                <li><a href="{{ route('admin.phuongthuc.index') }}"><i class="fas fa-credit-card"></i> Phương thức thanh toán</a></li>
             </ul>
         </li>
         
@@ -98,13 +83,6 @@
             <a href="{{ route('admin.danhgia.index') }}" class="menu-link">
                 <i class="fas fa-star"></i>
                 <span>Quản lý đánh giá</span>
-            </a>
-        </li>
-        
-        <li class="menu-item">
-            <a href="{{ route('admin.trangthai.index') }}" class="menu-link">
-                <i class="fas fa-tags"></i>
-                <span>Trạng thái</span>
             </a>
         </li>
         
