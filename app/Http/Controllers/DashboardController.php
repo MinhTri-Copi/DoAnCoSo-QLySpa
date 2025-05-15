@@ -114,11 +114,18 @@ class DashboardController extends Controller
             $chartData[$i] = $monthlyRevenue[$i] ?? 0;
         }
 
-        // Đặt lịch gần đây
+        // Đặt lịch gần đây - chỉ hiển thị lịch đặt từ hôm nay và sắp xếp theo thứ tự thời gian
         $recentBookings = DatLich::with(['user', 'dichVu'])
-            ->orderBy('Thoigiandatlich', 'desc')
-            ->take(5)
+            ->where('Thoigiandatlich', '>=', Carbon::today())
+            ->orderBy('Thoigiandatlich', 'asc')
+            ->take(10)
             ->get();
+            
+        // Đếm số lịch đặt sắp tới trong vòng 1 giờ tới chỉ trong ngày hôm nay
+        $urgentBookingsCount = DatLich::where('Thoigiandatlich', '>=', Carbon::now())
+            ->where('Thoigiandatlich', '<=', Carbon::now()->addHour())
+            ->whereDate('Thoigiandatlich', Carbon::today())
+            ->count();
 
         // Đánh giá gần đây
         try {
@@ -171,7 +178,8 @@ class DashboardController extends Controller
             'dayOfWeekStats',
             'roomStats',
             'accountStats',
-            'period'
+            'period',
+            'urgentBookingsCount'
         ));
     }
 

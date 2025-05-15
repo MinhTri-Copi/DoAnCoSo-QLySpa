@@ -424,4 +424,51 @@ class DatLichController extends Controller
             'timeSlots' => $availableTimeSlots
         ]);
     }
+
+    /**
+     * Update status of a booking via AJAX
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            // Log the request
+            \Log::info('Update booking status request:', [
+                'id' => $id,
+                'status' => $request->status
+            ]);
+            
+            // Validate input
+            $request->validate([
+                'status' => 'required|string|in:Đã xác nhận,Đã hủy,Chờ xác nhận,Đã đặt,Hoàn thành'
+            ]);
+            
+            // Find the booking
+            $datLich = DatLich::findOrFail($id);
+            
+            // Update status
+            $datLich->Trangthai_ = $request->status;
+            $datLich->save();
+            
+            // Return success response
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái thành công',
+                'data' => [
+                    'id' => $datLich->MaDL,
+                    'status' => $datLich->Trangthai_
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating booking status: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi cập nhật trạng thái: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

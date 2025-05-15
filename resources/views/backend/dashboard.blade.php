@@ -146,6 +146,52 @@
         background-color: #e74c3c;
     }
     
+    /* Animation for removing rows */
+    .booking-row {
+        transition: all 0.3s ease;
+    }
+    
+    .booking-row.fade-out {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    
+    /* Pulsing dot for upcoming bookings within 1 hour */
+    .urgent-booking-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ff3860;
+        margin-right: 6px;
+        position: relative;
+    }
+    
+    .urgent-booking-dot::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: rgba(255, 56, 96, 0.7);
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        70% {
+            transform: scale(2);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+    
     .user-name {
         color: white;
         font-size: 0.9rem;
@@ -572,6 +618,25 @@
     }
 
     /* Time filter styles are now in time-filter.css */
+
+    /* Style for rows with urgent bookings */
+    .urgent-booking {
+        background-color: rgba(255, 56, 96, 0.05) !important;
+        border-left: 3px solid #ff3860 !important;
+    }
+    
+    /* Subtle pulse animation for the urgent alert banner */
+    @keyframes pulse-subtle {
+        0% {
+            box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3);
+        }
+        50% {
+            box-shadow: 0 4px 20px rgba(255, 56, 96, 0.5);
+        }
+        100% {
+            box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3);
+        }
+    }
 </style>
 @endsection
 
@@ -582,7 +647,25 @@
         <h1><i class="fas fa-spa"></i> Chào mừng đến với Rosa Admin!</h1>
         <p>Quản lý hoạt động spa của bạn một cách dễ dàng và hiệu quả</p>
         <div class="shine-line"></div>
+    </div>
+    
+    @if($urgentBookingsCount > 0)
+    <!-- Thông báo lịch đặt sắp tới trong vòng 1 giờ -->
+    <div class="alert alert-urgent mb-4" style="background: linear-gradient(135deg, #ff3860, #ff5e57); color: white; border-radius: 8px; padding: 15px 20px; box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3); border-left: 5px solid #ff1744; display: flex; align-items: center; justify-content: space-between; animation: pulse-subtle 2s infinite;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle fa-2x mr-3" style="color: white;"></i>
+            <div>
+                <h5 style="font-weight: 600; margin-bottom: 5px; color: white; font-size: 16px;">Cảnh báo lịch đặt hôm nay!</h5>
+                <p style="margin-bottom: 0; font-size: 14px;">
+                    <span style="font-weight: 700; font-size: 16px;">{{ $urgentBookingsCount }}</span> cuộc hẹn trong hôm nay sẽ diễn ra trong vòng 1 giờ tới!
+                </p>
+            </div>
         </div>
+        <a href="#booking-section" class="btn btn-light btn-sm" style="background-color: white; color: #ff3860; border: none; font-weight: 600; padding: 8px 16px; border-radius: 6px; transition: all 0.2s ease;">
+            <i class="fas fa-eye mr-1"></i> Xem ngay
+        </a>
+    </div>
+    @endif
     
     <!-- Bộ lọc thời gian -->
     <div class="position-relative" style="z-index: 100;">
@@ -911,10 +994,10 @@
     <div class="row mt-4">
         <div class="col-lg-8">
             <div class="row">
-                <div class="col-lg-6 mb-4">
+                <div class="col-lg-6 mb-4" id="booking-section">
                     <div class="dashboard-card" style="border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); background-color: white; height: 100%;">
                         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white; border-bottom: 1px solid #f0f0f0; padding: 18px 24px; border-radius: 15px 15px 0 0;">
-                            <h5 class="mb-0" style="font-weight: 600; color: #333;"><i class="fas fa-calendar-alt mr-2" style="color: #db7093;"></i> Đặt Lịch Gần Đây</h5>
+                            <h5 class="mb-0" style="font-weight: 600; color: #333;"><i class="fas fa-calendar-alt mr-2" style="color: #db7093;"></i> Lịch Đặt Sắp Tới</h5>
                             <div class="d-flex align-items-center">
                                 <span class="badge d-flex align-items-center mr-2" style="background-color: #db7093; color: white; border-radius: 20px; padding: 5px 12px; font-size: 12px;">
                                     <i class="fas fa-clock mr-1"></i> {{ count($recentBookings) }}
@@ -931,23 +1014,24 @@
                             <div class="d-flex justify-content-between align-items-center px-4 py-3" style="background-color: #f9f9f9; border-bottom: 1px solid #f0f0f0;">
                                 <div class="d-flex align-items-center">
                                     <div class="mr-3">
-                                        <label for="filter-status" class="mb-0 mr-2" style="font-size: 0.85rem; color: #666; font-weight: 500;">Trạng thái:</label>
-                                        <select id="filter-status" class="form-control form-control-sm" style="display: inline-block; width: auto; padding: 4px 8px; font-size: 0.85rem; border-radius: 6px; border-color: #e0e0e0;">
-                                            <option value="all">Tất cả</option>
-                                            <option value="Đã xác nhận">Đã xác nhận</option>
-                                            <option value="Chờ xác nhận">Chờ xác nhận</option>
-                                            <option value="Đã đặt">Đã đặt</option>
-                                            <option value="Đã hủy">Đã hủy</option>
-                                        </select>
+                                        <div style="font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 5px;">Lọc theo ngày:</div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="date" id="booking-filter-date" class="form-control form-control-sm booking-filter" style="display: inline-block; width: auto; padding: 4px 8px; font-size: 0.85rem; border-radius: 6px; border-color: #e0e0e0;">
+                                            <button id="reset-date-filter" class="btn btn-sm ml-2" style="background-color: #f1f1f1; border: none; color: #666; padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; width: 32px; height: 32px;">
+                                                <i class="fas fa-redo-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <div>
-                                        <label for="sort-order" class="mb-0 mr-2" style="font-size: 0.85rem; color: #666; font-weight: 500;">Sắp xếp:</label>
-                                        <select id="sort-order" class="form-control form-control-sm" style="display: inline-block; width: auto; padding: 4px 8px; font-size: 0.85rem; border-radius: 6px; border-color: #e0e0e0;">
-                                            <option value="newest">Mới nhất trước</option>
-                                            <option value="oldest">Cũ nhất trước</option>
-                                        </select>
+                                        <div style="font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 5px;">Sắp xếp:</div>
+                                        <div>
+                                            <select id="booking-sort-order" class="form-control form-control-sm booking-filter" style="display: inline-block; width: auto; padding: 4px 8px; font-size: 0.85rem; border-radius: 6px; border-color: #e0e0e0;">
+                                                <option value="soonest">Gần nhất trước</option>
+                                                <option value="latest">Xa nhất trước</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -955,76 +1039,83 @@
                                 <table class="data-table table mb-0" style="font-size: 0.9rem;">
                                     <thead style="background-color: #f9f9f9;">
                                         <tr>
-                                            <th class="pl-4 py-3" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Trạng thái</th>
+                                            <th class="pl-4 py-3" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Thời gian</th>
                                             <th class="py-3" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Khách hàng</th>
-                                            <th class="py-3" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Dịch vụ</th>
-                                            <th class="pr-4 py-3 text-center" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Hành động</th>
+                                            <th class="pr-4 py-3" style="border-top: none; color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.75rem;">Dịch vụ</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="booking-table-body">
                                         @forelse($recentBookings as $booking)
-                                        <tr style="border-bottom: 1px solid #f5f5f5;">
+                                        @php
+                                            $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich);
+                                            $isUrgent = $bookingTime->diffInMinutes(now()) < 60 && $bookingTime->isFuture() && $bookingTime->isToday();
+                                        @endphp
+                                        <tr style="border-bottom: 1px solid #f5f5f5; cursor: pointer;" 
+                                            class="booking-row {{ $isUrgent ? 'urgent-booking' : '' }}" 
+                                            data-status="{{ $booking->Trangthai_ }}" 
+                                            data-id="{{ $booking->MaDL }}"
+                                            onclick="window.location.href='{{ route('admin.datlich.show', $booking->MaDL) }}'">
                                             <td class="pl-4 py-3">
-                                                @if($booking->Trangthai_ == 'Đã đặt')
-                                                    <span style="display: inline-block; padding: 5px 10px; border-radius: 20px; background-color: rgba(66, 153, 225, 0.15); color: #4299e1; font-size: 0.75rem; font-weight: 500;">
-                                                        <i class="fas fa-calendar-check mr-1"></i> Đã đặt
-                                                    </span>
-                                                @elseif($booking->Trangthai_ == 'Đã xác nhận')
-                                                    <span style="display: inline-block; padding: 5px 10px; border-radius: 20px; background-color: rgba(72, 187, 120, 0.15); color: #48bb78; font-size: 0.75rem; font-weight: 500;">
-                                                        <i class="fas fa-check-circle mr-1"></i> Đã xác nhận
-                                                    </span>
-                                                @elseif($booking->Trangthai_ == 'Hủy' || $booking->Trangthai_ == 'Đã hủy')
-                                                    <span style="display: inline-block; padding: 5px 10px; border-radius: 20px; background-color: rgba(229, 62, 62, 0.15); color: #e53e3e; font-size: 0.75rem; font-weight: 500;">
-                                                        <i class="fas fa-times-circle mr-1"></i> Đã hủy
-                                                    </span>
-                                                @elseif($booking->Trangthai_ == 'Chờ xác nhận')
-                                                    <span style="display: inline-block; padding: 5px 10px; border-radius: 20px; background-color: rgba(246, 173, 85, 0.15); color: #f6ad55; font-size: 0.75rem; font-weight: 500;" title="Chờ xác nhận">
-                                                        <i class="fas fa-clock mr-1"></i> Chờ xác nhận
-                                                    </span>
-                                                @else
-                                                    <span data-bs-toggle="tooltip" title="{{ $booking->Trangthai_ ?? 'Trạng thái khác' }}" style="display: inline-block; padding: 5px 10px; border-radius: 20px; background-color: rgba(160, 174, 192, 0.15); color: #718096; font-size: 0.75rem; font-weight: 500;">
-                                                        <i class="fas fa-question-circle mr-1"></i> {{ substr($booking->Trangthai_ ?? 'Khác', 0, 10) }}
-                                                    </span>
-                                                @endif
+                                                <div class="d-flex flex-column">
+                                                    <div style="font-weight: 600; color: #333; margin-bottom: 3px;">
+                                                        @if($isUrgent)
+                                                        <span class="urgent-booking-dot" title="Sắp diễn ra (dưới 1 giờ)"></span>
+                                                        @endif
+                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y') }}
+                                                    </div>
+                                                    <div style="font-size: 0.8rem; color: #888;">
+                                                        <i class="far fa-clock mr-1" style="color: #db7093;"></i>
+                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('H:i') }}
+                                                    </div>
+                                                    <div style="margin-top: 5px;">
+                                                        @if($booking->Trangthai_ == 'Đã đặt')
+                                                            <span style="display: inline-block; padding: 4px 8px; border-radius: 20px; background-color: rgba(66, 153, 225, 0.15); color: #4299e1; font-size: 0.7rem; font-weight: 500;">
+                                                                <i class="fas fa-calendar-check mr-1"></i> Đã đặt
+                                                            </span>
+                                                        @elseif($booking->Trangthai_ == 'Chờ xác nhận')
+                                                            <span style="display: inline-block; padding: 4px 8px; border-radius: 20px; background-color: rgba(246, 173, 85, 0.15); color: #f6ad55; font-size: 0.7rem; font-weight: 500;">
+                                                                <i class="fas fa-clock mr-1"></i> Chờ xác nhận
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
                                                     <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($booking->user->Hoten ?? 'N/A'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                                        <i class="fas fa-user"></i>
+                                                        {{ strtoupper(substr($booking->user->Hoten ?? 'N/A', 0, 1)) }}
                                                     </div>
-                                                    <span style="font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">{{ $booking->user->Hoten ?? 'N/A' }}</span>
+                                                    <div>
+                                                        <div style="font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                                                            {{ $booking->user->Hoten ?? 'N/A' }}
+                                                        </div>
+                                                        @if($booking->user && $booking->user->SDT)
+                                                            <div style="font-size: 0.75rem; color: #888;">
+                                                                <i class="fas fa-phone-alt mr-1" style="color: #db7093;"></i> {{ $booking->user->SDT }}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td class="py-3" style="color: #555;">
+                                            <td class="pr-4 py-3" style="color: #555;">
                                                 <div class="d-flex align-items-center" style="margin-bottom: 5px;">
                                                     <div style="width: 24px; height: 24px; background-color: rgba(219, 112, 147, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
                                                         <i class="fas fa-spa" style="color: #db7093; font-size: 0.8rem;"></i>
-                                                </div>
+                                                    </div>
                                                     <span style="font-weight: 500;" data-bs-toggle="tooltip" title="{{ $booking->dichVu->Tendichvu ?? 'N/A' }}">
                                                         {{ Str::limit($booking->dichVu->Tendichvu ?? 'N/A', 20) }}
                                                     </span>
                                                 </div>
+                                                @if($booking->dichVu && $booking->dichVu->Gia)
                                                 <div class="d-flex align-items-center">
                                                     <div style="width: 24px; height: 24px; background-color: rgba(219, 112, 147, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
-                                                        <i class="far fa-clock" style="color: #db7093; font-size: 0.8rem;"></i>
-                                                </div>
+                                                        <i class="fas fa-tag" style="color: #db7093; font-size: 0.8rem;"></i>
+                                                    </div>
                                                     <span style="font-size: 0.75rem; color: #777;">
-                                                    {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y H:i') }}
+                                                        {{ number_format($booking->dichVu->Gia, 0, ',', '.') }} VNĐ
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td class="pr-4 py-3">
-                                                <div class="d-flex justify-content-center">
-                                                    <button class="btn mr-2" data-bs-toggle="tooltip" title="Xem chi tiết" style="background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border: none; padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; transition: all 0.2s;">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="btn mr-2" data-bs-toggle="tooltip" title="Xác nhận" style="background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border: none; padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; transition: all 0.2s;">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn" data-bs-toggle="tooltip" title="Hủy" style="background-color: rgba(229, 62, 62, 0.1); color: #e53e3e; border: none; padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; transition: all 0.2s;">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @endif
                                             </td>
                                         </tr>
                                         @empty
@@ -1034,7 +1125,7 @@
                                                     <div style="width: 70px; height: 70px; margin: 0 auto 15px; background-color: rgba(219, 112, 147, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                                         <i class="fas fa-calendar-times" style="font-size: 32px; color: #db7093;"></i>
                                                     </div>
-                                                    <p style="color: #777; margin: 0; font-size: 0.9rem;">Không có đặt lịch gần đây</p>
+                                                    <p style="color: #777; margin: 0; font-size: 0.9rem;">Không có lịch đặt nào cần xác nhận</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -2280,5 +2371,313 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+</script>
+
+<script>
+    // ... existing script code ...
+
+    // Booking confirmations and filtering
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle booking confirmation buttons
+        const confirmButtons = document.querySelectorAll('.confirm-booking-btn');
+        confirmButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const bookingId = this.getAttribute('data-id');
+                if (confirm('Bạn có chắc chắn muốn xác nhận đặt lịch này không?')) {
+                    updateBookingStatus(bookingId, 'Đã xác nhận');
+                }
+            });
+        });
+
+        // Handle booking cancellation buttons
+        const cancelButtons = document.querySelectorAll('.cancel-booking-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const bookingId = this.getAttribute('data-id');
+                if (confirm('Bạn có chắc chắn muốn hủy đặt lịch này không?')) {
+                    updateBookingStatus(bookingId, 'Đã hủy');
+                }
+            });
+        });
+
+        // Function to update booking status via AJAX
+        function updateBookingStatus(bookingId, status) {
+            // Show loading notification
+            showNotification('loading', 'Đang cập nhật...', 'Vui lòng đợi trong khi chúng tôi cập nhật trạng thái đặt lịch.');
+            
+            fetch(`/admin/datlich/${bookingId}/update-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    status: status
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi khi cập nhật trạng thái');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    const row = document.querySelector(`.booking-row[data-id="${bookingId}"]`);
+                    if (row) {
+                        row.classList.add('fade-out');
+                        setTimeout(() => {
+                            row.remove();
+                            // Check if table is empty
+                            const tbody = document.getElementById('booking-table-body');
+                            if (tbody.querySelectorAll('tr.booking-row').length === 0) {
+                                tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        <div style="padding: 20px;">
+                                            <div style="width: 70px; height: 70px; margin: 0 auto 15px; background-color: rgba(219, 112, 147, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-calendar-times" style="font-size: 32px; color: #db7093;"></i>
+                                            </div>
+                                            <p style="color: #777; margin: 0; font-size: 0.9rem;">Không có lịch đặt nào cần xác nhận</p>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                            }
+                        }, 300);
+                    }
+                    
+                    // Show success notification
+                    showNotification('success', 'Cập nhật thành công', `Trạng thái đặt lịch đã được cập nhật thành ${status}`);
+                } else {
+                    throw new Error(data.message || 'Không thể cập nhật trạng thái');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('error', 'Lỗi cập nhật', error.message);
+            });
+        }
+
+        // Filter bookings by status
+        const statusFilter = document.getElementById('booking-filter-status');
+        const sortOrder = document.getElementById('booking-sort-order');
+        
+        document.querySelectorAll('.booking-filter').forEach(filter => {
+            filter.addEventListener('change', filterBookings);
+        });
+        
+        function filterBookings() {
+            const selectedStatus = statusFilter.value;
+            const rows = document.querySelectorAll('#booking-table-body .booking-row');
+            
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                
+                if (selectedStatus === 'all' || selectedStatus === rowStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Check if any rows are visible
+            let visibleRows = false;
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    visibleRows = true;
+                }
+            });
+            
+            // Show empty message if no rows visible
+            const tbody = document.getElementById('booking-table-body');
+            const emptyMessage = document.querySelector('#booking-table-body .empty-message');
+            
+            if (!visibleRows) {
+                if (!emptyMessage) {
+                    tbody.innerHTML += `
+                    <tr class="empty-message">
+                        <td colspan="4" class="text-center py-5">
+                            <div style="padding: 20px;">
+                                <div style="width: 70px; height: 70px; margin: 0 auto 15px; background-color: rgba(219, 112, 147, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-filter" style="font-size: 32px; color: #db7093;"></i>
+                                </div>
+                                <p style="color: #777; margin: 0; font-size: 0.9rem;">Không có lịch đặt nào phù hợp với bộ lọc</p>
+                            </div>
+                        </td>
+                    </tr>`;
+                }
+            } else if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        }
+        
+        // Notification system
+        function showNotification(type, title, message) {
+            const container = document.querySelector('.notifications-container') || createNotificationContainer();
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    ${type === 'success' ? '<i class="fas fa-check"></i>' : 
+                      type === 'error' ? '<i class="fas fa-times"></i>' : 
+                      '<i class="fas fa-spinner fa-spin"></i>'}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <div class="notification-progress"></div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Show animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Auto remove after delay (except for loading)
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            }
+            
+            return notification;
+        }
+        
+        function createNotificationContainer() {
+            const container = document.createElement('div');
+            container.className = 'notifications-container';
+            document.body.appendChild(container);
+            return container;
+        }
+        
+        function updateNotification(notification, type, title, message) {
+            notification.className = `notification notification-${type} show`;
+            
+            const icon = notification.querySelector('.notification-icon');
+            icon.innerHTML = type === 'success' ? '<i class="fas fa-check"></i>' : 
+                             type === 'error' ? '<i class="fas fa-times"></i>' : 
+                             '<i class="fas fa-spinner fa-spin"></i>';
+            
+            notification.querySelector('.notification-title').textContent = title;
+            notification.querySelector('.notification-message').textContent = message;
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            }
+        }
+    });
+
+</script>
+
+<script>
+    // ... existing script code ...
+
+    // Xử lý lọc theo ngày
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateFilter = document.getElementById('booking-filter-date');
+        const resetBtn = document.getElementById('reset-date-filter');
+        const rows = document.querySelectorAll('#booking-table-body .booking-row');
+        
+        if (dateFilter) {
+            dateFilter.addEventListener('change', function() {
+                const selectedDate = this.value;
+                
+                if (selectedDate) {
+                    rows.forEach(row => {
+                        const dateCell = row.querySelector('td:first-child .d-flex:first-child div:first-child');
+                        if (dateCell) {
+                            const rowDate = convertDateFormat(dateCell.textContent.trim());
+                            if (rowDate === selectedDate) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
+                } else {
+                    // Nếu không chọn ngày, hiển thị tất cả
+                    rows.forEach(row => {
+                        row.style.display = '';
+                    });
+                }
+                
+                // Kiểm tra nếu không có kết quả hiển thị
+                checkEmptyResults();
+            });
+        }
+        
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (dateFilter) {
+                    dateFilter.value = '';
+                    // Hiển thị lại tất cả các hàng
+                    rows.forEach(row => {
+                        row.style.display = '';
+                    });
+                    
+                    // Xóa thông báo không có kết quả nếu có
+                    const emptyMessage = document.querySelector('#booking-table-body .empty-message');
+                    if (emptyMessage) {
+                        emptyMessage.remove();
+                    }
+                }
+            });
+        }
+        
+        // Hàm để chuyển định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
+        function convertDateFormat(dateStr) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            return '';
+        }
+        
+        // Hàm kiểm tra và hiển thị thông báo khi không có kết quả
+        function checkEmptyResults() {
+            let visibleRows = false;
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    visibleRows = true;
+                }
+            });
+            
+            const tbody = document.getElementById('booking-table-body');
+            const emptyMessage = document.querySelector('#booking-table-body .empty-message');
+            
+            if (!visibleRows) {
+                if (!emptyMessage) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'empty-message';
+                    tr.innerHTML = `
+                        <td colspan="3" class="text-center py-5">
+                            <div style="padding: 20px;">
+                                <div style="width: 70px; height: 70px; margin: 0 auto 15px; background-color: rgba(219, 112, 147, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-calendar-times" style="font-size: 32px; color: #db7093;"></i>
+                                </div>
+                                <p style="color: #777; margin: 0; font-size: 0.9rem;">Không có lịch đặt nào cho ngày đã chọn</p>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } else if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        }
+    });
 </script>
 @endsection

@@ -116,6 +116,7 @@ Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich'
 Route::get('datlich/{id}/confirmDestroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirmDestroy');
 Route::get('datlich-statistics', [DatLichController::class, 'statistics'])->name('admin.datlich.statistics');
 Route::get('datlich/check-availability', [DatLichController::class, 'checkAvailability'])->name('admin.datlich.checkAvailability');
+Route::post('datlich/{id}/update-status', [DatLichController::class, 'updateStatus'])->name('admin.datlich.updateStatus');
 Route::get('datlich-dashboard', [DatLichDashboardController::class, 'index'])->name('admin.datlich.dashboard');
 
     // Route cho quản lý trạng thái phòng (TRANGTHAIPHONG)
