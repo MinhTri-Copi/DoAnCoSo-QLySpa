@@ -461,4 +461,25 @@ class HoaDonVaThanhToanController extends Controller
         
         return redirect()->back()->with('success', 'Xuất Excel thành công!');
     }
+
+    /**
+     * Fetch booking details via API
+     */
+    public function getBookingDetails($id)
+    {
+        try {
+            // Sử dụng eager loading để lấy thông tin dịch vụ
+            $booking = DatLich::with(['dichVu', 'user'])->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $booking
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy thông tin đặt lịch: ' . $e->getMessage()
+            ], 404);
+        }
+    }
 }
