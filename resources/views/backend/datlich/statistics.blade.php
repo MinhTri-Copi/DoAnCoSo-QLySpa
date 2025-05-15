@@ -2,7 +2,27 @@
 
 @section('title', 'Thống Kê Đặt Lịch')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+@endsection
+
 @section('content')
+@php
+$headerActions = '
+<a href="' . route('admin.datlich.index') . '" class="spa-btn">
+    <i class="fas fa-arrow-left"></i>
+    <span>Quay Lại</span>
+</a>
+';
+@endphp
+
+@include('backend.layouts.header-banner', [
+    'title' => 'Thống Kê Đặt Lịch',
+    'subtitle' => 'Phân tích dữ liệu đặt lịch',
+    'icon' => 'fas fa-chart-line',
+    'actions' => $headerActions
+])
+
 <style>
     :root {
         --primary-color: #ff6b8b;
@@ -15,51 +35,6 @@
         --danger-color: #dc3545;
         --warning-color: #ffc107;
         --info-color: #17a2b8;
-    }
-
-    .header-container {
-        background-color: var(--primary-color);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
-        color: var(--text-on-primary);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header-title {
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .header-subtitle {
-        font-size: 14px;
-        margin-top: 5px;
-        opacity: 0.9;
-    }
-
-    .btn-white {
-        background-color: white;
-        color: var(--primary-color);
-        border: none;
-        border-radius: 50px;
-        padding: 8px 20px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s;
-        text-decoration: none;
-    }
-
-    .btn-white:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .btn-white i {
-        margin-right: 8px;
     }
 
     .filter-container {
@@ -283,15 +258,6 @@
     }
 
     @media (max-width: 768px) {
-        .header-container {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .btn-white {
-            margin-top: 15px;
-        }
-        
         .filter-form {
             flex-direction: column;
         }
@@ -301,16 +267,6 @@
         }
     }
 </style>
-
-<div class="header-container">
-    <div>
-        <div class="header-title">Thống Kê Đặt Lịch</div>
-        <div class="header-subtitle">Phân tích dữ liệu đặt lịch</div>
-    </div>
-    <a href="{{ route('admin.datlich.index') }}" class="btn-white">
-        <i class="fas fa-arrow-left"></i> Quay Lại
-    </a>
-</div>
 
 <div class="filter-container">
     <div class="filter-title">

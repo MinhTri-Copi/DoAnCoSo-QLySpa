@@ -15,6 +15,24 @@ class DatLichController extends Controller
     {
         $query = DatLich::with('user', 'dichVu');
         
+        // Tìm kiếm tổng quát
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                // Tìm theo mã đặt lịch
+                $q->where('MaDL', 'like', '%' . $search . '%')
+                // Tìm theo người dùng
+                ->orWhereHas('user', function($query) use ($search) {
+                    $query->where('Hoten', 'like', '%' . $search . '%')
+                        ->orWhere('SDT', 'like', '%' . $search . '%');
+                })
+                // Tìm theo dịch vụ
+                ->orWhereHas('dichVu', function($query) use ($search) {
+                    $query->where('Tendichvu', 'like', '%' . $search . '%');
+                });
+            });
+        }
+        
         // Tìm kiếm theo người dùng
         if ($request->has('user_id') && $request->user_id) {
             $query->where('Manguoidung', $request->user_id);
@@ -52,7 +70,7 @@ class DatLichController extends Controller
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
         
-        $datLichs = $query->paginate(10);
+        $datLichs = $query->paginate(10)->withQueryString();
         
         // Lấy danh sách người dùng và dịch vụ cho bộ lọc
         $users = User::all();
@@ -77,97 +95,68 @@ class DatLichController extends Controller
 
     public function store(Request $request)
     {
-        // Log the received data for debugging
-        \Log::info('Received booking data:', $request->all());
+        // Log dữ liệu đầu vào
+        \Log::info('Dữ liệu nhận được:', $request->all());
         
-        // Xử lý trường hợp nhận bookingDate và bookingTime thay vì Thoigiandatlich
-        if ($request->has('bookingDate') && $request->has('bookingTime') && !$request->filled('Thoigiandatlich')) {
-            $request->merge([
-                'Thoigiandatlich' => $request->bookingDate . ' ' . $request->bookingTime . ':00'
-            ]);
-            \Log::info('Created Thoigiandatlich from date and time:', ['Thoigiandatlich' => $request->Thoigiandatlich]);
-        }
-        
-        $request->validate([
-            'Manguoidung' => 'required|exists:USER,Manguoidung',
-            'Thoigiandatlich' => 'required|date',
-            'Trangthai_' => 'required|string|max:50',
-            'MaDV' => 'required|exists:DICHVU,MaDV',
-        ], [
-            'Manguoidung.required' => 'Vui lòng chọn người dùng.',
-            'Manguoidung.exists' => 'Người dùng không hợp lệ.',
-            'Thoigiandatlich.required' => 'Thời gian đặt lịch không được để trống.',
-            'Thoigiandatlich.date' => 'Thời gian đặt lịch không hợp lệ.',
-            'Trangthai_.required' => 'Trạng thái không được để trống.',
-            'Trangthai_.max' => 'Trạng thái không được vượt quá 50 ký tự.',
-            'MaDV.required' => 'Vui lòng chọn dịch vụ.',
-            'MaDV.exists' => 'Dịch vụ không hợp lệ.',
-        ]);
-
-        // Lấy ngày từ thời gian đặt lịch
-        $bookingDate = Carbon::parse($request->Thoigiandatlich)->format('Y-m-d');
-        
-        // Kiểm tra số lượng lịch đặt trong ngày không vượt quá 30
-        $bookingsCountInDay = DatLich::whereDate('Thoigiandatlich', $bookingDate)->count();
-        if ($bookingsCountInDay >= 30) {
-            return redirect()->back()->withInput()->with('error', 'Đã đạt giới hạn 30 lịch đặt trong ngày này. Vui lòng chọn ngày khác.');
-        }
-        
-        // Lấy thông tin dịch vụ
-        $dichVu = DichVu::findOrFail($request->MaDV);
-        
-        // Lấy thời gian dịch vụ (phút)
-        $serviceTime = $dichVu->Thoigian;
-        
-        // Thời gian đặt lịch
-        $bookingTime = Carbon::parse($request->Thoigiandatlich);
-        
-        // Tính thời gian kết thúc dịch vụ
-        $endTime = (clone $bookingTime)->addMinutes($serviceTime);
-        
-        // Kiểm tra số lượng lịch đặt cho dịch vụ này trong cùng khung giờ
-        $overlappingBookings = DatLich::where('MaDV', $request->MaDV)
-            ->where(function($query) use ($bookingTime, $endTime) {
-                // Lịch đặt bắt đầu trong khoảng thời gian dịch vụ
-                $query->whereBetween('Thoigiandatlich', [$bookingTime, $endTime])
-                    // Hoặc lịch đặt kết thúc trong khoảng thời gian dịch vụ
-                    ->orWhere(function($q) use ($bookingTime, $endTime) {
-                        $q->where('Thoigiandatlich', '<=', $bookingTime)
-                          ->whereRaw("DATE_ADD(Thoigiandatlich, INTERVAL (SELECT Thoigian FROM DICHVU WHERE MaDV = DATLICH.MaDV) MINUTE) >= ?", [$bookingTime]);
-                    });
-            })
-            ->count();
-        
-        // Nếu dịch vụ có thời gian 30 phút, giới hạn 2 lịch đặt cùng lúc
-        $maxConcurrentBookings = 2;
-        if ($overlappingBookings >= $maxConcurrentBookings) {
-            return redirect()->back()->withInput()->with('error', 'Đã đạt giới hạn số lượng lịch đặt cho dịch vụ này trong khung giờ đã chọn. Vui lòng chọn thời gian khác.');
-        }
-        
-        // Lấy giá trị MaDL lớn nhất
-        $maxMaDL = DatLich::max('MaDL');
-        if ($maxMaDL) {
-            $number = (int) substr($maxMaDL, 2);
-            $suggestedMaDL = 'DL' . ($number + 1);
-        } else {
-            $suggestedMaDL = 'DL1';
-        }
-
         try {
+            // Xử lý dữ liệu ngày và giờ
+            if ($request->has('bookingDate') && $request->has('bookingTime')) {
+                $bookingDateTime = $request->bookingDate . ' ' . $request->bookingTime . ':00';
+                $request->merge([
+                    'Thoigiandatlich' => $bookingDateTime
+                ]);
+                \Log::info('Đã tạo Thoigiandatlich:', ['value' => $bookingDateTime]);
+            }
+            
+            // Validate dữ liệu cơ bản
+            $request->validate([
+                'Manguoidung' => 'required',
+                'MaDV' => 'required',
+                'Trangthai_' => 'required'
+            ], [
+                'Manguoidung.required' => 'Vui lòng chọn người dùng.',
+                'MaDV.required' => 'Vui lòng chọn dịch vụ.',
+                'Trangthai_.required' => 'Vui lòng chọn trạng thái.'
+            ]);
+            
+            // Tạo mã đặt lịch mới
+            $suggestedMaDL = 'DL1';
+            $maxMaDL = DatLich::max('MaDL');
+            
+            if ($maxMaDL) {
+                if (is_numeric($maxMaDL)) {
+                    $suggestedMaDL = $maxMaDL + 1;
+                } else {
+                    $matches = [];
+                    preg_match('/DL(\d+)/', $maxMaDL, $matches);
+                    if (isset($matches[1])) {
+                        $number = (int)$matches[1];
+                        $suggestedMaDL = 'DL' . ($number + 1);
+                    }
+                }
+            }
+            
+            \Log::info('Mã đặt lịch mới:', ['MaDL' => $suggestedMaDL]);
+            
+            // Lưu lịch đặt vào database
             DB::beginTransaction();
             
-            DatLich::create([
-                'MaDL' => $suggestedMaDL,
-                'Manguoidung' => $request->Manguoidung,
-                'Thoigiandatlich' => $request->Thoigiandatlich,
-                'Trangthai_' => $request->Trangthai_,
-                'MaDV' => $request->MaDV,
-            ]);
+            $datLich = new DatLich();
+            $datLich->MaDL = $suggestedMaDL;
+            $datLich->Manguoidung = $request->Manguoidung;
+            $datLich->MaDV = $request->MaDV;
+            $datLich->Thoigiandatlich = $request->Thoigiandatlich;
+            $datLich->Trangthai_ = $request->Trangthai_;
+            $saved = $datLich->save();
+            
+            \Log::info('Kết quả lưu:', ['success' => $saved]);
             
             DB::commit();
-            return redirect()->route('admin.datlich.index')->with('success', 'Thêm đặt lịch thành công!');
+            
+            return redirect()->route('admin.datlich.index')->with('success', 'Thêm lịch đặt thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Lỗi lưu lịch đặt: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
         }
     }
@@ -314,7 +303,7 @@ class DatLichController extends Controller
         $startDate = Carbon::parse($startDate)->startOfDay();
         $endDate = Carbon::parse($endDate)->endOfDay();
         
-        // Tổng số lịch đặt trong khoảng thời gian
+        // Tổng số lịch đặt trong khoảng thời gian (bao gồm tất cả các trạng thái)
         $totalBookings = DatLich::whereBetween('Thoigiandatlich', [$startDate, $endDate])->count();
         
         // Thống kê theo trạng thái
