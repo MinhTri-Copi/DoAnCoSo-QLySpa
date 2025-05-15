@@ -21,6 +21,7 @@ use App\Http\Controllers\HoaDonVaThanhToanController;
 use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
+use App\Models\HangThanhVien;
 
 
 
@@ -123,7 +124,7 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
 
     // Route cho quản lý phương thức (PHUONGTHUC)
     Route::resource('phuongthuc', PhuongThucController::class, ['names' => 'admin.phuongthuc']);
-    Route::get('phuongthuc/{id}/confirm-destroy', [PhuongThucController::class, 'confirmDestroy'])->name('admin.phuongthuc.confirm-destroy');
+    Route::get('phuongthuc/{id}/confirm-destroy', [PhuongThucController::class, 'confirmDestroy'])->name('admin.phuongthuc.confirmDestroy');
 
     // Routes cho quản lý lịch sử điểm thưởng (LSDIEMTHUONG)
     Route::resource('lsdiemthuong', PointHistoryController::class, ['names' => 'admin.lsdiemthuong']);
@@ -144,5 +145,6 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
 
     // Routes cho tìm kiếm
     Route::get('/search', [SearchController::class, 'searchByFunction'])->name('admin.search');
+    
 });
 
