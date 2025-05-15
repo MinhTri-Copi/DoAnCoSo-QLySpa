@@ -1,12 +1,178 @@
 @extends('backend.layouts.app')
 
 @section('styles')
-<link href="{{ asset('css/admin/phuongthuc.css') }}" rel="stylesheet">
+<link href="{{ asset('css/admin/phuongthuc.css') }}?v={{ time() }}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+<style>
+    /* Inline styles để đảm bảo ghi đè các styles khác */
+    .payment-detail-card {
+        border: none !important;
+        border-radius: 15px !important;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(255, 107, 149, 0.15) !important;
+        background-color: #ffffff !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .payment-detail-card .card-header {
+        background: linear-gradient(40deg, #ff6b95, #ffa7bc) !important;
+        color: white !important;
+        border-bottom: none !important;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.25rem 1.5rem !important;
+    }
+    
+    .payment-detail-card .card-header h6 {
+        color: white !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .btn-pink {
+        background-color: #ff6b95 !important;
+        border-color: #ff6b95 !important;
+        color: white !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1.5rem !important;
+        border-radius: 50px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 10px rgba(255, 107, 149, 0.2) !important;
+    }
+    
+    .btn-outline-pink {
+        background-color: transparent !important;
+        border-color: #ff6b95 !important;
+        color: #ff6b95 !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1.5rem !important;
+        border-radius: 50px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .btn-outline-pink:hover {
+        background-color: #ff6b95 !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 15px rgba(255, 107, 149, 0.2) !important;
+    }
+    
+    .btn-pink:hover {
+        background-color: #ff4c7f !important;
+        border-color: #ff4c7f !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 15px rgba(255, 107, 149, 0.3) !important;
+    }
+    
+    .text-primary {
+        color: #ff6b95 !important;
+    }
+    
+    .btn-primary {
+        background-color: #ff6b95 !important;
+        border-color: #ff6b95 !important;
+        color: white !important;
+        border-radius: 50px !important;
+        padding: 0.5rem 1.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .badge-pink {
+        background-color: #ff6b95 !important;
+        color: white !important;
+        padding: 0.5em 1em !important;
+        border-radius: 50px !important;
+        font-weight: 500 !important;
+    }
+    
+    .payment-method-icon {
+        color: #ff6b95 !important;
+    }
+    
+    .timeline-item-marker-indicator {
+        background-color: #ff6b95 !important;
+    }
+    
+    .stat-item {
+        background-color: rgba(255, 107, 149, 0.05) !important;
+        border-radius: 15px !important;
+        padding: 1.25rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stat-icon {
+        color: #ff6b95 !important;
+    }
+    
+    .info-label {
+        color: #ff6b95 !important;
+    }
+    
+    /* Header styling */
+    .payment-header {
+        background: #ff6b95 !important;
+        color: white !important;
+        padding: 1.5rem !important;
+        border-radius: 15px !important;
+        margin-bottom: 2rem !important;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(255, 107, 149, 0.3) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+    
+    .payment-header h1 {
+        margin: 0 !important;
+        font-size: 1.75rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+    }
+    
+    .payment-header p {
+        margin: 0 !important;
+        opacity: 0.9 !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    .add-payment-btn {
+        background-color: white !important;
+        color: #ff6b95 !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .add-payment-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+        background-color: #f8f9fa !important;
+    }
+    
+    .add-payment-btn i {
+        margin-right: 0.5rem !important;
+    }
+</style>
 @endsection
 
 @section('content')
 <div class="container-fluid">
-    <!-- Page Heading -->
+    <!-- Header giống hình mẫu -->
+    <div class="payment-header animate__animated animate__fadeIn">
+        <div>
+            <h1>Quản Lý Phương Thức Thanh Toán</h1>
+            <p><i class="fas fa-credit-card mr-2"></i> Tối ưu trải nghiệm và phục vụ khách hàng tốt nhất</p>
+        </div>
+        <a href="{{ route('admin.phuongthuc.create') }}" class="add-payment-btn">
+            <i class="fas fa-plus"></i>
+            <span>Thêm Phương Thức Mới</span>
+        </a>
+    </div>
+
+    <!-- Thông tin chi tiết phương thức -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Chi Tiết Phương Thức Thanh Toán</h1>
         <div>

@@ -182,3 +182,260 @@
         margin-bottom: 0.25rem;
     }
 }
+
+/* Pink and White Theme for Payment Method Edit */
+.payment-edit-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(255, 107, 149, 0.15) !important;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.payment-edit-card:hover {
+    box-shadow: 0 0.5rem 2rem 0 rgba(255, 107, 149, 0.2) !important;
+}
+
+.payment-edit-card .card-header {
+    background: linear-gradient(40deg, #ff6b95, #ffa7bc);
+    color: white;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.25rem 1.5rem;
+}
+
+.payment-edit-card .card-header h6 {
+    color: white !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+.payment-edit-card .card-body {
+    padding: 1.75rem;
+}
+
+.form-control:focus {
+    border-color: #ff6b95;
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 149, 0.25);
+}
+
+.btn-group-edit {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1.5rem;
+}
+
+.btn-pink {
+    background-color: #ff6b95;
+    border-color: #ff6b95;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(255, 107, 149, 0.2);
+}
+
+.btn-pink:hover {
+    background-color: #ff4c7f;
+    border-color: #ff4c7f;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 149, 0.3);
+}
+
+.btn-outline-pink {
+    background-color: transparent;
+    border-color: #ff6b95;
+    color: #ff6b95;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-pink:hover {
+    background-color: #ff6b95;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 149, 0.2);
+}
+
+.payment-stats-card {
+    border: none;
+    border-radius: 15px;
+    background-color: #ffffff;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(255, 107, 149, 0.15) !important;
+}
+
+.payment-stats-card .card-header {
+    background: linear-gradient(40deg, #ff6b95, #ffa7bc);
+    color: white;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.25rem 1.5rem;
+}
+
+.payment-stats-card .card-header h6 {
+    color: white !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+.pink-icon {
+    color: #ff6b95;
+}
+
+.stat-item-pink {
+    background-color: rgba(255, 107, 149, 0.05);
+    border-radius: 15px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.stat-item-pink:hover {
+    background-color: rgba(255, 107, 149, 0.1);
+    transform: translateY(-3px);
+}
+
+.stat-icon-pink {
+    color: #ff6b95;
+}
+
+.badge-pink {
+    background-color: #ff6b95;
+    color: white;
+    padding: 0.5em 1em;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.required-field {
+    color: #ff6b95;
+    font-weight: bold;
+}
+
+/* Icon preview section */
+.icon-preview-section {
+    background-color: rgba(255, 107, 149, 0.05);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+#iconPreview {
+    font-size: 3rem;
+    color: #ff6b95;
+    display: block;
+    margin: 0 auto 1rem auto;
+}
+
+.payment-method-icon {
+    color: #ff6b95;
+}
+
+/* Form animations and transitions */
+.highlight-field {
+    transition: all 0.3s ease;
+    transform: translateY(-2px);
+}
+
+.highlight-field label {
+    color: #ff6b95 !important;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #ff6b95;
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 149, 0.25);
+}
+
+#iconPreview {
+    transition: all 0.3s ease;
+}
+
+#iconPreview.transitioning {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* Text styles */
+.text-pink {
+    color: #ff6b95 !important;
+}
+
+/* Custom input animations */
+.form-control {
+    transition: all 0.3s ease;
+}
+
+.form-control:hover:not(:focus) {
+    border-color: rgba(255, 107, 149, 0.5);
+}
+
+textarea.form-control {
+    min-height: 120px;
+}
+
+/* Button hover effects */
+.btn-pink:active, .btn-pink:focus {
+    background-color: #ff4c7f;
+    border-color: #ff4c7f;
+    color: white;
+}
+
+.btn-outline-pink:active, .btn-outline-pink:focus {
+    background-color: rgba(255, 107, 149, 0.1);
+    border-color: #ff6b95;
+    color: #ff6b95;
+}
+
+/* Card hover effects */
+.payment-edit-card, .payment-stats-card {
+    transition: all 0.3s ease;
+}
+
+.payment-edit-card:hover, .payment-stats-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Alert styling */
+.alert {
+    border: none;
+    border-radius: 15px;
+}
+
+.alert-info {
+    background-color: rgba(86, 204, 242, 0.1);
+    color: #56ccf2;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .btn-group-edit {
+        flex-direction: column;
+    }
+    
+    .btn-group-edit .btn {
+        margin-bottom: 10px;
+    }
+}
