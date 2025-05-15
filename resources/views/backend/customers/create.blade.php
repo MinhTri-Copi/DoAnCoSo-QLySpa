@@ -191,6 +191,25 @@
         background-color: var(--light-pink);
         border-color: var(--border-color);
         color: var(--spa-primary-dark);
+        display: flex;
+        align-items: center;
+        width: 45px;
+        justify-content: center;
+    }
+
+    .input-group-text i {
+        width: 16px;
+        text-align: center;
+        font-size: 16px;
+    }
+    
+    /* Icon alignment fix */
+    .icon-aligned {
+        width: 20px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
     }
 
     label {
@@ -205,6 +224,43 @@
         padding: 0.6rem 1.5rem;
         font-weight: 500;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn i {
+        width: 18px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .input-group > .input-group-prepend > .input-group-text {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .input-group > .input-group-append > .input-group-text,
+    .input-group > .input-group-append > .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .input-group-prepend,
+    .input-group-append {
+        display: flex;
+    }
+
+    .input-group > .form-control {
+        position: relative;
+        flex: 1 1 auto;
+        width: 1%;
+        margin-bottom: 0;
     }
 
     .btn-primary {
@@ -259,19 +315,24 @@
         border-radius: var(--radius-md);
         padding: 1.5rem;
         margin-bottom: 1.5rem;
-        border-left: 4px solid var(--spa-primary);
+        border-left: 4px solid var(--primary-pink);
     }
 
     .form-section-title {
-        color: var(--spa-primary-dark);
+        color: var(--dark-pink);
         margin-bottom: 1.5rem;
         font-weight: 600;
         display: flex;
         align-items: center;
+        line-height: 1.2;
     }
 
     .form-section-title i {
-        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+        color: var(--primary-pink);
     }
 
     .form-section-content {
@@ -348,13 +409,13 @@
         <div class="customer-header-content">
             <div>
                 <h1 class="h3 mb-0 text-white">
-                    <i class="fas fa-user-plus mr-2"></i>Thêm Khách Hàng Mới
+                    <i class="fas fa-user-plus icon-aligned"></i>Thêm Khách Hàng Mới
                 </h1>
                 <p class="text-white-50 mb-0">Tạo hồ sơ cho khách hàng mới của spa</p>
             </div>
             <div>
                 <a href="{{ route('admin.customers.index') }}" class="btn btn-light">
-                    <i class="fas fa-arrow-left mr-1"></i>
+                    <i class="fas fa-arrow-left"></i>
                     <span>Quay Lại Danh Sách</span>
                 </a>
             </div>
@@ -365,7 +426,7 @@
     <div class="card customer-card animate-fade-in-up">
         <div class="card-header-gradient py-3">
             <h6 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-user-edit mr-2"></i>Thông Tin Khách Hàng
+                <i class="fas fa-user-edit icon-aligned"></i>Thông Tin Khách Hàng
             </h6>
         </div>
         <div class="card-body p-4">
@@ -375,7 +436,7 @@
                 <!-- Personal Information -->
                 <div class="form-section animate-fade-in-up">
                     <h5 class="form-section-title">
-                        <i class="fas fa-user-circle"></i> Thông Tin Cá Nhân
+                        <i class="fas fa-user-circle icon-aligned"></i> Thông Tin Cá Nhân
                     </h5>
                     <div class="form-section-content">
                         <div class="row">
@@ -461,7 +522,7 @@
                 <!-- Contact Information -->
                 <div class="form-section animate-fade-in-up animate-delay-1">
                     <h5 class="form-section-title">
-                        <i class="fas fa-address-card"></i> Thông Tin Liên Hệ
+                        <i class="fas fa-address-card icon-aligned"></i> Thông Tin Liên Hệ
                     </h5>
                     <div class="form-section-content">
                         <div class="row">
