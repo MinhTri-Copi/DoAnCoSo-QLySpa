@@ -90,6 +90,7 @@
             <ul class="submenu">
                 <li><a href="{{ route('admin.hoadonvathanhtoan.index') }}"><i class="fas fa-file-invoice-dollar"></i> Hóa đơn & thanh toán</a></li>
                 <li><a href="{{ route('admin.lsdiemthuong.index') }}"><i class="fas fa-coins"></i> Lịch sử điểm thưởng</a></li>
+                <li><a href="{{ route('admin.phuongthuc.index') }}"><i class="fas fa-credit-card"></i> Phương thức thanh toán</a></li>
             </ul>
         </li>
         

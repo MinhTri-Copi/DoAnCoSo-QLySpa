@@ -23,13 +23,8 @@ class PhuongThucController extends Controller
 
     public function store(Request $request)
     {
-        $maxMaPT = PhuongThuc::max('MaPT');
-        if ($maxMaPT) {
-            $number = (int) substr($maxMaPT, 2);
-            $suggestedMaPT = 'PT' . ($number + 1);
-        } else {
-            $suggestedMaPT = 'PT1';
-        }
+        $maxMaPT = PhuongThuc::max('MaPT') ?? 0;
+        $suggestedMaPT = $maxMaPT + 1;
 
         $request->validate([
             'TenPT' => 'required|string|max:255',

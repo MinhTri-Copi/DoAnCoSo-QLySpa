@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!isValid) {
                 e.preventDefault();
+            } else {
+                // Add loading state to the submit button when form is valid
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Đang lưu...';
+                    submitBtn.disabled = true;
+                }
             }
         });
     }
@@ -45,33 +52,81 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Preview payment method icon
+    // Preview payment method icon with enhanced animation
     const paymentMethodNameInput = document.getElementById('TenPT');
     const iconPreview = document.getElementById('iconPreview');
+    const iconItems = document.querySelectorAll('.payment-method-item i');
     
     if (paymentMethodNameInput && iconPreview) {
         // Set initial icon
         const name = paymentMethodNameInput.value;
-        const iconClass = window.getPaymentMethodIcon(name);
-        const colorClass = window.getPaymentMethodClass(name);
+        updateIcon(name);
         
-        // Remove all existing icon classes
-        iconPreview.className = '';
-        
-        // Add new classes
-        iconPreview.classList.add('fas', iconClass, colorClass, 'fa-3x', 'mb-3');
-        
-        // Update icon on input change
+        // Update icon on input change with debounce for better performance
+        let debounceTimer;
         paymentMethodNameInput.addEventListener('input', function() {
-            const name = this.value;
-            const iconClass = window.getPaymentMethodIcon(name);
-            const colorClass = window.getPaymentMethodClass(name);
+            clearTimeout(debounceTimer);
             
-            // Remove all existing icon classes
-            iconPreview.className = '';
+            // Add transitioning class for smooth animation
+            iconPreview.classList.add('transitioning');
             
-            // Add new classes
-            iconPreview.classList.add('fas', iconClass, colorClass, 'fa-3x', 'mb-3');
+            debounceTimer = setTimeout(() => {
+                const name = this.value;
+                updateIcon(name);
+                
+                // Remove transitioning class after animation completes
+                setTimeout(() => {
+                    iconPreview.classList.remove('transitioning');
+                }, 300);
+            }, 300);
         });
     }
+    
+    // Update all payment method icons in the page
+    document.querySelectorAll('.payment-method-item').forEach(item => {
+        const name = item.getAttribute('data-name');
+        const iconElement = item.querySelector('.payment-method-icon i');
+        
+        if (iconElement && name) {
+            const iconClass = window.getPaymentMethodIcon(name);
+            
+            // Remove existing font awesome classes
+            iconElement.className = '';
+            
+            // Add new classes with pink theme
+            iconElement.classList.add('fas', iconClass, 'fa-3x');
+        }
+    });
+    
+    /**
+     * Update the icon preview with animation
+     */
+    function updateIcon(name) {
+        const iconClass = window.getPaymentMethodIcon(name);
+        
+        // Remove all existing icon classes but keep the transitioning class if it's there
+        const isTransitioning = iconPreview.classList.contains('transitioning');
+        iconPreview.className = isTransitioning ? 'transitioning' : '';
+        
+        // Apply new icon classes
+        iconPreview.classList.add('fas', iconClass, 'fa-3x');
+        
+        // Update other icon instances
+        iconItems.forEach(icon => {
+            icon.className = '';
+            icon.classList.add('fas', iconClass, 'fa-3x');
+        });
+    }
+    
+    // Add animation to form fields on focus
+    const formInputs = document.querySelectorAll('.form-control');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.closest('.form-group').classList.add('highlight-field');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.closest('.form-group').classList.remove('highlight-field');
+        });
+    });
 });
