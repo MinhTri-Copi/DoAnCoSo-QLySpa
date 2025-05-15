@@ -7,47 +7,96 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     .page-edit-dichvu {
-        background-color: #f8f9fa;
+        padding: 2.5rem 0;
+        background-color: #f9f9fd;
+        min-height: calc(100vh - 100px);
+        position: relative;
+    }
+    
+    .page-edit-dichvu::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 107, 107, 0.05) 0%, rgba(255, 107, 107, 0) 70%);
+        z-index: 0;
     }
 
     .edit-form-container {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        padding: 30px;
-        margin-bottom: 50px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        padding: 45px;
+        margin-bottom: 60px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        z-index: 1;
+    }
+
+    .edit-form-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .edit-form-container::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(120deg, rgba(255, 107, 107, 0.05) 0%, rgba(255, 142, 142, 0.05) 100%);
+        border-radius: 50%;
+        bottom: -100px;
+        right: -100px;
+        z-index: 0;
     }
 
     .form-header {
-        background: linear-gradient(120deg, #ff9a9e 0%, #fad0c4 100%);
-        margin: -30px -30px 30px;
-        padding: 25px 30px;
-        border-radius: 15px 15px 0 0;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+        margin: -45px -45px 40px;
+        padding: 40px 45px;
+        border-radius: 20px 20px 0 0;
         color: white;
         position: relative;
         overflow: hidden;
     }
 
     .form-header h2 {
-        font-size: 1.8rem;
+        font-size: 2.4rem;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         position: relative;
         z-index: 2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .form-header p {
+        font-size: 1.2rem;
         opacity: 0.9;
         margin-bottom: 0;
         position: relative;
         z-index: 2;
     }
 
+    .form-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+        transform: rotate(30deg);
+        z-index: 1;
+    }
+    
     .form-header::after {
         content: "";
         position: absolute;
-        right: -20px;
-        bottom: -50px;
+        right: -30px;
+        bottom: -60px;
         width: 180px;
         height: 180px;
         background: rgba(255, 255, 255, 0.1);
@@ -55,23 +104,40 @@
         z-index: 1;
     }
 
-    .form-header::before {
-        content: "";
+    .form-icon {
         position: absolute;
-        left: -50px;
-        top: -50px;
-        width: 120px;
-        height: 120px;
-        background: rgba(255, 255, 255, 0.1);
+        top: 30px;
+        right: 45px;
+        width: 70px;
+        height: 70px;
+        background: white;
         border-radius: 50%;
-        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .form-icon i {
+        font-size: 2rem;
+        color: #ff6b6b;
     }
 
     .form-row {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 20px;
+        gap: 30px;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 1;
     }
 
     .full-width {
@@ -79,27 +145,38 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        position: relative;
     }
 
     .form-group label {
         display: block;
         font-weight: 600;
-        color: #495057;
-        margin-bottom: 8px;
+        font-size: 1.1rem;
+        color: #343a40;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+    }
+
+    .form-group:focus-within label {
+        color: #ff6b6b;
     }
 
     .form-control, .form-select {
-        border-radius: 10px;
-        padding: 12px 15px;
-        border: 1px solid #e1e5eb;
+        border-radius: 12px;
+        padding: 16px 20px;
+        height: auto;
+        border: 2px solid #e9ecef;
         transition: all 0.3s;
         width: 100%;
+        font-size: 1.1rem;
+        background-color: #f8f9fa;
     }
 
     .form-control:focus, .form-select:focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.25);
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15);
+        background-color: #fff;
         outline: none;
     }
 
@@ -110,140 +187,229 @@
     .invalid-feedback {
         display: block;
         color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 5px;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
     }
 
     .form-text {
         color: #6c757d;
-        font-size: 0.85rem;
-        margin-top: 5px;
+        font-size: 0.9rem;
+        margin-top: 8px;
     }
 
     .required-label::after {
         content: "*";
-        color: #dc3545;
+        color: #ff6b6b;
         margin-left: 4px;
     }
 
     .image-upload-container {
-        border: 2px dashed #dee2e6;
-        border-radius: 10px;
-        padding: 30px;
+        border: 3px dashed #e9ecef;
+        border-radius: 16px;
+        padding: 50px 30px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s;
-        margin-bottom: 20px;
+        position: relative;
+        background-color: #f8f9fa;
     }
 
     .image-upload-container:hover {
-        border-color: #ff9a9e;
-        background-color: #fff9f9;
+        border-color: #ff6b6b;
+        background-color: #fff5f5;
+    }
+
+    .image-upload-container.drag-active {
+        border-color: #ff6b6b;
+        background-color: #fff5f5;
+        transform: scale(1.02);
     }
 
     .image-upload-icon {
-        font-size: 2.5rem;
-        color: #adb5bd;
-        margin-bottom: 10px;
+        font-size: 3.5rem;
+        color: #ff6b6b;
+        margin-bottom: 20px;
+        transition: all 0.3s;
     }
 
-    .image-preview {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 10px;
-        margin-top: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    .image-upload-container:hover .image-upload-icon {
+        transform: translateY(-5px);
     }
 
-    .current-image-preview {
+    .image-upload-container p {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+        color: #495057;
+    }
+
+    .image-upload-container .upload-hints {
+        display: block;
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 10px;
+    }
+
+    .image-preview, .current-image-preview {
         max-width: 100%;
-        max-height: 200px;
-        border-radius: 10px;
-        margin-top: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-height: 240px;
+        border-radius: 12px;
+        margin-top: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .current-image-container {
+        background-color: #f8f9fa;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        position: relative;
+    }
+
+    .current-image-label {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background-color: #ff6b6b;
+        color: white;
+        font-size: 0.85rem;
+        padding: 5px 15px;
+        border-radius: 20px;
+        z-index: 1;
+        box-shadow: 0 3px 10px rgba(255, 107, 107, 0.2);
     }
 
     .checkboxes-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 15px;
-        margin-top: 10px;
+        margin-top: 15px;
     }
 
     .custom-checkbox {
         display: flex;
         align-items: center;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+    .custom-checkbox:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
     }
 
     .custom-checkbox input[type="checkbox"] {
-        margin-right: 8px;
+        margin-right: 10px;
+        transform: scale(1.3);
+        accent-color: #ff6b6b;
+    }
+
+    .custom-checkbox label {
+        margin-bottom: 0;
+        font-weight: 500;
+        cursor: pointer;
     }
 
     .form-actions {
         display: flex;
         justify-content: space-between;
-        margin-top: 40px;
+        align-items: center;
+        margin-top: 60px;
         border-top: 1px solid #e9ecef;
-        padding-top: 20px;
+        padding-top: 30px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .left-actions {
+        display: flex;
+        gap: 15px;
     }
 
     .btn-action {
-        padding: 12px 24px;
-        border-radius: 10px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 1.1rem;
         font-weight: 600;
         transition: all 0.3s;
         border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 150px;
+        text-align: center;
+        text-decoration: none;
     }
 
     .btn-primary-pink {
-        background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
         color: white;
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
     }
 
     .btn-primary-pink:hover {
-        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.3);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        transform: translateY(-5px);
+        color: white;
     }
 
     .btn-secondary-light {
         background: #e9ecef;
         color: #495057;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
 
     .btn-secondary-light:hover {
         background: #dee2e6;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        color: #343a40;
     }
 
     .btn-danger-light {
-        background: #f8d7da;
-        color: #721c24;
+        background: #ffe4e6;
+        color: #d63031;
+        box-shadow: 0 5px 15px rgba(214, 48, 49, 0.1);
     }
 
     .btn-danger-light:hover {
-        background: #f5c6cb;
+        background: #ffd1d5;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(214, 48, 49, 0.2);
+        color: #c0392b;
+    }
+
+    .btn-action i {
+        margin-right: 10px;
+        font-size: 1rem;
     }
 
     .input-group {
         display: flex;
         align-items: center;
+        position: relative;
     }
 
     .input-group-text {
         background-color: #e9ecef;
-        border: 1px solid #e1e5eb;
-        border-radius: 10px 0 0 10px;
-        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        padding: 16px 20px;
         font-weight: 600;
         color: #495057;
+        font-size: 1.1rem;
     }
 
     .input-group .form-control {
-        border-radius: 0 10px 10px 0;
-        border-left: 0;
-    }
-
-    .input-slider {
-        margin-top: 10px;
+        border-radius: 0 12px 12px 0;
+        border-left: none;
     }
 
     .time-picker-icon {
@@ -258,11 +424,12 @@
     .service-status {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
         font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
 
     .status-pending {
@@ -285,6 +452,39 @@
         color: #a93226;
     }
 
+    .section-divider {
+        display: flex;
+        align-items: center;
+        margin: 40px 0;
+        color: #6c757d;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .section-divider::before {
+        margin-right: 15px;
+    }
+
+    .section-divider::after {
+        margin-left: 15px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .form-row {
@@ -296,166 +496,195 @@
         }
         
         .form-actions {
-            flex-direction: column-reverse;
+            flex-direction: column;
             gap: 15px;
+        }
+        
+        .left-actions {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
         }
         
         .btn-action {
             width: 100%;
+            min-width: 100%;
         }
 
         .checkboxes-container {
             grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .form-header h2 {
+            font-size: 1.8rem;
+        }
+        
+        .form-icon {
+            display: none;
+        }
+        
+        .image-upload-container {
+            padding: 30px 20px;
         }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container-fluid page-edit-dichvu" style="max-width: 1600px; margin: 0 auto; padding: 0 20px;">
-    <div class="edit-form-container animate__animated animate__fadeIn">
-        <div class="form-header">
-            <h2>Chỉnh Sửa Dịch Vụ</h2>
-            <p>Cập nhật thông tin dịch vụ #{{ $dichVu->MaDV }} - {{ $dichVu->Tendichvu }}</p>
-        </div>
-        
-        <form method="POST" action="{{ route('admin.dichvu.update', $dichVu->MaDV) }}" enctype="multipart/form-data" id="editServiceForm">
-            @csrf
-            @method('PUT')
+<div class="container-fluid page-edit-dichvu">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <div class="edit-form-container animate__animated animate__fadeIn">
+            <div class="form-header">
+                <div class="form-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h2>Chỉnh Sửa Dịch Vụ</h2>
+                <p>Cập nhật thông tin dịch vụ #{{ $dichVu->MaDV }} - {{ $dichVu->Tendichvu }}</p>
+            </div>
             
-            <div class="form-row">
+            <form method="POST" action="{{ route('admin.dichvu.update', $dichVu->MaDV) }}" enctype="multipart/form-data" id="editServiceForm">
+                @csrf
+                @method('PUT')
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="MaDV" class="required-label">Mã Dịch Vụ</label>
+                        <input id="MaDV" type="number" class="form-control @error('MaDV') is-invalid @enderror" name="MaDV" value="{{ old('MaDV', $dichVu->MaDV) }}" required placeholder="Nhập mã dịch vụ">
+                        @error('MaDV')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text">Mã dịch vụ phải là duy nhất trong hệ thống</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Tendichvu" class="required-label">Tên Dịch Vụ</label>
+                        <input id="Tendichvu" type="text" class="form-control @error('Tendichvu') is-invalid @enderror" name="Tendichvu" value="{{ old('Tendichvu', $dichVu->Tendichvu) }}" required placeholder="Nhập tên dịch vụ">
+                        @error('Tendichvu')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Gia" class="required-label">Giá Dịch Vụ</label>
+                        <div class="input-group">
+                            <span class="input-group-text">VNĐ</span>
+                            <input id="Gia" type="number" step="1000" class="form-control @error('Gia') is-invalid @enderror" name="Gia" value="{{ old('Gia', $dichVu->Gia) }}" required placeholder="Nhập giá dịch vụ">
+                        </div>
+                        @error('Gia')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Thoigian" class="required-label">Thời Gian Thực Hiện</label>
+                        <div style="position: relative;">
+                            <input id="Thoigian" type="text" class="form-control timepicker @error('Thoigian') is-invalid @enderror" name="Thoigian" value="{{ old('Thoigian', $dichVu->Thoigian ? $dichVu->Thoigian->format('H:i') : '') }}" required placeholder="HH:MM">
+                            <i class="fas fa-clock time-picker-icon"></i>
+                        </div>
+                        @error('Thoigian')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text">Thời gian dự kiến để hoàn thành dịch vụ</small>
+                    </div>
+                </div>
+
+                <div class="section-divider">Thông tin chi tiết</div>
+
                 <div class="form-group">
-                    <label for="MaDV" class="required-label">Mã Dịch Vụ</label>
-                    <input id="MaDV" type="number" class="form-control @error('MaDV') is-invalid @enderror" name="MaDV" value="{{ old('MaDV', $dichVu->MaDV) }}" required>
-                    @error('MaDV')
+                    <label for="MoTa">Mô Tả Dịch Vụ</label>
+                    <textarea id="MoTa" class="form-control @error('MoTa') is-invalid @enderror" name="MoTa" rows="6" placeholder="Nhập mô tả chi tiết về dịch vụ...">{{ old('MoTa', $dichVu->MoTa) }}</textarea>
+                    @error('MoTa')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                    <small class="form-text">Mã dịch vụ phải là duy nhất trong hệ thống</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="Tendichvu" class="required-label">Tên Dịch Vụ</label>
-                    <input id="Tendichvu" type="text" class="form-control @error('Tendichvu') is-invalid @enderror" name="Tendichvu" value="{{ old('Tendichvu', $dichVu->Tendichvu) }}" required>
-                    @error('Tendichvu')
+                    <label for="image_upload">Hình Ảnh Dịch Vụ</label>
+                    @if($dichVu->Image && file_exists(public_path($dichVu->Image)))
+                        <div class="current-image-container">
+                            <span class="current-image-label">Hình ảnh hiện tại</span>
+                            <img src="{{ asset($dichVu->Image) }}" alt="{{ $dichVu->Tendichvu }}" class="current-image-preview">
+                            <input type="hidden" name="current_image" value="{{ $dichVu->Image }}">
+                        </div>
+                    @endif
+
+                    <div class="image-upload-container" id="image_upload_container">
+                        <i class="fas fa-cloud-upload-alt image-upload-icon"></i>
+                        <p>Nhấp để chọn hoặc kéo thả hình ảnh mới vào đây</p>
+                        <span class="upload-hints">Định dạng hỗ trợ: JPEG, PNG, JPG, GIF • Tối đa 2MB</span>
+                        <input type="file" id="image_upload" name="image_upload" class="d-none @error('image_upload') is-invalid @enderror" accept="image/*">
+                        <div id="image_preview_container" class="mt-3 d-none">
+                            <img id="image_preview" class="image-preview">
+                        </div>
+                    </div>
+                    @error('image_upload')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
 
-            <div class="form-row">
+                <div class="section-divider">Lịch trình & Tùy chọn</div>
+
                 <div class="form-group">
-                    <label for="Gia" class="required-label">Giá</label>
-                    <div class="input-group">
-                        <span class="input-group-text">VNĐ</span>
-                        <input id="Gia" type="number" step="1000" class="form-control @error('Gia') is-invalid @enderror" name="Gia" value="{{ old('Gia', $dichVu->Gia) }}" required>
+                    <label>Ngày Có Sẵn</label>
+                    @php
+                        $availableDays = json_decode($dichVu->available_days ?? '[]', true);
+                    @endphp
+                    <div class="checkboxes-container">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_mon" name="available_days[]" value="monday" {{ in_array('monday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_mon">Thứ 2</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_tue" name="available_days[]" value="tuesday" {{ in_array('tuesday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_tue">Thứ 3</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_wed" name="available_days[]" value="wednesday" {{ in_array('wednesday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_wed">Thứ 4</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_thu" name="available_days[]" value="thursday" {{ in_array('thursday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_thu">Thứ 5</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_fri" name="available_days[]" value="friday" {{ in_array('friday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_fri">Thứ 6</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_sat" name="available_days[]" value="saturday" {{ in_array('saturday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_sat">Thứ 7</label>
+                        </div>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="day_sun" name="available_days[]" value="sunday" {{ in_array('sunday', old('available_days', $availableDays)) ? 'checked' : '' }}>
+                            <label for="day_sun">CN</label>
+                        </div>
                     </div>
-                    @error('Gia')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="form-group">
-                    <label for="Thoigian" class="required-label">Thời Gian Thực Hiện</label>
-                    <div style="position: relative;">
-                        <input id="Thoigian" type="text" class="form-control timepicker @error('Thoigian') is-invalid @enderror" name="Thoigian" value="{{ old('Thoigian', $dichVu->Thoigian ? $dichVu->Thoigian->format('H:i') : '') }}" required placeholder="HH:mm">
-                        <i class="fas fa-clock time-picker-icon"></i>
-                    </div>
-                    @error('Thoigian')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="MoTa">Mô Tả</label>
-                <textarea id="MoTa" class="form-control @error('MoTa') is-invalid @enderror" name="MoTa" rows="4">{{ old('MoTa', $dichVu->MoTa) }}</textarea>
-                @error('MoTa')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="image_upload">Hình Ảnh</label>
-                @if($dichVu->Image && file_exists(public_path($dichVu->Image)))
-                    <div class="text-center mb-3">
-                        <p class="mb-2">Hình ảnh hiện tại:</p>
-                        <img src="{{ asset($dichVu->Image) }}" alt="{{ $dichVu->Tendichvu }}" class="current-image-preview">
-                        <input type="hidden" name="current_image" value="{{ $dichVu->Image }}">
-                    </div>
-                @endif
-
-                <div class="image-upload-container" id="image_upload_container">
-                    <i class="fas fa-cloud-upload-alt image-upload-icon"></i>
-                    <p>Nhấp để chọn hoặc kéo thả hình ảnh mới vào đây</p>
-                    <input type="file" id="image_upload" name="image_upload" class="d-none @error('image_upload') is-invalid @enderror" accept="image/*">
-                    <div id="image_preview_container" class="mt-3 d-none">
-                        <img id="image_preview" class="image-preview">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="featured" name="featured" value="1" {{ old('featured', $dichVu->featured ?? false) ? 'checked' : '' }}>
+                        <label for="featured">Đánh dấu là dịch vụ nổi bật</label>
                     </div>
                 </div>
-                @error('image_upload')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-                <small class="form-text">Định dạng hỗ trợ: JPEG, PNG, JPG, GIF. Tối đa 2MB.</small>
-            </div>
 
-            <div class="form-group">
-                <label>Ngày Có Sẵn</label>
-                @php
-                    $availableDays = json_decode($dichVu->available_days ?? '[]', true);
-                @endphp
-                <div class="checkboxes-container">
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_mon" name="available_days[]" value="monday" {{ in_array('monday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_mon">Thứ 2</label>
+                <div class="form-actions">
+                    <div class="left-actions">
+                        <a href="{{ route('admin.dichvu.index') }}" class="btn btn-action btn-secondary-light">
+                            <i class="fas fa-arrow-left"></i> Quay Lại
+                        </a>
+                        <a href="{{ route('admin.dichvu.confirm-destroy', $dichVu->MaDV) }}" class="btn btn-action btn-danger-light">
+                            <i class="fas fa-trash"></i> Xóa
+                        </a>
                     </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_tue" name="available_days[]" value="tuesday" {{ in_array('tuesday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_tue">Thứ 3</label>
-                    </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_wed" name="available_days[]" value="wednesday" {{ in_array('wednesday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_wed">Thứ 4</label>
-                    </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_thu" name="available_days[]" value="thursday" {{ in_array('thursday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_thu">Thứ 5</label>
-                    </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_fri" name="available_days[]" value="friday" {{ in_array('friday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_fri">Thứ 6</label>
-                    </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_sat" name="available_days[]" value="saturday" {{ in_array('saturday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_sat">Thứ 7</label>
-                    </div>
-                    <div class="custom-checkbox">
-                        <input type="checkbox" id="day_sun" name="available_days[]" value="sunday" {{ in_array('sunday', old('available_days', $availableDays)) ? 'checked' : '' }}>
-                        <label for="day_sun">CN</label>
-                    </div>
+                    <button type="submit" class="btn btn-action btn-primary-pink">
+                        <i class="fas fa-save"></i> Cập Nhật
+                    </button>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <div class="custom-checkbox">
-                    <input type="checkbox" id="featured" name="featured" value="1" {{ old('featured', $dichVu->featured ?? false) ? 'checked' : '' }}>
-                    <label for="featured">Đánh dấu là dịch vụ nổi bật</label>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <div class="left-actions">
-                    <a href="{{ route('admin.dichvu.index') }}" class="btn btn-action btn-secondary-light">
-                        <i class="fas fa-arrow-left me-2"></i>Quay Lại
-                    </a>
-                    <a href="{{ route('admin.dichvu.confirm-destroy', $dichVu->MaDV) }}" class="btn btn-action btn-danger-light ms-2">
-                        <i class="fas fa-trash me-2"></i>Xóa
-                    </a>
-                </div>
-                <button type="submit" class="btn btn-action btn-primary-pink">
-                    <i class="fas fa-save me-2"></i>Cập Nhật Dịch Vụ
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
@@ -506,13 +735,13 @@
 
         ['dragenter', 'dragover'].forEach(eventName => {
             imageUploadContainer.addEventListener(eventName, function() {
-                this.classList.add('border-primary');
+                this.classList.add('drag-active');
             }, false);
         });
 
         ['dragleave', 'drop'].forEach(eventName => {
             imageUploadContainer.addEventListener(eventName, function() {
-                this.classList.remove('border-primary');
+                this.classList.remove('drag-active');
             }, false);
         });
 
