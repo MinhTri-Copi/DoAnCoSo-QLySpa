@@ -2,63 +2,148 @@
 
 @section('title', 'Quản Lý Hạng Thành Viên')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+@endsection
+
 @section('content')
 <style>
+    /* ===== MODERN SPA DESIGN ===== */
     :root {
-        --primary-color: #ff6b8b;
-        --primary-light: #ffd0d9;
-        --primary-dark: #e84e6f;
-        --text-on-primary: #ffffff;
-        --secondary-color: #f8f9fa;
-        --border-color: #e9ecef;
-        --success-color: #28a745;
-        --danger-color: #dc3545;
-        --warning-color: #ffc107;
-        --info-color: #17a2b8;
+        --primary-pink: #ff6b95;
+        --light-pink: #ffd0d9;
+        --dark-pink: #e84a78;
+        --text-primary: #2c3e50;
+        --text-secondary: #7a8ca0;
+        --info: #3498db;
+        --primary: #8e44ad;
+        --danger: #e74c3c;
+        --warning: #f39c12;
+        --light-gray: #f7f9fc;
+        --white: #ffffff;
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 5px 25px rgba(0, 0, 0, 0.07);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.09);
+        --shadow-pink: 0 8px 25px rgba(255, 107, 149, 0.14);
+        --transition-fast: all 0.2s ease;
+        --transition-medium: all 0.3s ease;
     }
 
+    /* ===== HEADER ===== */
     .header-container {
-        background-color: var(--primary-color);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
-        color: var(--text-on-primary);
+        background: linear-gradient(135deg, var(--primary-pink) 0%, #ff92b6 100%);
+        border-radius: var(--radius-lg);
+        padding: 2.2rem 3rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-pink);
+        max-height: 160px;
+    }
+
+    .header-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: pulse 6s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.1) 20%, 
+            rgba(255,255,255,0.2) 40%, 
+            rgba(255,255,255,0.1) 60%, 
+            rgba(255,255,255,0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 5s infinite linear;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
     }
 
     .header-title {
-        font-size: 24px;
-        font-weight: bold;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 4;
     }
 
     .header-subtitle {
-        font-size: 14px;
-        margin-top: 5px;
-        opacity: 0.9;
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 400;
+        position: relative;
+        z-index: 4;
     }
 
     .btn-pink {
-        background-color: var(--text-on-primary);
-        color: var(--primary-color);
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-pink);
         border: none;
+        font-size: 1.05rem;
+        font-weight: 600;
+        padding: 0.8rem 1.7rem;
         border-radius: 50px;
-        padding: 8px 20px;
-        font-weight: bold;
         display: flex;
         align-items: center;
-        transition: all 0.3s;
-    }
-
-    .btn-pink:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        gap: 0.6rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: var(--transition-fast);
+        text-decoration: none;
+        position: relative;
+        z-index: 4;
     }
 
     .btn-pink i {
-        margin-right: 8px;
+        font-size: 0.8rem;
+        background: rgba(255, 107, 149, 0.15);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transition-fast);
+    }
+
+    .btn-pink:hover {
+        background: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-pink:hover i {
+        background: rgba(255, 107, 149, 0.25);
     }
 
     .stats-container {
@@ -72,70 +157,113 @@
         flex: 1;
         min-width: 200px;
         background-color: white;
-        border-radius: 15px;
+        border-radius: var(--radius-md);
         padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: var(--shadow-sm);
         position: relative;
         overflow: hidden;
+        transition: var(--transition-medium);
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    .stat-card:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
     }
 
     .stat-icon {
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background-color: var(--primary-color);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-icon::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: inherit;
+        opacity: 0.2;
+        z-index: -1;
+        transform: scale(1.3);
+        transition: var(--transition-medium);
+    }
+
+    .stat-card:hover .stat-icon::after {
+        transform: scale(1.8);
     }
 
     .stat-value {
-        font-size: 28px;
-        font-weight: bold;
+        font-size: 2rem;
+        font-weight: 700;
         margin-bottom: 5px;
+        color: var(--text-primary);
     }
 
     .stat-label {
-        color: #6c757d;
-        font-size: 14px;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .stat-progress {
-        height: 4px;
-        background-color: #e9ecef;
-        border-radius: 2px;
+        height: 5px;
+        background-color: var(--light-gray);
+        border-radius: 20px;
         margin-top: 15px;
         overflow: hidden;
     }
 
     .stat-progress-bar {
         height: 100%;
-        border-radius: 2px;
+        border-radius: 20px;
+        width: 0;
+        animation: progressGrow 1.5s ease forwards;
     }
 
-    .progress-1 {
-        background-color: #4cd964;
-        width: 75%;
-    }
-
-    .progress-2 {
-        background-color: var(--primary-color);
-        width: 45%;
-    }
-
-    .progress-3 {
-        background-color: #007bff;
-        width: 60%;
+    @keyframes progressGrow {
+        to { width: var(--progress-width, 75%); }
     }
 
     .content-card {
         background-color: white;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: var(--radius-md);
+        padding: 25px;
+        box-shadow: var(--shadow-sm);
         margin-bottom: 30px;
+        animation: fadeIn 0.6s ease forwards;
+        animation-delay: 0.6s;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
     }
 
     .card-header {
@@ -143,67 +271,92 @@
         justify-content: space-between;
         align-items: center;
         padding-bottom: 15px;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 15px;
+        border-bottom: 1px solid var(--light-gray);
+        margin-bottom: 20px;
     }
 
     .card-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #343a40;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
         display: flex;
         align-items: center;
     }
 
     .card-title i {
-        color: var(--primary-color);
+        color: var(--primary-pink);
         margin-right: 10px;
+        font-size: 1.1rem;
     }
 
-    .search-filter-container {
+    /* Rest of the styles can remain the same but let's update the badges */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+        margin-left: 8px;
+    }
+
+    .badge-silver {
+        background-color: #f1f3f5;
+        color: #495057;
+    }
+
+    .badge-gold {
+        background-color: #ffd700;
+        color: #856404;
+    }
+
+    .badge-platinum {
+        background-color: #e2e2e2;
+        color: #444;
+        border: 1px solid #ccc;
+    }
+
+    .badge-diamond {
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        color: #1a477e;
+    }
+
+    .btn-action {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
         display: flex;
-        gap: 15px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin: 0 3px;
     }
 
-    .search-box {
-        flex: 1;
-        min-width: 200px;
-        position: relative;
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 10px 15px 10px 40px;
-        border: 1px solid var(--border-color);
-        border-radius: 50px;
-        font-size: 14px;
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6c757d;
-    }
-
-    .filter-box {
+    .action-buttons {
         display: flex;
-        gap: 10px;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
     }
 
-    .filter-select {
-        padding: 10px 15px;
-        border: 1px solid var(--border-color);
-        border-radius: 50px;
-        font-size: 14px;
-        min-width: 150px;
+    .btn-view {
+        background-color: var(--info);
     }
 
-    .table-responsive {
-        overflow-x: auto;
+    .btn-edit {
+        background-color: var(--warning);
+    }
+
+    .btn-delete {
+        background-color: var(--danger);
+    }
+
+    .btn-action:hover {
+        opacity: 0.85;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
     }
 
     .table {
@@ -213,91 +366,40 @@
     }
 
     .table th {
-        background-color: #f8f9fa;
-        padding: 12px 15px;
+        background-color: var(--light-gray);
+        padding: 14px 18px;
         text-align: left;
         font-weight: 600;
-        color: #495057;
-        border-bottom: 2px solid var(--border-color);
+        color: var(--text-primary);
+        border-bottom: 2px solid #e9ecef;
     }
 
     .table td {
-        padding: 12px 15px;
-        border-bottom: 1px solid var(--border-color);
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--light-gray);
         vertical-align: middle;
+        transition: var(--transition-fast);
+    }
+
+    .table tr {
+        transition: var(--transition-fast);
+        cursor: pointer;
     }
 
     .table tr:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(247, 249, 252, 0.7);
     }
 
-    .badge {
-        padding: 5px 10px;
-        border-radius: 50px;
-        font-size: 12px;
-        font-weight: 500;
+    .table tr:hover td {
+        color: var(--primary-pink);
     }
 
-    .badge-silver {
-        background-color: #e9ecef;
-        color: #495057;
-    }
-
-    .badge-gold {
-        background-color: #ffc107;
-        color: #212529;
-    }
-
-    .badge-platinum {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .badge-diamond {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 5px;
-    }
-
-    .btn-action {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-view {
-        background-color: var(--info-color);
-    }
-
-    .btn-edit {
-        background-color: var(--warning-color);
-    }
-
-    .btn-delete {
-        background-color: var(--danger-color);
-    }
-
-    .btn-action:hover {
-        opacity: 0.8;
-        transform: translateY(-2px);
-    }
-
+    /* Styling for pagination */
     .pagination {
         display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
-        gap: 5px;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 8px;
     }
 
     .page-item {
@@ -308,70 +410,220 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background-color: white;
-        border: 1px solid var(--border-color);
-        color: #495057;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background-color: var(--white);
+        color: var(--text-primary);
+        border: 1px solid #e9ecef;
+        font-weight: 500;
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+        cursor: pointer;
     }
 
     .page-item.active .page-link {
-        background-color: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary-pink) 0%, #ff92b6 100%);
         color: white;
-        border-color: var(--primary-color);
+        border-color: var(--primary-pink);
+        box-shadow: 0 5px 15px rgba(255, 107, 149, 0.2);
+        transform: translateY(-2px);
     }
 
-    .page-link:hover {
-        background-color: #f8f9fa;
+    .page-link:hover:not(.active) {
+        background-color: #f6f9fc;
+        border-color: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.07);
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        color: #dee2e6;
-        margin-bottom: 15px;
-    }
-
-    .empty-state h4 {
-        color: #6c757d;
-        margin-bottom: 10px;
-    }
-
-    .empty-state p {
+    .page-item.disabled .page-link {
         color: #adb5bd;
-        max-width: 400px;
-        margin: 0 auto 20px;
+        pointer-events: none;
+        background-color: #f8f9fa;
+        border-color: #edeff2;
+    }
+
+    .page-item.prev-next .page-link {
+        background-color: var(--light-gray);
+        color: var(--primary-pink);
+        font-size: 1.1rem;
+    }
+
+    .page-item.prev-next .page-link:hover {
+        background-color: var(--primary-pink);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 149, 0.2);
+    }
+
+    /* Animation for pagination */
+    .pagination .page-item {
+        opacity: 0;
+        animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .pagination .page-item:nth-child(1) { animation-delay: 0.7s; }
+    .pagination .page-item:nth-child(2) { animation-delay: 0.75s; }
+    .pagination .page-item:nth-child(3) { animation-delay: 0.8s; }
+    .pagination .page-item:nth-child(4) { animation-delay: 0.85s; }
+    .pagination .page-item:nth-child(5) { animation-delay: 0.9s; }
+
+    /* Styling for filters */
+    .search-filter-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        animation: fadeIn 0.6s ease forwards;
+        animation-delay: 0.65s;
+        opacity: 0;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--radius-md);
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        background-color: #f9fafc;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary-pink);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 149, 0.1);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-box input:focus + i {
+        color: var(--primary-pink);
+    }
+
+    .filter-box {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .filter-select-container {
+        position: relative;
+        min-width: 200px;
+    }
+
+    .filter-select-container::after {
+        content: '\f107';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .filter-select-container:hover::after {
+        color: var(--primary-pink);
+    }
+
+    .filter-select {
+        appearance: none;
+        width: 100%;
+        padding: 14px 20px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--radius-md);
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        background-color: #f9fafc;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-pink);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 149, 0.1);
+    }
+
+    .filter-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: var(--light-gray);
+        color: var(--text-secondary);
+        border-radius: 30px;
+        font-size: 0.75rem;
+        margin-left: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 15px;
+        height: 48px;
+        background-color: var(--light-gray);
+        color: var(--text-secondary);
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-btn:hover {
+        background-color: var(--primary-pink);
+        color: white;
+        box-shadow: 0 5px 15px rgba(255, 107, 149, 0.2);
+    }
+
+    .filter-btn i {
+        margin-right: 8px;
     }
 
     @media (max-width: 768px) {
-        .header-container {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .btn-pink {
-            margin-top: 15px;
-            align-self: flex-start;
-        }
-        
-        .stats-container {
-            flex-direction: column;
-        }
-        
         .search-filter-container {
             flex-direction: column;
+        }
+        
+        .filter-box {
+            width: 100%;
+        }
+        
+        .filter-select-container {
+            flex: 1;
+            min-width: auto;
         }
     }
 </style>
 
 <div class="header-container">
+    <div class="header-shimmer"></div>
     <div>
         <div class="header-title">Quản Lý Hạng Thành Viên</div>
         <div class="header-subtitle">Tối ưu trải nghiệm và phục vụ khách hàng tốt nhất</div>
@@ -383,57 +635,57 @@
 
 <div class="stats-container">
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: var(--primary-pink);">
             <i class="fas fa-users"></i>
         </div>
         <div class="stat-value">{{ $totalRanks ?? count($ranks) }}</div>
         <div class="stat-label">Tổng Hạng Thành Viên</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar progress-1"></div>
+            <div class="stat-progress-bar" style="background-color: var(--primary-pink); --progress-width: 100%;"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon" style="background-color: #e9ecef;">
+        <div class="stat-icon" style="background-color: #c0c0c0;">
             <i class="fas fa-user"></i>
         </div>
         <div class="stat-value">{{ $silverCount ?? $ranks->where('Tenhang', 'Thành viên Bạc')->count() }}</div>
         <div class="stat-label">Thành Viên Bạc</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar" style="background-color: #e9ecef; width: 75%;"></div>
+            <div class="stat-progress-bar" style="background-color: #c0c0c0; --progress-width: 75%;"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon" style="background-color: #ffc107;">
+        <div class="stat-icon" style="background-color: #ffd700;">
             <i class="fas fa-user"></i>
         </div>
         <div class="stat-value">{{ $goldCount ?? $ranks->where('Tenhang', 'Thành viên Vàng')->count() }}</div>
         <div class="stat-label">Thành Viên Vàng</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar" style="background-color: #ffc107; width: 50%;"></div>
+            <div class="stat-progress-bar" style="background-color: #ffd700; --progress-width: 60%;"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon" style="background-color: #6c757d;">
+        <div class="stat-icon" style="background-color: #e5e4e2;">
             <i class="fas fa-user"></i>
         </div>
         <div class="stat-value">{{ $platinumCount ?? $ranks->where('Tenhang', 'Thành viên Bạch Kim')->count() }}</div>
         <div class="stat-label">Thành Viên Bạch Kim</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar" style="background-color: #6c757d; width: 35%;"></div>
+            <div class="stat-progress-bar" style="background-color: #e5e4e2; --progress-width: 45%;"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon" style="background-color: #17a2b8;">
+        <div class="stat-icon" style="background-color: #b9f2ff;">
             <i class="fas fa-crown"></i>
         </div>
         <div class="stat-value">{{ $diamondCount ?? $ranks->where('Tenhang', 'Thành viên Kim Cương')->count() }}</div>
         <div class="stat-label">Thành Viên Kim Cương</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar" style="background-color: #17a2b8; width: 25%;"></div>
+            <div class="stat-progress-bar" style="background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%); --progress-width: 30%;"></div>
         </div>
     </div>
 </div>
@@ -444,7 +696,7 @@
             <i class="fas fa-list"></i> Danh Sách Hạng Thành Viên
         </div>
         <div>
-            <button class="btn-action" style="background-color: var(--primary-color);" id="toggleFilters">
+            <button class="btn-action" style="background-color: var(--primary-pink);" id="toggleFilters">
                 <i class="fas fa-filter"></i>
             </button>
         </div>
@@ -452,18 +704,24 @@
     
     <div class="search-filter-container" id="filterContainer">
         <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, mã, mô tả...">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, mã...">
         </div>
         
         <div class="filter-box">
-            <select class="filter-select" id="rankTypeFilter">
-                <option value="">Tất cả hạng</option>
-                <option value="Thành viên Bạc">Thành viên Bạc</option>
-                <option value="Thành viên Vàng">Thành viên Vàng</option>
-                <option value="Thành viên Bạch Kim">Thành viên Bạch Kim</option>
-                <option value="Thành viên Kim Cương">Thành viên Kim Cương</option>
-            </select>
+            <div class="filter-select-container">
+                <select class="filter-select" id="rankTypeFilter">
+                    <option value="">Tất cả hạng thành viên</option>
+                    <option value="Thành viên Bạc">Thành viên Bạc</option>
+                    <option value="Thành viên Vàng">Thành viên Vàng</option>
+                    <option value="Thành viên Bạch Kim">Thành viên Bạch Kim</option>
+                    <option value="Thành viên Kim Cương">Thành viên Kim Cương</option>
+                </select>
+            </div>
+            
+            <button class="filter-btn" id="applyFilters">
+                <i class="fas fa-sliders-h"></i> Áp dụng
+            </button>
         </div>
     </div>
     
@@ -486,7 +744,7 @@
             </thead>
             <tbody>
                 @forelse($ranks as $rank)
-                <tr>
+                <tr class="rank-row" data-url="{{ route('admin.membership_ranks.show', $rank->Mahang) }}" data-rank-type="{{ $rank->Tenhang }}">
                     <td>{{ $rank->Mahang }}</td>
                     <td>
                         {{ $rank->Tenhang }}
@@ -504,15 +762,12 @@
                     </td>
                     <td>{{ $rank->Mota }}</td>
                     <td>{{ $rank->user->Hoten ?? 'N/A' }}</td>
-                    <td>
+                    <td onclick="event.stopPropagation()">
                         <div class="action-buttons">
-                            <a href="{{ route('admin.membership_ranks.show', $rank->Mahang) }}" class="btn-action btn-view">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('admin.membership_ranks.edit', $rank->Mahang) }}" class="btn-action btn-edit">
+                            <a href="{{ route('admin.membership_ranks.edit', $rank->Mahang) }}" class="btn-action btn-edit" title="Chỉnh sửa">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{{ route('admin.membership_ranks.confirm-destroy', $rank->Mahang) }}" class="btn-action btn-delete">
+                            <a href="{{ route('admin.membership_ranks.confirm-destroy', $rank->Mahang) }}" class="btn-action btn-delete" title="Xóa">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -537,18 +792,22 @@
     </div>
     
     <!-- Pagination -->
-    <div class="pagination">
+    <div class="pagination-container">
         <ul class="pagination">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">
+            <li class="page-item prev-next {{ $ranks->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $ranks->previousPageUrl() }}" {{ $ranks->onFirstPage() ? 'aria-disabled="true"' : '' }}>
                     <i class="fas fa-chevron-left"></i>
                 </a>
             </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">
+            
+            @for ($i = 1; $i <= $ranks->lastPage(); $i++)
+                <li class="page-item {{ $ranks->currentPage() == $i ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $ranks->url($i) }}">{{ $i }}</a>
+                </li>
+            @endfor
+            
+            <li class="page-item prev-next {{ $ranks->hasMorePages() ? '' : 'disabled' }}">
+                <a class="page-link" href="{{ $ranks->nextPageUrl() }}" {{ $ranks->hasMorePages() ? '' : 'aria-disabled="true"' }}>
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </li>
@@ -564,6 +823,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     toggleFilters.addEventListener('click', function() {
         filterContainer.style.display = filterContainer.style.display === 'none' ? 'flex' : 'none';
+    });
+    
+    // Row click navigation
+    const rankRows = document.querySelectorAll('.rank-row');
+    
+    rankRows.forEach(row => {
+        row.addEventListener('click', function() {
+            window.location.href = this.dataset.url;
+        });
     });
     
     // Search functionality
@@ -585,12 +853,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const mota = row.cells[2].textContent.toLowerCase();
             const user = row.cells[3].textContent.toLowerCase();
             
+            // Lấy giá trị data-rank-type để so sánh chính xác
+            const rowRankType = row.getAttribute('data-rank-type');
+            
             const matchesSearch = mahang.includes(searchTerm) || 
                                 tenhang.includes(searchTerm) || 
                                 mota.includes(searchTerm) || 
                                 user.includes(searchTerm);
                                 
-            const matchesRankType = rankType === '' || tenhang.includes(rankType.toLowerCase());
+            const matchesRankType = rankType === '' || rowRankType === rankType;
             
             row.style.display = (matchesSearch && matchesRankType) ? '' : 'none';
         }

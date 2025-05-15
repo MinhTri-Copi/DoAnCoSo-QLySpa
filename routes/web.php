@@ -110,9 +110,11 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
    Route::post('dichvu/{id}/toggle-featured', [DichVuController::class, 'toggleFeatured'])->name('admin.dichvu.toggle-featured');
    Route::get('api/services', [DichVuController::class, 'apiServices'])->name('api.services');
 
-   //Route cho quản lý đặt lịch (DATLICH)
-   Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich']);
-    Route::get('datlich/{id}/confirm-destroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirm-destroy');
+   // Route cho quản lý đặt lịch (DATLICH)
+Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich']);
+Route::get('datlich/{id}/confirmDestroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirmDestroy');
+Route::get('datlich-statistics', [DatLichController::class, 'statistics'])->name('admin.datlich.statistics');
+Route::get('datlich/check-availability', [DatLichController::class, 'checkAvailability'])->name('admin.datlich.checkAvailability');
 
     // Route cho quản lý trạng thái phòng (TRANGTHAIPHONG)
     Route::resource('trangthaiphong', TrangThaiPhongController::class, ['names' => 'admin.trangthaiphong']);
