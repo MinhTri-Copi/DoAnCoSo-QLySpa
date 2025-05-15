@@ -21,6 +21,7 @@ use App\Http\Controllers\HoaDonVaThanhToanController;
 use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DatLichDashboardController;
 use App\Models\HangThanhVien;
 
 
@@ -115,6 +116,7 @@ Route::resource('datlich', DatLichController::class, ['names' => 'admin.datlich'
 Route::get('datlich/{id}/confirmDestroy', [DatLichController::class, 'confirmDestroy'])->name('admin.datlich.confirmDestroy');
 Route::get('datlich-statistics', [DatLichController::class, 'statistics'])->name('admin.datlich.statistics');
 Route::get('datlich/check-availability', [DatLichController::class, 'checkAvailability'])->name('admin.datlich.checkAvailability');
+Route::get('datlich-dashboard', [DatLichDashboardController::class, 'index'])->name('admin.datlich.dashboard');
 
     // Route cho quản lý trạng thái phòng (TRANGTHAIPHONG)
     Route::resource('trangthaiphong', TrangThaiPhongController::class, ['names' => 'admin.trangthaiphong']);

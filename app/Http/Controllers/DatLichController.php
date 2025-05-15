@@ -303,7 +303,7 @@ class DatLichController extends Controller
         $startDate = Carbon::parse($startDate)->startOfDay();
         $endDate = Carbon::parse($endDate)->endOfDay();
         
-        // Tổng số lịch đặt trong khoảng thời gian
+        // Tổng số lịch đặt trong khoảng thời gian (bao gồm tất cả các trạng thái)
         $totalBookings = DatLich::whereBetween('Thoigiandatlich', [$startDate, $endDate])->count();
         
         // Thống kê theo trạng thái
