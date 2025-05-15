@@ -2,7 +2,27 @@
 
 @section('title', 'Thêm Lịch Đặt Mới')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+@endsection
+
 @section('content')
+@php
+$headerActions = '
+<a href="' . route('admin.datlich.index') . '" class="spa-btn">
+    <i class="fas fa-arrow-left"></i>
+    <span>Quay Lại</span>
+</a>
+';
+@endphp
+
+@include('backend.layouts.header-banner', [
+    'title' => 'Thêm Lịch Đặt Mới',
+    'subtitle' => 'Tạo lịch đặt dịch vụ mới',
+    'icon' => 'fas fa-calendar-plus',
+    'actions' => $headerActions
+])
+
 <style>
     :root {
         --primary-color: #ff6b8b;
@@ -15,25 +35,6 @@
         --danger-color: #dc3545;
         --warning-color: #ffc107;
         --info-color: #17a2b8;
-    }
-
-    .header-container {
-        background-color: var(--primary-color);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
-        color: var(--text-on-primary);
-    }
-
-    .header-title {
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .header-subtitle {
-        font-size: 14px;
-        margin-top: 5px;
-        opacity: 0.9;
     }
 
     .content-card {
@@ -266,16 +267,11 @@
     }
 </style>
 
-<div class="header-container">
-    <div class="header-title">Thêm Lịch Đặt Mới</div>
-    <div class="header-subtitle">Tạo lịch đặt dịch vụ mới</div>
-</div>
-
 <div class="content-card">
     <div class="card-header">
-        <div class="card-title">
-            <i class="fas fa-calendar-plus"></i> Thông Tin Lịch Đặt
-        </div>
+        <h2 class="card-title">
+            <i class="fas fa-info-circle"></i> Thông Tin Lịch Đặt
+        </h2>
     </div>
     
     @if($errors->any())

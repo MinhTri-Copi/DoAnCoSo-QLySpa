@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Quản lý phòng')
+@section('title', 'Quản Lý Phòng')
 
 @section('styles')
 <style>
