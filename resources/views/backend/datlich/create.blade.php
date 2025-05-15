@@ -294,7 +294,7 @@
     </div>
     @endif
     
-    <form action="{{ route('admin.datlich.store') }}" method="POST" id="bookingForm">
+    <form action="{{ route('admin.datlich.store') }}" method="POST" id="bookingForm" onsubmit="return validateAndSubmitForm(event)">
         @csrf
         
         <div class="form-group">
@@ -389,7 +389,9 @@
         
         <div class="btn-container">
             <a href="{{ route('admin.datlich.index') }}" class="btn btn-secondary">Hủy</a>
-            <button type="submit" class="btn btn-primary">Lưu Lịch Đặt</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i> Lưu Lịch Đặt
+            </button>
         </div>
     </form>
 </div>
@@ -407,6 +409,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const timeSlotsContainer = document.getElementById('timeSlotsContainer');
     const timeSlotsGrid = document.getElementById('timeSlotsGrid');
+    
+    // Hiển thị thông báo lỗi từ server nếu có
+    @if(session('error'))
+    alert('{{ session('error') }}');
+    @endif
+    
+    // Hiển thị thông báo thành công từ server nếu có
+    @if(session('success'))
+    alert('{{ session('success') }}');
+    @endif
     
     // Cập nhật thông tin dịch vụ khi chọn
     serviceSelect.addEventListener('change', function() {
@@ -492,49 +504,114 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Function to validate and prepare form data before submission
-function validateAndPrepareForm(event) {
+function validateForm() {
+    console.log('Đang xác thực form...');
+    
     const bookingDateInput = document.getElementById('bookingDate');
     const bookingTimeInput = document.getElementById('bookingTime');
     const serviceSelect = document.getElementById('MaDV');
     const userSelect = document.getElementById('Manguoidung');
     const statusSelect = document.getElementById('Trangthai_');
-
-    // Validate required fields
+    
+    console.log('Form data:', {
+        date: bookingDateInput.value,
+        time: bookingTimeInput.value,
+        service: serviceSelect.value,
+        user: userSelect.value,
+        status: statusSelect.value
+    });
+    
+    // Kiểm tra các trường bắt buộc
     if (!bookingDateInput.value) {
         alert('Vui lòng chọn ngày đặt lịch.');
+        bookingDateInput.focus();
         return false;
     }
-
+    
     if (!bookingTimeInput.value) {
         alert('Vui lòng chọn giờ đặt lịch.');
+        bookingTimeInput.focus();
         return false;
     }
-
+    
     if (!serviceSelect.value) {
         alert('Vui lòng chọn dịch vụ.');
-        return false; 
+        serviceSelect.focus();
+        return false;
     }
-
+    
     if (!userSelect.value) {
         alert('Vui lòng chọn người dùng.');
+        userSelect.focus();
         return false;
     }
-
+    
     if (!statusSelect.value) {
         alert('Vui lòng chọn trạng thái.');
+        statusSelect.focus();
         return false;
     }
-
-    // Debug info
-    console.log('Form submission data:');
-    console.log('Date:', bookingDateInput.value);
-    console.log('Time:', bookingTimeInput.value);
-    console.log('Service:', serviceSelect.value);
-    console.log('User:', userSelect.value);
-    console.log('Status:', statusSelect.value);
-
+    
+    // Kiểm tra thời gian hợp lệ (8:00-18:00)
+    const timeValue = bookingTimeInput.value;
+    const timeHour = parseInt(timeValue.split(':')[0]);
+    if (timeHour < 8 || timeHour >= 18) {
+        alert('Vui lòng chọn thời gian từ 8:00 đến 18:00.');
+        bookingTimeInput.focus();
+        return false;
+    }
+    
+    // Kiểm tra ngày không phải là quá khứ
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDate = new Date(bookingDateInput.value);
+    if (bookingDate < today) {
+        alert('Không thể đặt lịch vào ngày trong quá khứ.');
+        bookingDateInput.focus();
+        return false;
+    }
+    
+    // Hiển thị trạng thái đang lưu
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+    submitBtn.disabled = true;
+    
+    console.log('Form đã được xác thực, đang gửi...');
+    
+    // Đặt timeout để tránh trường hợp form không submit
+    setTimeout(function() {
+        if (submitBtn.disabled) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Lưu Lịch Đặt';
+        }
+    }, 10000);
+    
     return true;
+}
+
+function validateAndSubmitForm(event) {
+    event.preventDefault(); // Ngăn chặn form tự động submit
+    
+    console.log('Xác thực và gửi form...');
+    
+    if (validateForm()) {
+        console.log('Form hợp lệ, đang gửi...');
+        
+        // Chuẩn bị dữ liệu
+        const form = document.getElementById('bookingForm');
+        const formData = new FormData(form);
+        
+        // Log dữ liệu gửi đi
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+        
+        // Submit form theo cách thông thường
+        form.submit();
+    } else {
+        console.log('Form không hợp lệ');
+        return false;
+    }
 }
 </script>
 @endsection
