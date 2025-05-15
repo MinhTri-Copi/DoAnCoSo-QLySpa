@@ -963,32 +963,6 @@
                     </span>
                     <span class="btn-text">Chỉnh Sửa</span>
                 </a>
-                <div class="dropdown">
-                    <button class="btn btn-light-outline dropdown-toggle" type="button" id="dropdownMenuButton" 
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v mr-1"></i> Thao Tác
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuButton">
-                        <h6 class="dropdown-header">Tùy Chọn:</h6>
-                        <a class="dropdown-item" href="#" id="addPointsBtn">
-                            <i class="fas fa-coins fa-sm fa-fw mr-2 text-warning"></i>
-                            Thêm Điểm Thưởng
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-calendar-plus fa-sm fa-fw mr-2" style="color: var(--spa-primary);"></i>
-                            Đặt Lịch Hẹn Mới
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-print fa-sm fa-fw mr-2" style="color: var(--spa-primary);"></i>
-                            In Thông Tin
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="{{ route('admin.customers.confirmDestroy', $customer->Manguoidung) }}">
-                            <i class="fas fa-trash fa-sm fa-fw mr-2"></i>
-                            Xóa Khách Hàng
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
