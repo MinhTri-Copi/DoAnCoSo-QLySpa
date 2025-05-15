@@ -31,5 +31,3 @@ class Account extends Authenticatable
         return $this->Matkhau;
     }
 }
-
-//Ngyuen Vu tEST

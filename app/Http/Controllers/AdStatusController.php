@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\TrangThaiQC;
-use App\Models\QuangCao;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller; 
-use Illuminate\Support\Facades\DB;
 
 class AdStatusController extends Controller
 {
+    public function __construct()
+    {
+        
+    }
+
     public function index()
     {
         $statuses = TrangThaiQC::all();
@@ -36,9 +39,10 @@ class AdStatusController extends Controller
             'TenTT' => $request->TenTT,
         ]);
 
-        return redirect()->route('admin.ad-statuses.index')->with('success', 'Thêm trạng thái quảng cáo thành công!');
+        return redirect()->route('ad-statuses.index')->with('success', 'Thêm trạng thái quảng cáo thành công!');
     }
 
+    // Thêm phương thức xem chi tiết
     public function show($id)
     {
         $status = TrangThaiQC::findOrFail($id);
@@ -63,60 +67,27 @@ class AdStatusController extends Controller
             'TenTT' => $request->TenTT,
         ]);
 
-        return redirect()->route('admin.ad-statuses.show', $id)->with('success', 'Cập nhật trạng thái quảng cáo thành công!');
+        return redirect()->route('ad-statuses.index')->with('success', 'Cập nhật trạng thái quảng cáo thành công!');
     }
 
+    // Hiển thị view xác nhận xóa
     public function confirmDestroy($id)
     {
         $status = TrangThaiQC::findOrFail($id);
         return view('backend.ad_statuses.destroy', compact('status'));
     }
 
+    // Xử lý xóa
     public function destroy($id)
     {
         $status = TrangThaiQC::findOrFail($id);
+
+        if ($status->quangCao()->count() > 0) {
+            return redirect()->route('ad-statuses.index')->with('error', 'Không thể xóa trạng thái này vì nó đang được sử dụng!');
+        }
+
         $status->delete();
-        return redirect()->route('admin.ad-statuses.index')->with('success', 'Xóa trạng thái quảng cáo thành công!');
-    }
-    
-    // New method to get statistics
-    public function statistics()
-    {
-        // Get count of ads by status
-        $statusCounts = TrangThaiQC::withCount('quangCao')->get();
-        
-        // Get monthly trends
-        $monthlyTrends = QuangCao::select(
-                DB::raw('MONTH(created_at) as month'), 
-                DB::raw('YEAR(created_at) as year'), 
-                'MaTTQC',
-                DB::raw('count(*) as count')
-            )
-            ->whereRaw('created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)')
-            ->groupBy('year', 'month', 'MaTTQC')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get()
-            ->groupBy('MaTTQC');
-            
-        // Format for chart
-        $chartData = [];
-        $monthlyTrends->each(function($items, $statusId) use (&$chartData) {
-            $statusName = TrangThaiQC::find($statusId)->TenTT;
-            $chartData[$statusId] = [
-                'name' => $statusName,
-                'data' => $items->map(function($item) {
-                    return [
-                        'x' => $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT),
-                        'y' => $item->count
-                    ];
-                })->values()->toArray()
-            ];
-        });
-        
-        return view('backend.ad_statuses.statistics', [
-            'statusCounts' => $statusCounts,
-            'chartData' => json_encode(array_values($chartData))
-        ]);
+
+        return redirect()->route('ad-statuses.index')->with('success', 'Xóa trạng thái quảng cáo thành công!');
     }
 }

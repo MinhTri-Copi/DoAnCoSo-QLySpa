@@ -1,8 +1,8 @@
 /* ===== GENERAL STYLES ===== */
 :root {
-  --primary-color: #ff6b95;
-  --primary-light: #ffdbe9;
-  --primary-dark: #e84a78;
+  --primary-color: #db7093;
+  --primary-light: #ffb6c1;
+  --primary-dark: #c76585;
   --secondary-color: #6c757d;
   --success-color: #28a745;
   --info-color: #17a2b8;
@@ -43,7 +43,7 @@ a:focus {
 }
 
 body {
-  font-family: "Roboto", "Noto Sans", sans-serif;
+  font-family: "Quicksand", sans-serif;
   background-color: #ffffff !important;
   color: #333;
   line-height: 1.6;

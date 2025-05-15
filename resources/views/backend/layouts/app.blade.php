@@ -18,7 +18,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <!-- Admin Styles -->
     <link href="{{ asset('admin/css/admin-style.css') }}" rel="stylesheet">
@@ -32,27 +32,6 @@
             --sidebar-width: 250px;
             --header-height: 60px;
             --footer-height: 50px;
-        }
-        
-        /* Override sidebar colors for consistent pink theme */
-        .sidebar {
-            --primary-color: #ff6b95;
-            --primary-light: #ffdbe9;
-            --primary-dark: #e84a78;
-        }
-        
-        .menu-link:hover {
-            background-color: #ff6b95 !important;
-        }
-        
-        .submenu li a:hover {
-            background-color: #ff6b95 !important;
-        }
-        
-        .menu-item.active .menu-link, 
-        .menu-link.active {
-            color: white !important;
-            background-color: #ff6b95 !important;
         }
     </style>
 </head>
