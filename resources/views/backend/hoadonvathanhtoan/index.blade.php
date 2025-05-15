@@ -345,6 +345,7 @@
         padding: 12px 15px;
         border-bottom: 1px solid var(--border-color);
         vertical-align: middle;
+        height: 72px; /* Add consistent height for all cells */
     }
 
     .table tr:hover {
@@ -381,6 +382,9 @@
     .action-buttons {
         display: flex;
         gap: 5px;
+        justify-content: flex-end;
+        align-items: center;
+        height: 100%;
     }
 
     .btn-action {
@@ -395,6 +399,7 @@
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
+        flex-shrink: 0;
     }
 
     .btn-view {
