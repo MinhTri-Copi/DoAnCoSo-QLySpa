@@ -1,46 +1,676 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Quản Lý Trạng Thái Phòng')
+@section('title', 'Quản lý Trạng Thái Phòng')
+
+@section('styles')
+<style>
+    /* ===== MODERN SPA DESIGN ===== */
+    :root {
+        --primary-pink: #ff6b95;
+        --light-pink: #ffdbe9;
+        --dark-pink: #e84a78;
+        --text-primary: #2c3e50;
+        --text-secondary: #7a8ca0;
+        --info: #3498db;
+        --primary: #8e44ad;
+        --danger: #e74c3c;
+        --light-gray: #f7f9fc;
+        --white: #ffffff;
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 5px 25px rgba(0, 0, 0, 0.07);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.09);
+        --shadow-pink: 0 8px 25px rgba(255, 107, 149, 0.14);
+        --transition-fast: all 0.2s ease;
+        --transition-medium: all 0.3s ease;
+    }
+
+    /* ===== HEADER ===== */
+    .spa-dashboard-header {
+        background: linear-gradient(135deg, var(--primary-pink) 0%, #ff92b6 100%);
+        border-radius: var(--radius-lg);
+        padding: 1.8rem 2.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-pink);
+        max-height: 140px;
+    }
+
+    .spa-dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: pulse 6s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0.1) 20%, 
+            rgba(255,255,255,0.2) 40%, 
+            rgba(255,255,255,0.1) 60%, 
+            rgba(255,255,255,0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 5s infinite linear;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glitter-dot {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 3;
+        box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
+        animation: glitter 8s infinite;
+    }
+
+    .glitter-dot:nth-child(1) {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .glitter-dot:nth-child(2) {
+        width: 6px;
+        height: 6px;
+        top: 40%;
+        left: 30%;
+        animation-delay: 2s;
+    }
+
+    .glitter-dot:nth-child(3) {
+        width: 3px;
+        height: 3px;
+        top: 20%;
+        right: 25%;
+        animation-delay: 4s;
+    }
+
+    .glitter-dot:nth-child(4) {
+        width: 5px;
+        height: 5px;
+        bottom: 30%;
+        right: 15%;
+        animation-delay: 6s;
+    }
+
+    @keyframes glitter {
+        0% { transform: scale(0); opacity: 0; }
+        10% { transform: scale(1); opacity: 0.8; }
+        20% { transform: scale(0.2); opacity: 0.2; }
+        30% { transform: scale(1.2); opacity: 0.7; }
+        40% { transform: scale(0.5); opacity: 0.5; }
+        50% { transform: scale(1); opacity: 0.9; }
+        60% { transform: scale(0.3); opacity: 0.3; }
+        100% { transform: scale(0); opacity: 0; }
+    }
+
+    .spa-header-content {
+        position: relative;
+        z-index: 4;
+    }
+
+    .spa-header-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 0.3rem;
+        letter-spacing: 0.5px;
+    }
+
+    .spa-header-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+    }
+
+    .spa-header-subtitle i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .spa-header-action {
+        position: relative;
+        z-index: 4;
+    }
+
+    .spa-btn-add {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-pink);
+        border: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: var(--transition-fast);
+        text-decoration: none;
+    }
+
+    .spa-btn-add i {
+        font-size: 0.8rem;
+        background: rgba(255, 107, 149, 0.15);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transition-fast);
+    }
+
+    .spa-btn-add:hover {
+        background: white;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        color: var(--dark-pink);
+        text-decoration: none;
+    }
+
+    .spa-btn-add:hover i {
+        background: rgba(255, 107, 149, 0.25);
+        transform: rotate(90deg);
+    }
+
+    /* ===== CONTENT WRAPPER ===== */
+    .spa-content-wrapper {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .spa-content-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .spa-content-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .spa-content-title i {
+        color: var(--primary-pink);
+    }
+
+    .spa-search-box {
+        position: relative;
+        max-width: 400px;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .spa-search-box input {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        padding-left: 3rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50px;
+        font-size: 0.95rem;
+        transition: var(--transition-fast);
+        background: var(--light-gray);
+    }
+
+    .spa-search-box input:focus {
+        outline: none;
+        border-color: var(--primary-pink);
+        background: var(--white);
+        box-shadow: 0 3px 15px rgba(255, 107, 149, 0.1);
+    }
+
+    .spa-search-box i {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    .spa-content-body {
+        padding: 1.5rem 2rem 2rem;
+    }
+
+    /* ===== TABLE STYLES ===== */
+    .spa-status-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        margin-top: -12px;
+    }
+
+    .spa-status-table thead th {
+        background: transparent;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 1rem 1.5rem 0.8rem;
+        border: none;
+        text-align: center;
+    }
+
+    .spa-status-table thead th:first-child,
+    .spa-status-table thead th:nth-child(2) {
+        text-align: left;
+    }
+
+    .spa-status-table tbody tr {
+        background: var(--light-gray);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition-fast);
+        border-radius: var(--radius-md);
+    }
+
+    .spa-status-table tbody tr td {
+        padding: 1.2rem 1.5rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    .spa-status-table tbody tr td:first-child {
+        border-top-left-radius: var(--radius-md);
+        border-bottom-left-radius: var(--radius-md);
+    }
+
+    .spa-status-table tbody tr td:last-child {
+        border-top-right-radius: var(--radius-md);
+        border-bottom-right-radius: var(--radius-md);
+    }
+
+    .spa-status-table tbody tr:hover {
+        background: var(--light-pink);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .spa-status-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-primary);
+        margin-bottom: 0.2rem;
+    }
+
+    .spa-status-code {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: block;
+    }
+
+    .spa-status-id {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.4rem 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--primary-pink);
+        background: var(--light-pink);
+        border-radius: 50px;
+    }
+
+    .spa-actions-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+    }
+
+    .spa-action-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: var(--transition-fast);
+        border: none;
+        outline: none;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .spa-action-btn.view {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+    }
+
+    .spa-action-btn.edit {
+        background: rgba(142, 68, 173, 0.15);
+        color: #8e44ad;
+    }
+
+    .spa-action-btn.delete {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+    }
+
+    .spa-action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .spa-action-btn.view:hover {
+        background: #e6f7ff;
+        color: #2980b9;
+    }
+
+    .spa-action-btn.edit:hover {
+        background: #f4e6f8;
+        color: #8e44ad;
+    }
+
+    .spa-action-btn.delete:hover {
+        background: #fde4e2;
+        color: #c0392b;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .spa-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+
+    .spa-empty-icon {
+        font-size: 3.5rem;
+        color: #dbe1e8;
+        margin-bottom: 1.5rem;
+    }
+
+    .spa-empty-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.8rem;
+    }
+
+    .spa-empty-desc {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        max-width: 400px;
+        margin: 0 auto 1.5rem;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 991px) {
+        .spa-dashboard-header {
+            padding: 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.2rem;
+            max-height: none;
+        }
+
+        .spa-header-action {
+            align-self: flex-start;
+        }
+
+        .spa-content-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .spa-search-box {
+            width: 100%;
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .spa-content-body {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .spa-status-table thead th, 
+        .spa-status-table tbody td {
+            padding: 0.8rem;
+        }
+
+        .spa-action-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+@endsection
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">Quản Lý Trạng Thái Phòng</h2>
+<div class="container-fluid">
+    <!-- Modern SPA Dashboard Header -->
+    <div class="spa-dashboard-header">
+        <div class="header-shimmer"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="glitter-dot"></div>
+        <div class="spa-header-content">
+            <h1 class="spa-header-title">Quản Lý Trạng Thái Phòng</h1>
+            <p class="spa-header-subtitle">
+                <i class="fas fa-door-open"></i>
+                Thiết lập và quản lý các trạng thái phòng trong hệ thống
+            </p>
+        </div>
+        <div class="spa-header-action">
+            <a href="{{ route('admin.trangthaiphong.create') }}" class="spa-btn-add">
+                <i class="fas fa-plus"></i>
+                Thêm Trạng Thái Mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="spa-content-wrapper">
+        <div class="spa-content-header">
+            <h2 class="spa-content-title">
+                <i class="fas fa-list-alt"></i>
+                Danh Sách Trạng Thái Phòng
+            </h2>
+        </div>
+
+        <div class="spa-content-body">
+            <div class="spa-search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Tìm kiếm trạng thái phòng..." id="searchInput">
+            </div>
+
+            <!-- Thông báo -->
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
         </div>
     @endif
     @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
         </div>
     @endif
 
-    <a href="{{ route('admin.trangthaiphong.create') }}" class="btn btn-primary mb-3">Thêm Trạng Thái Phòng</a>
-
-    <table class="table table-bordered">
+            @if($trangThaiPhongs->isEmpty())
+                <div class="spa-empty-state">
+                    <i class="fas fa-door-open spa-empty-icon"></i>
+                    <h3 class="spa-empty-title">Chưa có trạng thái phòng nào</h3>
+                    <p class="spa-empty-desc">Hệ thống chưa có trạng thái phòng nào được thiết lập. Bạn có thể tạo trạng thái mới để quản lý phòng.</p>
+                    <a href="{{ route('admin.trangthaiphong.create') }}" class="spa-btn-add">
+                        <i class="fas fa-plus"></i>
+                        Thêm Trạng Thái Mới
+                    </a>
+                </div>
+            @else
+                <table class="spa-status-table">
         <thead>
             <tr>
-                <th>Mã Trạng Thái Phòng</th>
+                            <th class="text-center">Mã</th>
                 <th>Tên Trạng Thái</th>
-                <th>Thao Tác</th>
+                            <th class="text-center">Thao Tác</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($trangThaiPhongs as $trangThaiPhong)
-                <tr>
-                    <td>{{ $trangThaiPhong->MatrangthaiP }}</td>
-                    <td>{{ $trangThaiPhong->Tentrangthai }}</td>
-                    <td>
-                        <a href="{{ route('admin.trangthaiphong.show', $trangThaiPhong->MatrangthaiP) }}" class="btn btn-sm btn-info">Xem</a>
-                        <a href="{{ route('admin.trangthaiphong.edit', $trangThaiPhong->MatrangthaiP) }}" class="btn btn-sm btn-warning">Sửa</a>
-                        <a href="{{ route('admin.trangthaiphong.confirm-destroy', $trangThaiPhong->MatrangthaiP) }}" class="btn btn-sm btn-danger">Xóa</a>
+                        @foreach($trangThaiPhongs as $trangThaiPhong)
+                            <tr>
+                                <td class="text-center">
+                                    <span class="spa-status-id">{{ $trangThaiPhong->MatrangthaiP }}</span>
+                                </td>
+                                <td>
+                                    <div class="spa-status-name">{{ $trangThaiPhong->Tentrangthai }}</div>
+                                    <span class="spa-status-code">Mã: {{ $trangThaiPhong->MatrangthaiP }}</span>
+                                </td>
+                                <td>
+                                    <div class="spa-actions-wrapper">
+                                        <a href="{{ route('admin.trangthaiphong.show', $trangThaiPhong->MatrangthaiP) }}" class="spa-action-btn view" title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.trangthaiphong.edit', $trangThaiPhong->MatrangthaiP) }}" class="spa-action-btn edit" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ route('admin.trangthaiphong.confirm-destroy', $trangThaiPhong->MatrangthaiP) }}" class="spa-action-btn delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+            @endif
+        </div>
+    </div>
+
+    <!-- Additional Feature Cards Section -->
+    <div class="row mt-4 mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 shadow-sm" style="border-radius: var(--radius-md);">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="p-3 rounded-circle mr-3" style="background: rgba(255, 107, 149, 0.1);">
+                            <i class="fas fa-door-open text-pink" style="color: var(--primary-pink);"></i>
+                        </div>
+                        <h5 class="m-0 font-weight-bold">Trạng Thái Phòng</h5>
+                    </div>
+                    <p class="text-muted mb-0">Quản lý các trạng thái phòng khác nhau như đang sử dụng, còn trống, đang bảo trì, v.v.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 shadow-sm" style="border-radius: var(--radius-md);">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="p-3 rounded-circle mr-3" style="background: rgba(52, 152, 219, 0.1);">
+                            <i class="fas fa-calendar-check" style="color: var(--info);"></i>
+                        </div>
+                        <h5 class="m-0 font-weight-bold">Quản Lý Phòng</h5>
+                    </div>
+                    <p class="text-muted mb-0">Theo dõi và cập nhật trạng thái của từng phòng trong hệ thống.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 h-100 shadow-sm" style="border-radius: var(--radius-md);">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="p-3 rounded-circle mr-3" style="background: rgba(142, 68, 173, 0.1);">
+                            <i class="fas fa-cog" style="color: var(--primary);"></i>
+                        </div>
+                        <h5 class="m-0 font-weight-bold">Cài Đặt Hiển Thị</h5>
+                    </div>
+                    <p class="text-muted mb-0">Tùy chỉnh cách hiển thị và sắp xếp các trạng thái phòng.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.spa-status-table tbody tr');
+                
+                rows.forEach(row => {
+                    const statusId = row.querySelector('.spa-status-id').textContent.toLowerCase();
+                    const statusName = row.querySelector('.spa-status-name').textContent.toLowerCase();
+                    
+                    if (statusId.includes(searchTerm) || statusName.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Auto close alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                var closeBtn = alert.querySelector('.close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            });
+        }, 5000);
+    });
+</script>
 @endsection

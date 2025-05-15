@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Phong;
 use App\Models\TrangThaiPhong;
+use App\Models\HoaDonVaThanhToan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class PhongController extends Controller
@@ -11,7 +13,22 @@ class PhongController extends Controller
     public function index()
     {
         $phongs = Phong::with('trangThaiPhong')->get();
-        return view('backend.phong.index', compact('phongs'));
+        
+        $phongStats = HoaDonVaThanhToan::select('Maphong', DB::raw('count(*) as total_usage'))
+            ->groupBy('Maphong')
+            ->orderBy('total_usage', 'desc')
+            ->get()
+            ->keyBy('Maphong');
+        
+        $phongRevenue = HoaDonVaThanhToan::select('Maphong', DB::raw('sum(Tongtien) as total_revenue'))
+            ->groupBy('Maphong')
+            ->orderBy('total_revenue', 'desc')
+            ->get()
+            ->keyBy('Maphong');
+            
+        $topPhongs = $phongStats->take(5);
+        
+        return view('backend.phong.index', compact('phongs', 'phongStats', 'phongRevenue', 'topPhongs'));
     }
 
     public function create()
