@@ -142,6 +142,7 @@ Route::get('hoadonvathanhtoan-statistics', [HoaDonVaThanhToanController::class, 
 Route::get('hoadonvathanhtoan-export-excel', [HoaDonVaThanhToanController::class, 'exportExcel'])->name('admin.hoadonvathanhtoan.exportExcel');
 Route::get('hoadonvathanhtoan/{id}/create-danhgia', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.createDanhGia');
 Route::post('hoadonvathanhtoan/{id}/store-danhgia', [HoaDonVaThanhToanController::class, 'storeDanhGia'])->name('admin.hoadonvathanhtoan.storeDanhGia');
+Route::post('hoadonvathanhtoan/update-status', [HoaDonVaThanhToanController::class, 'updateStatus'])->name('admin.hoadonvathanhtoan.updateStatus');
     
     // Routes cho đánh giá hóa đơn
     Route::get('hoadonvathanhtoan/{id}/danhgia/create', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.danhgia.create');

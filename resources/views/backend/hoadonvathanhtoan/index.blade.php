@@ -44,12 +44,13 @@
         color: var(--primary-color);
         border: none;
         border-radius: 50px;
-        padding: 8px 20px;
+        padding: 8px 16px;
         font-weight: bold;
         display: flex;
         align-items: center;
         transition: all 0.3s;
         text-decoration: none;
+        height: 40px;
     }
 
     .btn-pink:hover {
@@ -168,9 +169,10 @@
 
     .search-filter-container {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         margin-bottom: 20px;
         flex-wrap: wrap;
+        align-items: flex-start;
     }
 
     .search-box {
@@ -181,10 +183,11 @@
 
     .search-box input {
         width: 100%;
-        padding: 10px 15px 10px 40px;
+        padding: 8px 15px 8px 35px;
         border: 1px solid var(--border-color);
         border-radius: 50px;
         font-size: 14px;
+        height: 40px;
     }
 
     .search-box i {
@@ -202,19 +205,121 @@
     }
 
     .filter-select {
-        padding: 10px 15px;
+        padding: 8px 12px;
         border: 1px solid var(--border-color);
         border-radius: 50px;
         font-size: 14px;
         min-width: 150px;
+        height: 40px;
     }
 
     .filter-date {
-        padding: 10px 15px;
+        padding: 8px 12px;
         border: 1px solid var(--border-color);
         border-radius: 50px;
         font-size: 14px;
         min-width: 150px;
+        height: 40px;
+    }
+
+    /* Add new styles for date range filters */
+    .date-range-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .date-range-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+
+    .date-range-inputs {
+        display: flex;
+        gap: 10px;
+    }
+
+    .date-input-group {
+        position: relative;
+        flex: 1;
+    }
+
+    .date-input-group label {
+        display: block;
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 3px;
+    }
+
+    .date-input-group input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+
+    .from-date input {
+        border-left: 3px solid #007bff;
+    }
+
+    .to-date input {
+        border-left: 3px solid var(--primary-color);
+    }
+
+    /* Add new styles for amount range filters */
+    .amount-range-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .amount-range-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+
+    .amount-range-inputs {
+        display: flex;
+        gap: 10px;
+    }
+
+    .amount-input-group {
+        position: relative;
+        flex: 1;
+    }
+
+    .amount-input-group label {
+        display: block;
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 3px;
+    }
+
+    .amount-input-group input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+
+    .from-amount input {
+        border-left: 3px solid #28a745;
+    }
+
+    .to-amount input {
+        border-left: 3px solid #dc3545;
     }
 
     .table-responsive {
@@ -313,11 +418,26 @@
         transform: translateY(-2px);
     }
 
+    /* Updated pagination styles */
+    .pagination-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
     .pagination {
         display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
-        gap: 5px;
+        gap: 6px;
+        margin: 0;
     }
 
     .page-item {
@@ -328,24 +448,42 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 8px;
         background-color: white;
         border: 1px solid var(--border-color);
         color: #495057;
         text-decoration: none;
         transition: all 0.2s;
+        font-size: 14px;
+        padding: 0 10px;
     }
 
     .page-item.active .page-link {
         background-color: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
+        box-shadow: 0 2px 5px rgba(255, 107, 139, 0.3);
     }
 
-    .page-link:hover {
+    .page-item.disabled .page-link {
+        color: #adb5bd;
+        pointer-events: none;
         background-color: #f8f9fa;
+        border-color: #e9ecef;
+    }
+
+    .page-link:hover:not(.disabled) {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        border-color: var(--primary-light);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-link.prev-next {
+        font-size: 18px;
     }
 
     .empty-state {
@@ -509,13 +647,35 @@
             </div>
             
             <div class="filter-box">
-                <input type="date" name="date_from" class="filter-date" placeholder="Từ ngày" value="{{ request('date_from') }}">
+                <div class="date-range-container">
+                    <div class="date-range-title">Khoảng Thời Gian</div>
+                    <div class="date-range-inputs">
+                        <div class="date-input-group from-date">
+                            <label for="date_from">Từ ngày:</label>
+                            <input type="date" id="date_from" name="date_from" placeholder="Từ ngày" value="{{ request('date_from') }}">
+                        </div>
+                        
+                        <div class="date-input-group to-date">
+                            <label for="date_to">Đến ngày:</label>
+                            <input type="date" id="date_to" name="date_to" placeholder="Đến ngày" value="{{ request('date_to') }}">
+                        </div>
+                    </div>
+                </div>
                 
-                <input type="date" name="date_to" class="filter-date" placeholder="Đến ngày" value="{{ request('date_to') }}">
-                
-                <input type="number" name="amount_from" class="filter-date" placeholder="Số tiền từ" value="{{ request('amount_from') }}">
-                
-                <input type="number" name="amount_to" class="filter-date" placeholder="Số tiền đến" value="{{ request('amount_to') }}">
+                <div class="amount-range-container">
+                    <div class="amount-range-title">Khoảng Giá Trị</div>
+                    <div class="amount-range-inputs">
+                        <div class="amount-input-group from-amount">
+                            <label for="amount_from">Số tiền từ:</label>
+                            <input type="number" id="amount_from" name="amount_from" placeholder="Số tiền từ" value="{{ request('amount_from') }}">
+                        </div>
+                        
+                        <div class="amount-input-group to-amount">
+                            <label for="amount_to">Số tiền đến:</label>
+                            <input type="number" id="amount_to" name="amount_to" placeholder="Số tiền đến" value="{{ request('amount_to') }}">
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="filter-box">
@@ -607,17 +767,7 @@
                     </td>
                     <td>
                         @if($hoaDon->trangThai)
-                            @php
-                                $statusClass = 'badge-pending';
-                                if($hoaDon->trangThai->Tentrangthai == 'Đã thanh toán') {
-                                    $statusClass = 'badge-confirmed';
-                                } elseif($hoaDon->trangThai->Tentrangthai == 'Đã hủy') {
-                                    $statusClass = 'badge-cancelled';
-                                } elseif($hoaDon->trangThai->Tentrangthai == 'Hoàn thành') {
-                                    $statusClass = 'badge-completed';
-                                }
-                            @endphp
-                            <span class="badge {{ $statusClass }}">{{ $hoaDon->trangThai->Tentrangthai }}</span>
+                            <span>{{ $hoaDon->trangThai->Tentrangthai }}</span>
                         @else
                             <span class="text-muted">N/A</span>
                         @endif
@@ -658,12 +808,12 @@
     </div>
     
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-        <div>
+    <div class="pagination-container">
+        <div class="pagination-info">
             Hiển thị {{ $hoaDons->firstItem() ?? 0 }} đến {{ $hoaDons->lastItem() ?? 0 }} của {{ $hoaDons->total() }} bản ghi
         </div>
         <div>
-            {{ $hoaDons->appends(request()->query())->links() }}
+            {{ $hoaDons->appends(request()->query())->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </div>
