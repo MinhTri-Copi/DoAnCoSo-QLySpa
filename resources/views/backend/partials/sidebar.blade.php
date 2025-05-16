@@ -39,6 +39,7 @@
                 <li><a href="{{ route('admin.customers.index') }}"><i class="fas fa-user-friends"></i> Khách hàng</a></li>
                 <li><a href="{{ route('admin.accounts.index') }}"><i class="fas fa-user-shield"></i> Tài khoản</a></li>
                 <li><a href="{{ route('admin.roles.index') }}"><i class="fas fa-user-tag"></i> Vai trò</a></li>
+                <li><a href="{{ route('admin.membership_ranks.index') }}"><i class="fas fa-award"></i> Hạng thành viên</a></li>
             </ul>
         </li>
         
@@ -105,6 +106,13 @@
             <a href="{{ route('admin.trangthai.index') }}" class="menu-link">
                 <i class="fas fa-tags"></i>
                 <span>Trạng thái</span>
+            </a>
+        </li>
+        
+        <li class="menu-item">
+            <a href="{{ route('admin.lsdiemthuong.index') }}" class="menu-link">
+                <i class="fas fa-history"></i>
+                <span>Lịch sử điểm thưởng</span>
             </a>
         </li>
         
