@@ -87,26 +87,12 @@
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
-                    <div class="dropdown-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <img src="{{ asset('admin/images/admin-avatar.jpg') }}" alt="User Avatar">
-                            </div>
-                            <div class="user-details">
-                                <h6>{{ Auth::user()->Hoten ?? 'Admin' }}</h6>
-                                <p>Quản trị viên</p>
-                            </div>
-                        </div>
-                    </div>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
+                    <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
                         <i class="fas fa-user me-2"></i>Thông tin cá nhân
                     </a>
                     <a href="#" class="dropdown-item">
                         <i class="fas fa-cog me-2"></i>Cài đặt tài khoản
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-history me-2"></i>Lịch sử hoạt động
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="{{ route('logout') }}" class="dropdown-item text-danger" 

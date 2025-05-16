@@ -22,6 +22,7 @@ use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatLichDashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Models\HangThanhVien;
 
 
@@ -133,7 +134,11 @@ Route::get('datlich-dashboard', [DatLichDashboardController::class, 'index'])->n
 
     // Routes cho quản lý lịch sử điểm thưởng (LSDIEMTHUONG)
     Route::resource('lsdiemthuong', PointHistoryController::class, ['names' => 'admin.lsdiemthuong']);
-    Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirm-destroy');
+    Route::get('lsdiemthuong/{id}/confirm-destroy', [PointHistoryController::class, 'confirmDestroy'])->name('admin.lsdiemthuong.confirmDestroy');
+    Route::get('lsdiemthuong-statistics', [PointHistoryController::class, 'statistics'])->name('admin.lsdiemthuong.statistics');
+    Route::get('lsdiemthuong-export-excel', [PointHistoryController::class, 'exportExcel'])->name('admin.lsdiemthuong.exportExcel');
+    Route::get('lsdiemthuong/get-user-details/{id}', [PointHistoryController::class, 'getUserDetails']);
+    Route::get('lsdiemthuong/get-invoice-details/{id}', [PointHistoryController::class, 'getInvoiceDetails']);
 
 // Route cho quản lý hóa đơn và thanh toán
 Route::resource('hoadonvathanhtoan', HoaDonVaThanhToanController::class, ['names' => 'admin.hoadonvathanhtoan']);
@@ -149,16 +154,48 @@ Route::post('hoadonvathanhtoan/update-status', [HoaDonVaThanhToanController::cla
     Route::get('hoadonvathanhtoan/{id}/danhgia/create', [HoaDonVaThanhToanController::class, 'createDanhGia'])->name('admin.hoadonvathanhtoan.danhgia.create');
     Route::post('hoadonvathanhtoan/{id}/danhgia', [HoaDonVaThanhToanController::class, 'storeDanhGia'])->name('admin.hoadonvathanhtoan.danhgia.store');
 
-
-    // Routes cho quản lý đánh giá (DANHGIA)
-    Route::resource('danhgia', DanhGiaController::class, ['names' => 'admin.danhgia', 'except' => ['create', 'store']]);
-    Route::get('danhgia/{id}/confirm-destroy', [DanhGiaController::class, 'confirmDestroy'])->name('admin.danhgia.confirm-destroy');
-
-    // Routes cho tìm kiếm
-    Route::get('/search', [SearchController::class, 'searchByFunction'])->name('admin.search');
+    // Danh sách đánh giá
+    Route::get('/danhgia', [DanhGiaController::class, 'index'])->name('admin.danhgia.index');
     
+    // Tạo đánh giá mới
+    Route::get('/danhgia/create', [DanhGiaController::class, 'create'])->name('admin.danhgia.create');
+    Route::post('/danhgia', [DanhGiaController::class, 'store'])->name('admin.danhgia.store');
+    
+    // Xem chi tiết đánh giá
+    Route::get('/danhgia/{id}', [DanhGiaController::class, 'show'])->name('admin.danhgia.show');
+    
+    // Chỉnh sửa đánh giá
+    Route::get('/danhgia/{id}/edit', [DanhGiaController::class, 'edit'])->name('admin.danhgia.edit');
+    Route::put('/danhgia/{id}', [DanhGiaController::class, 'update'])->name('admin.danhgia.update');
+    
+    // Xóa đánh giá
+    Route::get('/danhgia/{id}/destroy', [DanhGiaController::class, 'confirmDestroy'])->name('admin.danhgia.confirmDestroy');
+    Route::delete('/danhgia/{id}', [DanhGiaController::class, 'destroy'])->name('admin.danhgia.destroy');
+    
+    // Phản hồi đánh giá
+    Route::post('/danhgia/{id}/reply', [DanhGiaController::class, 'reply'])->name('admin.danhgia.reply');
+    
+    // Xuất dữ liệu đánh giá
+    Route::get('/danhgia-export', [DanhGiaController::class, 'export'])->name('admin.danhgia.export');
+    
+    // API lấy thống kê
+    Route::get('/danhgia-statistics', [DanhGiaController::class, 'getStatistics'])->name('admin.danhgia.statistics');
+    
+    // API lấy hóa đơn theo người dùng
+    Route::get('/danhgia/get-user-invoices/{userId}', [DanhGiaController::class, 'getUserInvoices'])->name('admin.danhgia.getUserInvoices');
 });
 
 // API để lấy thông tin đặt lịch cho hóa đơn
 Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
+
+// Routes cho profile
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('admin.profile.change-password');
+    Route::post('/profile/change-email', [ProfileController::class, 'changeEmail'])->name('admin.profile.change-email');
+});
+
+// Routes cho tìm kiếm
+Route::get('/search', [SearchController::class, 'searchByFunction'])->name('admin.search');
 
