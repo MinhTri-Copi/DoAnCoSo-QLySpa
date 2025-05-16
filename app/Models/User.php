@@ -34,7 +34,7 @@ class User extends Model
 
     public function hangThanhVien()
     {
-        return $this->hasMany(HangThanhVien::class, 'Manguoidung', 'Manguoidung');
+        return $this->hasOne(HangThanhVien::class, 'Manguoidung', 'Manguoidung');
     }
 
     public function phieuHoTro()
@@ -50,5 +50,16 @@ class User extends Model
     public function lsDiemThuong()
     {
         return $this->hasMany(LSDiemThuong::class, 'Manguoidung', 'Manguoidung');
+    }
+
+    /**
+     * Calculate total reward points
+     * 
+     * @return int
+     */
+    public function getTotalPoints()
+    {
+        // Sum all points from LSDIEMTHUONG table
+        return $this->lsDiemThuong()->sum('Sodiem');
     }
 }

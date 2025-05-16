@@ -6,6 +6,7 @@ use App\Models\HangThanhVien;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\MembershipRankService;
 
 class MembershipRankController extends Controller
 {
@@ -61,7 +62,7 @@ class MembershipRankController extends Controller
         $maxMahang = HangThanhVien::max('Mahang') ?? 0;
         $suggestedMahang = $maxMahang + 1;
 
-        // Lấy danh sách người dùng chưa có hạng thành viên
+        // Only get users who don't already have a membership rank
         $users = User::whereDoesntHave('hangThanhVien')->get();
         $rankTypes = array_keys($this->rankDescriptions);
         
@@ -105,9 +106,9 @@ class MembershipRankController extends Controller
     {
         $rank = HangThanhVien::findOrFail($id);
         
-        // Lấy danh sách người dùng chưa có hạng thành viên hoặc là người dùng hiện tại của hạng này
-        $users = User::whereDoesntHave('hangThanhVien')
-                    ->orWhere('Manguoidung', $rank->Manguoidung)
+        // Get only users without a membership rank or the current user
+        $users = User::where('Manguoidung', $rank->Manguoidung)
+                    ->orWhereDoesntHave('hangThanhVien')
                     ->get();
                     
         $rankTypes = array_keys($this->rankDescriptions);
@@ -152,6 +153,22 @@ class MembershipRankController extends Controller
         return redirect()->route('admin.membership_ranks.index')->with('success', 'Xóa hạng thành viên thành công!');
     }
     
+    /**
+     * Update all user membership ranks based on their reward points
+     */
+    public function updateAllRanks()
+    {
+        try {
+            $membershipService = app(MembershipRankService::class);
+            $stats = $membershipService->updateAllMembershipRanks();
+            
+            $message = "Cập nhật thành công hạng thành viên cho {$stats['total']} người dùng!";
+            return redirect()->route('admin.membership_ranks.index')->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.membership_ranks.index')->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+    
     // Thêm các phương thức API cho Ajax
     public function apiSearch(Request $request)
     {
@@ -179,6 +196,60 @@ class MembershipRankController extends Controller
         $ranks = $query->get();
         
         return response()->json($ranks);
+    }
+    
+    /**
+     * Clean up duplicate membership ranks
+     */
+    public function cleanupDuplicates()
+    {
+        try {
+            // Get all users with more than one membership rank
+            $users = DB::table('HANGTHANHVIEN')
+                ->select('Manguoidung', DB::raw('count(*) as total'))
+                ->groupBy('Manguoidung')
+                ->having('total', '>', 1)
+                ->get();
+                
+            if ($users->count() === 0) {
+                return redirect()->route('admin.membership_ranks.index')
+                    ->with('success', 'Không tìm thấy hạng thành viên trùng lặp.');
+            }
+            
+            $total = 0;
+            $affectedUsers = [];
+            
+            foreach ($users as $user) {
+                // Get all ranks for this user, ordered by Mahang (assuming higher is newer)
+                $ranks = DB::table('HANGTHANHVIEN')
+                    ->where('Manguoidung', $user->Manguoidung)
+                    ->orderBy('Mahang', 'desc')
+                    ->get();
+                    
+                // Keep the first one (latest) and delete the rest
+                $keepRankId = $ranks->first()->Mahang;
+                
+                $deleted = DB::table('HANGTHANHVIEN')
+                    ->where('Manguoidung', $user->Manguoidung)
+                    ->where('Mahang', '!=', $keepRankId)
+                    ->delete();
+                    
+                $total += $deleted;
+                $userData = User::find($user->Manguoidung);
+                $affectedUsers[] = $userData ? $userData->Hoten : "User #{$user->Manguoidung}";
+            }
+            
+            $message = "Đã xóa {$total} hạng thành viên trùng lặp của " . count($affectedUsers) . " người dùng.";
+            if (count($affectedUsers) <= 5) {
+                $message .= " Người dùng ảnh hưởng: " . implode(', ', $affectedUsers);
+            }
+            
+            return redirect()->route('admin.membership_ranks.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.membership_ranks.index')
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
     
     public function apiGetStatistics()

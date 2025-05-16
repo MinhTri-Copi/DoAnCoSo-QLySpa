@@ -146,6 +146,13 @@
         background: rgba(255, 107, 149, 0.25);
     }
 
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        z-index: 4;
+        position: relative;
+    }
+
     .stats-container {
         display: flex;
         flex-wrap: wrap;
@@ -628,9 +635,17 @@
         <div class="header-title">Quản Lý Hạng Thành Viên</div>
         <div class="header-subtitle">Tối ưu trải nghiệm và phục vụ khách hàng tốt nhất</div>
     </div>
-    <a href="{{ route('admin.membership_ranks.create') }}" class="btn-pink">
-        <i class="fas fa-plus"></i> Thêm Hạng Thành Viên Mới
-    </a>
+    <div class="header-buttons">
+        <a href="{{ route('admin.membership_ranks.cleanup-duplicates') }}" class="btn-pink" style="margin-right: 10px; background-color: #e74c3c;" onclick="return confirm('Bạn có chắc chắn muốn dọn dẹp các hạng thành viên trùng lặp không?');">
+            <i class="fas fa-broom"></i> Dọn Trùng Lặp
+        </a>
+        <a href="{{ route('admin.membership_ranks.update-all') }}" class="btn-pink" style="margin-right: 10px; background-color: #17a2b8;">
+            <i class="fas fa-sync-alt"></i> Cập Nhật Tất Cả Hạng
+        </a>
+        <a href="{{ route('admin.membership_ranks.create') }}" class="btn-pink">
+            <i class="fas fa-plus"></i> Thêm Hạng Thành Viên Mới
+        </a>
+    </div>
 </div>
 
 <div class="stats-container">

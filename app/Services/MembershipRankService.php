@@ -12,7 +12,7 @@ class MembershipRankService
         $totalPoints = $user->getTotalPoints();
         $rankData = $this->determineRank($totalPoints);
 
-        $membershipRank = $user->membershipRank;
+        $membershipRank = $user->hangThanhVien;
         if (!$membershipRank) {
             $maxMahang = HangThanhVien::max('Mahang') ?? 0;
             $newMahang = $maxMahang + 1;
@@ -56,5 +56,34 @@ class MembershipRankService
                 'Mota' => 'Hạng thành viên dành cho người mới',
             ];
         }
+    }
+    
+    /**
+     * Update membership ranks for all users
+     * 
+     * @return array Updated user counts by rank
+     */
+    public function updateAllMembershipRanks()
+    {
+        $stats = [
+            'Thành viên Bạc' => 0,
+            'Thành viên Vàng' => 0,
+            'Thành viên Bạch Kim' => 0,
+            'Thành viên Kim Cương' => 0,
+            'total' => 0
+        ];
+        
+        // Get all users
+        $users = User::with('lsDiemThuong')->get();
+        
+        foreach ($users as $user) {
+            $membershipRank = $this->updateMembershipRank($user);
+            if ($membershipRank) {
+                $stats[$membershipRank->Tenhang]++;
+                $stats['total']++;
+            }
+        }
+        
+        return $stats;
     }
 }

@@ -87,6 +87,8 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
     // Routes cho quản lý hạng thành viên
     Route::resource('membership_ranks', MembershipRankController::class, ['names' => 'admin.membership_ranks']);
     Route::get('/membership_ranks/{id}/confirm-destroy', [MembershipRankController::class, 'confirmDestroy'])->name('admin.membership_ranks.confirm-destroy');
+    Route::get('/membership_ranks/update-all/ranks', [MembershipRankController::class, 'updateAllRanks'])->name('admin.membership_ranks.update-all');
+    Route::get('/membership_ranks/cleanup/duplicates', [MembershipRankController::class, 'cleanupDuplicates'])->name('admin.membership_ranks.cleanup-duplicates');
 
     //Routes cho quản lý lịch sử điểm thưởng
     Route::post('/point_histories', [PointHistoryController::class, 'store'])->name('admin.point_histories.store');
