@@ -690,6 +690,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     el.textContent = data.period_text;
                 });
             }
+
+            // --- KHÔNG CẬP NHẬT PHÂN TÍCH DOANH THU VÌ LUÔN SO SÁNH THEO THÁNG ---
+            // Đã xóa code cập nhật phần phân tích doanh thu vì giá trị này luôn so sánh theo tháng
+            // và không bị ảnh hưởng bởi bộ lọc thời gian
         } catch (error) {
             console.error('Error updating dashboard stats:', error);
             if (typeof window.showNotification === 'function') {

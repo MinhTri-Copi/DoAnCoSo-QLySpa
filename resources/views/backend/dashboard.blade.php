@@ -1042,48 +1042,48 @@ use App\Models\Phong;
                         </div>
                         
                         <div class="col-lg-4 p-4" style="border-left: 1px solid #f5f5f5;">
-                            <h6 class="mb-4" style="font-weight: 600; color: #444;"><i class="fas fa-chart-pie mr-2" style="color: #db7093;"></i> Phân Tích Doanh Thu</h6>
+                            <h6 class="mb-4" style="font-weight: 600; color: #444;"><i class="fas fa-chart-pie mr-2" style="color: #db7093;"></i> Phân Tích Doanh Thu <small class="ml-1" style="font-size: 0.75rem; color: #888;">(so với tháng trước)</small></h6>
                             
                             <div class="stats-summary">
                                 <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Tổng đơn đặt lịch</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(219, 112, 147, 0.1); color: #db7093; border-radius: 20px; font-weight: 500;">48%</div>
+                                        <div id="bookings-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(219, 112, 147, 0.1); color: #db7093; border-radius: 20px; font-weight: 500;">{{ $bookingsChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $stats['total_bookings'] }}</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $currentMonthBookings ?? 0 }}</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 48%; background-color: #db7093;" role="progressbar" aria-valuenow="48" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="bookings-progress" class="progress-bar" style="width: {{ abs($bookingsChange ?? 0) }}%; background-color: #db7093;" role="progressbar" aria-valuenow="{{ $bookingsChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-arrow-up mr-1" style="color: #28a745;"></i> 48% tăng trưởng so với tháng trước
+                                    <div id="bookings-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($bookingsChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($bookingsChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($bookingsChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($bookingsChange ?? 0) }}% {{ ($bookingsChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 
                                 <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Tổng dịch vụ</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border-radius: 20px; font-weight: 500;">60%</div>
+                                        <div id="services-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border-radius: 20px; font-weight: 500;">{{ $servicesChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $stats['total_services'] }}</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $currentMonthServices ?? 0 }}</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 60%; background-color: #48bb78;" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="services-progress" class="progress-bar" style="width: {{ abs($servicesChange ?? 0) }}%; background-color: #48bb78;" role="progressbar" aria-valuenow="{{ $servicesChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-arrow-up mr-1" style="color: #28a745;"></i> 60% tăng trưởng so với tháng trước
+                                    <div id="services-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($servicesChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($servicesChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($servicesChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($servicesChange ?? 0) }}% {{ ($servicesChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 
-                                <div class="p-3" style="background-color: #f9f9f9; border-radius: 8px;">
+                                <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Doanh thu (triệu đồng)</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border-radius: 20px; font-weight: 500;">22%</div>
+                                        <div id="revenue-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border-radius: 20px; font-weight: 500;">{{ $revenueChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #db7093; margin-bottom: 10px;">{{ number_format($stats['total_revenue'] / 1000000, 1) }}M</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ number_format($currentMonthRevenue / 1000000, 1) }}M</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 22%; background-color: #db7093;" role="progressbar" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="revenue-progress" class="progress-bar" style="width: {{ abs($revenueChange ?? 0) }}%; background-color: #4299e1;" role="progressbar" aria-valuenow="{{ $revenueChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-bolt mr-1" style="color: #db7093;"></i> 22% tăng trưởng so với tháng trước
+                                    <div id="revenue-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($revenueChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($revenueChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($revenueChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($revenueChange ?? 0) }}% {{ ($revenueChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 

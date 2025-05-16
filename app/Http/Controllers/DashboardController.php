@@ -169,6 +169,45 @@ class DashboardController extends Controller
             ->pluck('count', 'RoleID')
             ->toArray();
 
+        // Tỉ lệ hoạt động của phòng
+        $stats['room_occupancy_rate'] = Phong::where('MatrangthaiP', 2)->count() / max(Phong::count(), 1) * 100;
+        
+        // PHÂN TÍCH DOANH THU - LUÔN SO SÁNH THÁNG HIỆN TẠI VỚI THÁNG TRƯỚC, KHÔNG PHỤ THUỘC VÀO BỘ LỌC
+        
+        // Thiết lập khoảng thời gian tháng hiện tại và tháng trước 
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+        $previousMonthStart = Carbon::now()->subMonth()->startOfMonth();
+        $previousMonthEnd = Carbon::now()->subMonth()->endOfMonth();
+        
+        // Doanh thu tháng hiện tại và tháng trước
+        $currentMonthRevenue = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$currentMonthStart, $currentMonthEnd])
+            ->where('Matrangthai', 4)
+            ->sum('Tongtien') ?? 0;
+            
+        $previousMonthRevenue = HoaDonVaThanhToan::whereBetween('Ngaythanhtoan', [$previousMonthStart, $previousMonthEnd])
+            ->where('Matrangthai', 4)
+            ->sum('Tongtien') ?? 0;
+        
+        // Đặt lịch tháng hiện tại và tháng trước - CHỈ ĐẾM ĐƠN ĐẶT LỊCH ĐÃ XÁC NHẬN
+        $currentMonthBookings = DatLich::whereBetween('Thoigiandatlich', [$currentMonthStart, $currentMonthEnd])
+            ->where('Trangthai_', 'Đã xác nhận')
+            ->count();
+            
+        $previousMonthBookings = DatLich::whereBetween('Thoigiandatlich', [$previousMonthStart, $previousMonthEnd])
+            ->where('Trangthai_', 'Đã xác nhận')
+            ->count();
+        
+        // Dịch vụ tháng hiện tại và tháng trước - TÍNH TẤT CẢ DỊCH VỤ, KHÔNG PHỤ THUỘC VÀO TRẠNG THÁI
+        $currentMonthServices = DichVu::count(); // Tổng số dịch vụ hiện có
+            
+        $previousMonthServices = $currentMonthServices; // Giả sử số dịch vụ không thay đổi giữa các tháng
+        
+        // Tính tỷ lệ thay đổi cho phân tích doanh thu
+        $revenueChange = $previousMonthRevenue > 0 ? round(($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue * 100) : 0;
+        $bookingsChange = $previousMonthBookings > 0 ? round(($currentMonthBookings - $previousMonthBookings) / $previousMonthBookings * 100) : 0;
+        $servicesChange = 0; // Không thay đổi vì chúng ta đang sử dụng tổng số dịch vụ
+
         return view('backend.dashboard', compact(
             'stats', 
             'chartData', 
@@ -179,7 +218,13 @@ class DashboardController extends Controller
             'roomStats',
             'accountStats',
             'period',
-            'urgentBookingsCount'
+            'urgentBookingsCount',
+            'bookingsChange',
+            'servicesChange',
+            'revenueChange',
+            'currentMonthBookings',  // Thêm biến này để hiển thị số lượng đúng
+            'currentMonthServices',   // Thêm biến này để hiển thị số lượng đúng
+            'currentMonthRevenue'    // Thêm biến này để hiển thị doanh thu đúng
         ));
     }
 
@@ -611,13 +656,6 @@ class DashboardController extends Controller
                 'total_reviews' => $currentReviews,
                 'customers_change' => $customersChange,
                 'reviews_change' => $reviewsChange,
-                // Phân tích doanh thu (logic mới)
-                'total_revenue' => $currentRevenue,
-                'total_bookings' => $currentBookings,
-                'total_services' => $currentServices,
-                'revenue_change' => $revenueChange,
-                'bookings_change' => $bookingsChange,
-                'services_change' => $servicesChange,
                 // Thông tin thời gian
                 'period_label' => $periodLabel,
                 'period_text' => $periodText
