@@ -2,6 +2,10 @@
 
 @section('title', 'Dashboard - Rosa Spa')
 
+@php
+use App\Models\Phong;
+@endphp
+
 @section('styles')
 <link href="{{ asset('demoDashBoard/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
 <link href="{{ asset('admin/css/dashboard.css') }}" rel="stylesheet">
@@ -1033,12 +1037,7 @@
                                 </div>
                                 <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; color: #999;">Cập nhật lần cuối: {{ date('d/m/Y H:i') }}</div>
                                 
-                                <!-- Thêm nút xuất dữ liệu -->
-                                <div style="position: absolute; top: 10px; right: 10px;">
-                                    <button class="btn btn-sm" style="background-color: white; border: 1px solid #eee; color: #666; font-size: 11px; padding: 2px 8px;" id="btn-export">
-                                        <i class="fas fa-file-export mr-1" style="color: #666;"></i> Xuất CSV
-                                    </button>
-                                </div>
+                              
                             </div>
                         </div>
                         
@@ -1348,32 +1347,45 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" style="padding-top: 70px;">
                                     <!-- Biểu đồ tròn cho thống kê phòng -->
-                                    <div style="position: relative; height: 180px; width: 180px; margin: 0 auto;">
+                                    <div style="position: relative; height: 180px; width: 180px; margin: 20px auto 30px auto; display: flex; justify-content: center; align-items: center;">
+                                        @php
+                                            $cleaningRooms = \App\Models\Phong::where('MatrangthaiP', 3)->count();
+                                            $totalRooms = array_sum($roomStats) + $cleaningRooms;
+                                            $cleaningPercentage = $totalRooms > 0 ? (100 * $cleaningRooms / $totalRooms) : 0;
+                                            $availablePercentage = $totalRooms > 0 ? (100 * $roomStats['available'] / $totalRooms) : 0;
+                                            $occupiedPercentage = $totalRooms > 0 ? (100 * $roomStats['occupied'] / $totalRooms) : 0;
+                                            $maintenancePercentage = $totalRooms > 0 ? (100 * $roomStats['maintenance'] / $totalRooms) : 0;
+                                        @endphp
                                         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(
-                                            #48bb78 0% {{ 100 * $roomStats['available'] / max(array_sum($roomStats), 1) }}%, 
-                                            #4299e1 {{ 100 * $roomStats['available'] / max(array_sum($roomStats), 1) }}% {{ 100 * ($roomStats['available'] + $roomStats['occupied']) / max(array_sum($roomStats), 1) }}%, 
-                                            #e53e3e {{ 100 * ($roomStats['available'] + $roomStats['occupied']) / max(array_sum($roomStats), 1) }}% 100%
+                                            #9f7aea 0% {{ $cleaningPercentage }}%, 
+                                            #48bb78 {{ $cleaningPercentage }}% {{ $cleaningPercentage + $availablePercentage }}%, 
+                                            #4299e1 {{ $cleaningPercentage + $availablePercentage }}% {{ $cleaningPercentage + $availablePercentage + $occupiedPercentage }}%, 
+                                            #e53e3e {{ $cleaningPercentage + $availablePercentage + $occupiedPercentage }}% 100%
                                         );"></div>
-                                        <div style="position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: #333;">
-                                            {{ array_sum($roomStats) }}
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: #333;">
+                                            {{ $totalRooms }}
                                         </div>
                                     </div>
                                     
                                     <!-- Chú thích cho biểu đồ -->
-                                    <div class="d-flex justify-content-center mt-3">
-                                        <div class="d-flex align-items-center mr-3">
-                                            <div style="width: 12px; height: 12px; background-color: #48bb78; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Sẵn sàng</span>
+                                    <div class="d-flex flex-wrap justify-content-center mt-3 mb-4">
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #9f7aea; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Đang dọn dẹp</span>
                                         </div>
-                                        <div class="d-flex align-items-center mr-3">
-                                            <div style="width: 12px; height: 12px; background-color: #4299e1; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Đang sử dụng</span>
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #48bb78; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Sẵn sàng</span>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <div style="width: 12px; height: 12px; background-color: #e53e3e; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Bảo trì</span>
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #4299e1; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Đang sử dụng</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #e53e3e; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Bảo trì</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1404,7 +1416,7 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="col-md-12">
+                                        <div class="col-md-12 mb-3">
                                             <div style="border-radius: 8px; padding: 15px; background-color: rgba(229, 62, 62, 0.1); border-left: 3px solid #e53e3e; display: flex; justify-content: space-between; align-items: center;">
                                                 <div>
                                                     <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Phòng Bảo Trì</div>
@@ -1412,6 +1424,18 @@
                                                 </div>
                                                 <div style="width: 40px; height: 40px; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center;">
                                                     <i class="fa fa-wrench" style="color: #e53e3e; font-size: 1.2rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-12">
+                                            <div style="border-radius: 8px; padding: 15px; background-color: rgba(159, 122, 234, 0.1); border-left: 3px solid #9f7aea; display: flex; justify-content: space-between; align-items: center;">
+                                                <div>
+                                                    <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Phòng Đang Dọn Dẹp</div>
+                                                    <div style="font-size: 1.5rem; font-weight: 600; color: #9f7aea;">{{ Phong::where('MatrangthaiP', 3)->count() }}</div>
+                                                </div>
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-broom" style="color: #9f7aea; font-size: 1.2rem;"></i>
                                                 </div>
                                             </div>
                                         </div>
