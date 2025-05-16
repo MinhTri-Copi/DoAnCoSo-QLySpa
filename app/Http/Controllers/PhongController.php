@@ -44,10 +44,10 @@ class PhongController extends Controller
     {
         $maxMaphong = Phong::max('Maphong');
         if ($maxMaphong) {
-            $number = (int) substr($maxMaphong, 2);
-            $suggestedMaphong = 'P' . ($number + 1);
+            $maxMaphong = Phong::max('Maphong') ?? 0;
+            $suggestedMaphong = $maxMaphong + 1;
         } else {
-            $suggestedMaphong = 'P1';
+            $suggestedMaphong = 1;
         }
 
         $request->validate([

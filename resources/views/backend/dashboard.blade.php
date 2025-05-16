@@ -2,6 +2,10 @@
 
 @section('title', 'Dashboard - Rosa Spa')
 
+@php
+use App\Models\Phong;
+@endphp
+
 @section('styles')
 <link href="{{ asset('demoDashBoard/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
 <link href="{{ asset('admin/css/dashboard.css') }}" rel="stylesheet">
@@ -637,6 +641,125 @@
             box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3);
         }
     }
+    
+    .support-ticket-item {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .support-ticket-item:hover {
+        box-shadow: 0 5px 15px rgba(219, 112, 147, 0.15);
+        transform: translateY(-2px);
+        border-color: rgba(219, 112, 147, 0.3);
+    }
+    
+    .status-text {
+        position: relative;
+    }
+    
+    .status-text:before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #db7093;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+    
+    /* Support ticket styling */
+    .support-ticket-item {
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+    
+    .support-ticket-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+        border-color: rgba(219, 112, 147, 0.3);
+    }
+    
+    .support-ticket-badge {
+        position: absolute;
+        top: -6px;
+        right: 10px;
+        background-color: #db7093;
+        color: white;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        z-index: 2;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        margin-top:15px;
+    }
+    
+    .support-method-badge {
+        background-color: rgba(219, 112, 147, 0.1);
+        color: #db7093;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.2;
+        display: inline-block;
+        margin-right: 5px;
+        word-break: break-word;
+    }
+    
+    .support-content {
+        font-size: 0.85rem;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background-color: #f9f9f9;
+        border-radius: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Animation for exclamation icon on urgent tickets */
+    @keyframes pulseAttention {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        50% {
+            transform: scale(1.15);
+            box-shadow: 0 5px 10px rgba(229, 62, 62, 0.5);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+    }
+
+    .urgent-ticket-icon {
+        position: relative;
+        top: -8px;
+        right: -8px;
+        background-color: #e53e3e;
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        animation: pulseAttention 1.5s infinite ease-in-out;
+        z-index: 99;
+        border: 2px solid white;
+    }
 </style>
 @endsection
 
@@ -914,58 +1037,53 @@
                                 </div>
                                 <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; color: #999;">Cập nhật lần cuối: {{ date('d/m/Y H:i') }}</div>
                                 
-                                <!-- Thêm nút xuất dữ liệu -->
-                                <div style="position: absolute; top: 10px; right: 10px;">
-                                    <button class="btn btn-sm" style="background-color: white; border: 1px solid #eee; color: #666; font-size: 11px; padding: 2px 8px;" id="btn-export">
-                                        <i class="fas fa-file-export mr-1" style="color: #666;"></i> Xuất CSV
-                                    </button>
-                                </div>
+                              
                             </div>
                         </div>
                         
                         <div class="col-lg-4 p-4" style="border-left: 1px solid #f5f5f5;">
-                            <h6 class="mb-4" style="font-weight: 600; color: #444;"><i class="fas fa-chart-pie mr-2" style="color: #db7093;"></i> Phân Tích Doanh Thu</h6>
+                            <h6 class="mb-4" style="font-weight: 600; color: #444;"><i class="fas fa-chart-pie mr-2" style="color: #db7093;"></i> Phân Tích Doanh Thu <small class="ml-1" style="font-size: 0.75rem; color: #888;">(so với tháng trước)</small></h6>
                             
                             <div class="stats-summary">
                                 <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Tổng đơn đặt lịch</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(219, 112, 147, 0.1); color: #db7093; border-radius: 20px; font-weight: 500;">48%</div>
+                                        <div id="bookings-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(219, 112, 147, 0.1); color: #db7093; border-radius: 20px; font-weight: 500;">{{ $bookingsChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $stats['total_bookings'] }}</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $currentMonthBookings ?? 0 }}</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 48%; background-color: #db7093;" role="progressbar" aria-valuenow="48" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="bookings-progress" class="progress-bar" style="width: {{ abs($bookingsChange ?? 0) }}%; background-color: #db7093;" role="progressbar" aria-valuenow="{{ $bookingsChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-arrow-up mr-1" style="color: #28a745;"></i> 48% tăng trưởng so với tháng trước
+                                    <div id="bookings-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($bookingsChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($bookingsChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($bookingsChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($bookingsChange ?? 0) }}% {{ ($bookingsChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 
                                 <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Tổng dịch vụ</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border-radius: 20px; font-weight: 500;">60%</div>
+                                        <div id="services-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border-radius: 20px; font-weight: 500;">{{ $servicesChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $stats['total_services'] }}</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ $currentMonthServices ?? 0 }}</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 60%; background-color: #48bb78;" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="services-progress" class="progress-bar" style="width: {{ abs($servicesChange ?? 0) }}%; background-color: #48bb78;" role="progressbar" aria-valuenow="{{ $servicesChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-arrow-up mr-1" style="color: #28a745;"></i> 60% tăng trưởng so với tháng trước
+                                    <div id="services-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($servicesChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($servicesChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($servicesChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($servicesChange ?? 0) }}% {{ ($servicesChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 
-                                <div class="p-3" style="background-color: #f9f9f9; border-radius: 8px;">
+                                <div class="mb-4 p-3" style="background-color: #f9f9f9; border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Doanh thu (triệu đồng)</div>
-                                        <div style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border-radius: 20px; font-weight: 500;">22%</div>
+                                        <div id="revenue-change-badge" style="font-size: 0.7rem; padding: 2px 8px; background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border-radius: 20px; font-weight: 500;">{{ $revenueChange ?? 0 }}%</div>
                                     </div>
-                                    <div style="font-size: 1.5rem; font-weight: 600; color: #db7093; margin-bottom: 10px;">{{ number_format($stats['total_revenue'] / 1000000, 1) }}M</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #333; margin-bottom: 10px;">{{ number_format($currentMonthRevenue / 1000000, 1) }}M</div>
                                     <div class="progress" style="height: 5px; border-radius: 3px; overflow: hidden; background-color: #eee;">
-                                        <div class="progress-bar" style="width: 22%; background-color: #db7093;" role="progressbar" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="revenue-progress" class="progress-bar" style="width: {{ abs($revenueChange ?? 0) }}%; background-color: #4299e1;" role="progressbar" aria-valuenow="{{ $revenueChange ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div style="margin-top: 8px; font-size: 0.75rem; color: #28a745;">
-                                        <i class="fas fa-bolt mr-1" style="color: #db7093;"></i> 22% tăng trưởng so với tháng trước
+                                    <div id="revenue-change-text" style="margin-top: 8px; font-size: 0.75rem; color: {{ ($revenueChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};">
+                                        <i class="fas fa-{{ ($revenueChange ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1" style="color: {{ ($revenueChange ?? 0) >= 0 ? '#28a745' : '#dc3545' }};"></i> {{ abs($revenueChange ?? 0) }}% {{ ($revenueChange ?? 0) >= 0 ? 'tăng trưởng' : 'giảm' }} so với tháng trước
                                     </div>
                                 </div>
                                 
@@ -1190,14 +1308,7 @@
                                 <div style="font-size: 0.85rem; color: #555; line-height: 1.5; margin-bottom: 10px;">
                                     {{ Str::limit($review->Nhanxet, 100) }}
                                 </div>
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn btn-sm mr-1" style="background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                        <i class="fas fa-reply mr-1" style="color: #4299e1;"></i> Trả lời
-                                    </button>
-                                    <button class="btn btn-sm" style="background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                        <i class="fas fa-eye mr-1" style="color: #48bb78;"></i> Xem chi tiết
-                                    </button>
-                                </div>
+                           
                             </div>
                             @empty
                             <div class="text-center py-5">
@@ -1236,32 +1347,45 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" style="padding-top: 70px;">
                                     <!-- Biểu đồ tròn cho thống kê phòng -->
-                                    <div style="position: relative; height: 180px; width: 180px; margin: 0 auto;">
+                                    <div style="position: relative; height: 180px; width: 180px; margin: 20px auto 30px auto; display: flex; justify-content: center; align-items: center;">
+                                        @php
+                                            $cleaningRooms = \App\Models\Phong::where('MatrangthaiP', 3)->count();
+                                            $totalRooms = array_sum($roomStats) + $cleaningRooms;
+                                            $cleaningPercentage = $totalRooms > 0 ? (100 * $cleaningRooms / $totalRooms) : 0;
+                                            $availablePercentage = $totalRooms > 0 ? (100 * $roomStats['available'] / $totalRooms) : 0;
+                                            $occupiedPercentage = $totalRooms > 0 ? (100 * $roomStats['occupied'] / $totalRooms) : 0;
+                                            $maintenancePercentage = $totalRooms > 0 ? (100 * $roomStats['maintenance'] / $totalRooms) : 0;
+                                        @endphp
                                         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(
-                                            #48bb78 0% {{ 100 * $roomStats['available'] / max(array_sum($roomStats), 1) }}%, 
-                                            #4299e1 {{ 100 * $roomStats['available'] / max(array_sum($roomStats), 1) }}% {{ 100 * ($roomStats['available'] + $roomStats['occupied']) / max(array_sum($roomStats), 1) }}%, 
-                                            #e53e3e {{ 100 * ($roomStats['available'] + $roomStats['occupied']) / max(array_sum($roomStats), 1) }}% 100%
+                                            #9f7aea 0% {{ $cleaningPercentage }}%, 
+                                            #48bb78 {{ $cleaningPercentage }}% {{ $cleaningPercentage + $availablePercentage }}%, 
+                                            #4299e1 {{ $cleaningPercentage + $availablePercentage }}% {{ $cleaningPercentage + $availablePercentage + $occupiedPercentage }}%, 
+                                            #e53e3e {{ $cleaningPercentage + $availablePercentage + $occupiedPercentage }}% 100%
                                         );"></div>
-                                        <div style="position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: #333;">
-                                            {{ array_sum($roomStats) }}
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: #333;">
+                                            {{ $totalRooms }}
                                         </div>
                                     </div>
                                     
                                     <!-- Chú thích cho biểu đồ -->
-                                    <div class="d-flex justify-content-center mt-3">
-                                        <div class="d-flex align-items-center mr-3">
-                                            <div style="width: 12px; height: 12px; background-color: #48bb78; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Sẵn sàng</span>
+                                    <div class="d-flex flex-wrap justify-content-center mt-3 mb-4">
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #9f7aea; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Đang dọn dẹp</span>
                                         </div>
-                                        <div class="d-flex align-items-center mr-3">
-                                            <div style="width: 12px; height: 12px; background-color: #4299e1; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Đang sử dụng</span>
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #48bb78; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Sẵn sàng</span>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <div style="width: 12px; height: 12px; background-color: #e53e3e; border-radius: 2px; margin-right: 5px;"></div>
-                                            <span style="font-size: 0.8rem; color: #555;">Bảo trì</span>
+                                        <div class="d-flex align-items-center mr-4 mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #4299e1; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Đang sử dụng</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3 px-2">
+                                            <div style="width: 15px; height: 15px; background-color: #e53e3e; border-radius: 3px; margin-right: 8px;"></div>
+                                            <span style="font-size: 0.85rem; color: #555; font-weight: 500;">Bảo trì</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1292,7 +1416,7 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="col-md-12">
+                                        <div class="col-md-12 mb-3">
                                             <div style="border-radius: 8px; padding: 15px; background-color: rgba(229, 62, 62, 0.1); border-left: 3px solid #e53e3e; display: flex; justify-content: space-between; align-items: center;">
                                                 <div>
                                                     <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Phòng Bảo Trì</div>
@@ -1303,13 +1427,25 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                        <div class="col-md-12">
+                                            <div style="border-radius: 8px; padding: 15px; background-color: rgba(159, 122, 234, 0.1); border-left: 3px solid #9f7aea; display: flex; justify-content: space-between; align-items: center;">
+                                                <div>
+                                                    <div style="font-size: 0.85rem; color: #555; font-weight: 500;">Phòng Đang Dọn Dẹp</div>
+                                                    <div style="font-size: 1.5rem; font-weight: 600; color: #9f7aea;">{{ Phong::where('MatrangthaiP', 3)->count() }}</div>
+                                                </div>
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: white; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-broom" style="color: #9f7aea; font-size: 1.2rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Thêm nút xem chi tiết -->
                             <div class="d-flex justify-content-center mt-3">
-                                <a href="#" class="btn btn-sm" style="background-color: #ecc94b; color: white; border: none; padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">
+                                <a href="{{ route('admin.phong.index') ?? url('/admin/phong') }}" class="btn btn-sm" style="background-color: #ecc94b; color: white; border: none; padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">
                                     <i class="fas fa-eye mr-1" style="color: #fff;"></i> Xem chi tiết phòng
                                 </a>
                             </div>
@@ -1343,32 +1479,60 @@
                     </div>
                     
                     @forelse($openSupportTickets as $ticket)
-                    <div style="border: 1px solid #f0f0f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; position: relative;">
-                        <div style="position: absolute; top: -6px; right: 10px; background-color: #db7093; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px;">
-                            #{{ $ticket->MaphieuHT }}
+                    <div class="support-ticket-item" 
+                         style="@if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý') border-left: 3px solid #e53e3e; @endif"
+                         onclick="window.location.href='{{ route('admin.phieuhotro.show', $ticket->MaphieuHT) }}'">
+                        
+                        <div class="support-ticket-badge" 
+                            style="background-color: 
+                            @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                                #FFF2CC; color: #E6A700;
+                            @elseif($ticket->trangThai->Tentrangthai == 'Đang xử lý')
+                                #DEEEFF; color: #4299E1;
+                            @elseif($ticket->trangThai->Tentrangthai == 'Hoàn tất' || $ticket->trangThai->Tentrangthai == 'Đã hoàn tất')
+                                #D7FFE0; color: #38A169;
+                            @else
+                                #db7093; color: white;
+                            @endif
+                            ">
+                            <i class="fas 
+                            @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                                fa-clock
+                            @elseif($ticket->trangThai->Tentrangthai == 'Đang xử lý')
+                                fa-sync-alt
+                            @elseif($ticket->trangThai->Tentrangthai == 'Hoàn tất' || $ticket->trangThai->Tentrangthai == 'Đã hoàn tất')
+                                fa-check
+                            @else
+                                fa-circle
+                            @endif
+                            mr-1" style="font-size: 8px;"></i>{{ $ticket->trangThai->Tentrangthai ?? 'Đang xử lý' }}
                         </div>
+                        
+                        @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                        <div class="urgent-ticket-icon">
+                            <i class="fas fa-exclamation" style="font-size: 12px; font-weight: bold;"></i>
+                        </div>
+                        @endif
+                        
                         <div class="d-flex align-items-center mb-2">
                             <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($ticket->user->Hoten ?? 'Khách hàng'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600;">
-                                {{ substr($ticket->user->Hoten ?? 'Khách hàng', 0, 1) }}
+                                {{ strtoupper(substr($ticket->user->Hoten ?? 'Khách hàng', 0, 1)) }}
                             </div>
                             <div>
                                 <div style="font-weight: 600; color: #333; font-size: 0.9rem;">{{ $ticket->user->Hoten ?? 'Khách hàng' }}</div>
-                                <div style="color: #888; font-size: 0.75rem; display: flex; align-items: center;">
-                                    <span class="badge mr-2" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px;">{{ $ticket->ptHoTro->Tenpt ?? 'N/A' }}</span>
-                                    <i class="fas fa-clock mr-1" style="color: #db7093;"></i> Đang xử lý
+                                <div style="color: #888; font-size: 0.75rem;">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="support-method-badge">
+                                            <i class="fas fa-headset mr-1"></i>{{ $ticket->ptHoTro->TenPT ?? 'N/A' }}
+                                        </span>
+                                    </div>
+                                 
                                 </div>
                             </div>
                         </div>
-                        <div style="font-size: 0.85rem; color: #555; line-height: 1.5; margin-bottom: 10px; padding: 8px 12px; background-color: #f9f9f9; border-radius: 6px;">
+                        
+                        <div class="support-content">
                             {{ Str::limit($ticket->Noidungyeucau, 100) }}
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-sm mr-1" style="background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-check mr-1" style="color: #48bb78;"></i> Hoàn thành
-                            </button>
-                            <button class="btn btn-sm" style="background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-reply mr-1" style="color: #4299e1;"></i> Trả lời
-                            </button>
                         </div>
                     </div>
                     @empty
@@ -1376,9 +1540,9 @@
                         <i class="fas fa-check-circle" style="font-size: 3rem; color: #48bb78; margin-bottom: 15px; display: block;"></i>
                         <p style="color: #555; margin: 0 0 5px 0; font-weight: 500;">Tuyệt vời!</p>
                         <p style="color: #888; margin: 0;">Không có phiếu hỗ trợ nào đang mở</p>
-                        <button class="btn btn-sm mt-3" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; border: 1px solid rgba(219, 112, 147, 0.3); padding: 5px 15px; font-size: 0.8rem;">
+                        <a href="{{ route('admin.phieuhotro.create') }}" class="btn btn-sm mt-3" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; border: 1px solid rgba(219, 112, 147, 0.3); padding: 5px 15px; font-size: 0.8rem;">
                             <i class="fas fa-plus mr-1" style="color: #db7093;"></i> Tạo phiếu hỗ trợ
-                        </button>
+                        </a>
                     </div>
                     @endforelse
                     

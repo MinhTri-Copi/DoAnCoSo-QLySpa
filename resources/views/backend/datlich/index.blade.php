@@ -162,6 +162,7 @@
     .spa-header-subtitle i {
         margin-right: 0.5rem;
         font-size: 1.1rem;
+        color: #ffffff;
     }
 
     .spa-header-action {
@@ -195,6 +196,7 @@
         justify-content: center;
         border-radius: 50%;
         transition: var(--transition-fast);
+        color: var(--primary-pink);
     }
 
     .spa-btn-add:hover {
@@ -283,6 +285,7 @@
         justify-content: center;
         color: white;
         margin-bottom: 15px;
+        font-size: 1.2rem;
     }
 
     .stat-value {
@@ -735,70 +738,60 @@
 </div>
 
 <div class="stats-container">
-    @php
-        $today = \Carbon\Carbon::now()->format('Y-m-d');
-        $todayBookings = $datLichs->filter(function($item) use ($today) {
-            return \Carbon\Carbon::parse($item->Thoigiandatlich)->format('Y-m-d') == $today;
-        })->count();
-        
-        $pendingBookings = $datLichs->where('Trangthai_', 'Chờ xác nhận')->count();
-        $confirmedBookings = $datLichs->where('Trangthai_', 'Đã xác nhận')->count();
-        $completedBookings = $datLichs->where('Trangthai_', 'Hoàn thành')->count();
-        $cancelledBookings = $datLichs->where('Trangthai_', 'Đã hủy')->count();
-    @endphp
+    {{-- Sử dụng biến được truyền từ controller thay vì tính toán từ $datLichs --}}
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #28a745;">
             <i class="fas fa-calendar-day"></i>
         </div>
         <div class="stat-value">{{ $todayBookings }}</div>
         <div class="stat-label">Lịch Đặt Hôm Nay</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar progress-1" style="width: {{ min(100, ($todayBookings / 30) * 100) }}%"></div>
+            <div class="stat-progress-bar progress-1" style="width: {{ min(100, ($todayBookings / max(1, $todayBookings)) * 100) }}%"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #ffc107;">
             <i class="fas fa-clock"></i>
         </div>
         <div class="stat-value">{{ $pendingBookings }}</div>
         <div class="stat-label">Chờ Xác Nhận</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar progress-2"></div>
+            <div class="stat-progress-bar progress-2" style="width: {{ min(100, ($pendingBookings / max(1, $pendingBookings + $confirmedBookings + $completedBookings + $cancelledBookings)) * 100) }}%"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #007bff;">
             <i class="fas fa-check-circle"></i>
         </div>
         <div class="stat-value">{{ $confirmedBookings }}</div>
         <div class="stat-label">Đã Xác Nhận</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar progress-3"></div>
+            <div class="stat-progress-bar progress-3" style="width: {{ min(100, ($confirmedBookings / max(1, $pendingBookings + $confirmedBookings + $completedBookings + $cancelledBookings)) * 100) }}%"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #17a2b8;">
             <i class="fas fa-flag-checkered"></i>
         </div>
         <div class="stat-value">{{ $completedBookings }}</div>
         <div class="stat-label">Hoàn Thành</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar progress-4"></div>
+            <div class="stat-progress-bar progress-4" style="width: {{ min(100, ($completedBookings / max(1, $pendingBookings + $confirmedBookings + $completedBookings + $cancelledBookings)) * 100) }}%"></div>
         </div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #dc3545;">
             <i class="fas fa-ban"></i>
         </div>
         <div class="stat-value">{{ $cancelledBookings }}</div>
         <div class="stat-label">Đã Huỷ</div>
         <div class="stat-progress">
-            <div class="stat-progress-bar" style="background-color: #dc3545; width: {{ min(100, ($cancelledBookings / 30) * 100) }}%"></div>
+            <div class="stat-progress-bar" style="background-color: #dc3545; width: {{ min(100, ($cancelledBookings / max(1, $pendingBookings + $confirmedBookings + $completedBookings + $cancelledBookings)) * 100) }}%"></div>
         </div>
     </div>
 </div>

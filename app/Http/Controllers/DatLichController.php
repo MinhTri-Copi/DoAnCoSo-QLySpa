@@ -65,12 +65,28 @@ class DatLichController extends Controller
             $query->where('Thoigiandatlich', '<=', $dateTo);
         }
         
+        // Lưu trữ query hiện tại để tính toán tổng số trước khi phân trang
+        $baseQueryForStats = clone $query;
+        
         // Sắp xếp
         $sortField = $request->get('sort', 'Thoigiandatlich');
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
         
         $datLichs = $query->paginate(10)->withQueryString();
+        
+        // Tính toán tổng số cho thống kê (toàn bộ các bản ghi thỏa mãn điều kiện)
+        $today = Carbon::now()->format('Y-m-d');
+        
+        // Lấy tổng số dựa trên truy vấn gốc (không phân trang)
+        $allMatchingBookings = $baseQueryForStats->get();
+        
+        // Tính các thống kê
+        $todayBookings = DatLich::whereDate('Thoigiandatlich', $today)->count();
+        $pendingBookings = DatLich::where('Trangthai_', 'Chờ xác nhận')->count();
+        $confirmedBookings = DatLich::where('Trangthai_', 'Đã xác nhận')->count();
+        $completedBookings = DatLich::where('Trangthai_', 'Hoàn thành')->count();
+        $cancelledBookings = DatLich::where('Trangthai_', 'Đã hủy')->count();
         
         // Lấy danh sách người dùng và dịch vụ cho bộ lọc
         $users = User::all();
@@ -79,7 +95,17 @@ class DatLichController extends Controller
         // Lấy danh sách trạng thái
         $statuses = DatLich::select('Trangthai_')->distinct()->pluck('Trangthai_');
         
-        return view('backend.datlich.index', compact('datLichs', 'users', 'dichVus', 'statuses'));
+        return view('backend.datlich.index', compact(
+            'datLichs', 
+            'users', 
+            'dichVus', 
+            'statuses',
+            'todayBookings',
+            'pendingBookings',
+            'confirmedBookings',
+            'completedBookings',
+            'cancelledBookings'
+        ));
     }
 
     public function create()

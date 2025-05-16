@@ -301,27 +301,63 @@
     /* Support Grid Layout */
     .support-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        width: 100%;
     }
-
+    
     .support-card {
         background: white;
-        border-radius: var(--radius-md);
-        box-shadow: var(--card-shadow);
-        transition: var(--transition);
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
         overflow: hidden;
-        border: 1px solid var(--border-color);
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
+        transition: all 0.3s ease;
         position: relative;
+        cursor: pointer;
+        border: 1px solid #f0f0f0;
     }
-
+    
     .support-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 8px 15px rgba(255, 107, 149, 0.15);
+        border-color: rgba(255, 107, 149, 0.3);
+    }
+
+    .support-card.active-card {
+        border-left: 3px solid var(--primary-pink);
+        background-color: #fffbfd;
+    }
+    
+    .urgent-indicator {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 22px;
+        height: 22px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        z-index: 10;
+        animation: pulse-red 1.5s infinite;
+    }
+    
+    @keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            transform: scale(0.95);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+            transform: scale(1.1);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+            transform: scale(0.95);
+        }
     }
 
     .support-card-header {
@@ -420,53 +456,6 @@
         justify-content: flex-end;
         flex-wrap: wrap;
         align-items: center;
-    }
-
-    .support-action-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--light-gray);
-        color: var(--text-secondary);
-        border: none;
-        cursor: pointer;
-        transition: var(--transition);
-        font-size: 0.9rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    }
-
-    .support-action-btn.view {
-        background: rgba(255, 107, 149, 0.1);
-        color: var(--primary-pink);
-    }
-
-    .support-action-btn.edit {
-        background: rgba(142, 68, 173, 0.1);
-        color: var(--secondary-color);
-    }
-
-    .support-action-btn.delete {
-        background: rgba(231, 76, 60, 0.1);
-        color: var(--red);
-    }
-
-    .support-action-btn:hover {
-        transform: translateY(-2px);
-    }
-
-    .support-action-btn.view:hover {
-        background: rgba(255, 107, 149, 0.2);
-    }
-
-    .support-action-btn.edit:hover {
-        background: rgba(142, 68, 173, 0.2);
-    }
-
-    .support-action-btn.delete:hover {
-        background: rgba(231, 76, 60, 0.2);
     }
 
     /* Search and Filter Section */
@@ -757,6 +746,7 @@
         color: var(--green);
         border: 1px solid rgba(46, 204, 113, 0.5);
         box-shadow: 0 3px 10px rgba(46, 204, 113, 0.1);
+        
     }
     
     .support-action-btn.process:hover {
@@ -1024,7 +1014,8 @@
                     data-status="{{ strtolower($phieuHoTro->trangThai->Tentrangthai ?? 'chờ xử lý') }}"
                     data-user="{{ $phieuHoTro->Manguoidung ?? '' }}"
                     data-ptht="{{ $phieuHoTro->MaPTHT ?? '' }}"
-                    data-content="{{ $phieuHoTro->Noidungyeucau ?? '' }}">
+                    data-content="{{ $phieuHoTro->Noidungyeucau ?? '' }}"
+                    onclick="window.location.href='{{ route('admin.phieuhotro.show', $phieuHoTro->MaphieuHT) }}'">
                     
                     @php
                         $statusName = strtolower($phieuHoTro->trangThai->Tentrangthai ?? 'chờ xử lý');
@@ -1081,64 +1072,7 @@
                         </ul>
                     </div>
                     <div class="support-card-footer">
-                        <!-- Always show two status update buttons -->
-                        <form action="{{ route('admin.phieuhotro.update', $phieuHoTro->MaphieuHT) }}" method="POST" class="status-update-form">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="MaphieuHT" value="{{ $phieuHoTro->MaphieuHT }}">
-                            <input type="hidden" name="Noidungyeucau" value="{{ $phieuHoTro->Noidungyeucau }}">
-                            <input type="hidden" name="Manguoidung" value="{{ $phieuHoTro->Manguoidung }}">
-                            <input type="hidden" name="MaPTHT" value="{{ $phieuHoTro->MaPTHT }}">
-                            
-                            <!-- Processing Button -->
-                            @php
-                                // Find status IDs for processing and completion
-                                $processingStatus = null;
-                                $completedStatus = null;
-                                
-                                foreach ($trangThais as $trangThai) {
-                                    if (strtolower($trangThai->Tentrangthai) == 'đang xử lý') {
-                                        $processingStatus = $trangThai->Matrangthai;
-                                    }
-                                    elseif (strtolower($trangThai->Tentrangthai) == 'hoàn thành') {
-                                        $completedStatus = $trangThai->Matrangthai;
-                                    }
-                                }
-
-                                $currentStatus = strtolower($statusName);
-                                $processingDisabled = ($currentStatus == 'đang xử lý');
-                                $completedDisabled = ($currentStatus == 'hoàn thành');
-                            @endphp
-                            
-                            <!-- Process button with tooltip -->
-                            <div class="action-tooltip">
-                                <button type="submit" name="Matrangthai" value="{{ $processingStatus }}" 
-                                    class="support-action-btn process" 
-                                    title="Chuyển sang Đang xử lý"
-                                    {{ $processingDisabled ? 'disabled' : '' }}>
-                                    <i class="fas fa-hourglass-half"></i>
-                                </button>
-                                <span class="tooltip-text">Đánh dấu là "Đang xử lý"</span>
-                            </div>
-                            
-                            <!-- Complete button with tooltip -->
-                            <div class="action-tooltip">
-                                <button type="submit" name="Matrangthai" value="{{ $completedStatus }}" 
-                                    class="support-action-btn complete" 
-                                    title="Chuyển sang Hoàn thành"
-                                    {{ $completedDisabled ? 'disabled' : '' }}>
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
-                                <span class="tooltip-text">Đánh dấu là "Hoàn thành"</span>
-                            </div>
-                        </form>
-                        
-                        <a href="{{ route('admin.phieuhotro.edit', $phieuHoTro->MaphieuHT) }}" class="support-action-btn edit" title="Chỉnh sửa">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{{ route('admin.phieuhotro.confirm-destroy', $phieuHoTro->MaphieuHT) }}" class="support-action-btn delete" title="Xóa">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                        <!-- Phần "Xem chi tiết" đã được bỏ theo yêu cầu -->
                     </div>
                 </div>
             @endforeach
@@ -1325,25 +1259,6 @@
             }
         });
         
-        // Thêm chức năng click vào card để xem chi tiết
-        supportCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                // Nếu click vào các nút hành động, thì không xử lý ở đây
-                if (e.target.closest('.support-action-btn') || e.target.closest('a') || e.target.tagName === 'A' || e.target.closest('button')) {
-                    return;
-                }
-                
-                // Lấy mã phiếu hỗ trợ từ data attribute
-                const supportId = this.getAttribute('data-id');
-                
-                // Tạo URL đến trang chi tiết
-                const detailLink = '{{ url("admin/phieuhotro") }}/' + supportId;
-                
-                // Chuyển hướng đến trang chi tiết
-                window.location.href = detailLink;
-            });
-        });
-
         // Auto close alerts after 5 seconds
         setTimeout(function() {
             document.querySelectorAll('.alert').forEach(function(alert) {
@@ -1385,10 +1300,10 @@
                             const statusBadge = card.querySelector('.support-status');
                             if (statusBadge) {
                                 // Update the status badge visually for immediate feedback
-                                if (buttonValue === "{{ $processingStatus }}") {
+                                if (buttonValue === "Đang xử lý") {
                                     statusBadge.textContent = "Đang xử lý";
                                     statusBadge.className = "support-status status-processing";
-                                } else if (buttonValue === "{{ $completedStatus }}") {
+                                } else if (buttonValue === "Hoàn thành") {
                                     statusBadge.textContent = "Hoàn thành";
                                     statusBadge.className = "support-status status-completed";
                                 }
