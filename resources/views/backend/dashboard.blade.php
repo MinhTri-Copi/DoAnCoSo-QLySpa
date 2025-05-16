@@ -637,6 +637,125 @@
             box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3);
         }
     }
+    
+    .support-ticket-item {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .support-ticket-item:hover {
+        box-shadow: 0 5px 15px rgba(219, 112, 147, 0.15);
+        transform: translateY(-2px);
+        border-color: rgba(219, 112, 147, 0.3);
+    }
+    
+    .status-text {
+        position: relative;
+    }
+    
+    .status-text:before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #db7093;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+    
+    /* Support ticket styling */
+    .support-ticket-item {
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+    
+    .support-ticket-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+        border-color: rgba(219, 112, 147, 0.3);
+    }
+    
+    .support-ticket-badge {
+        position: absolute;
+        top: -6px;
+        right: 10px;
+        background-color: #db7093;
+        color: white;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        z-index: 2;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        margin-top:15px;
+    }
+    
+    .support-method-badge {
+        background-color: rgba(219, 112, 147, 0.1);
+        color: #db7093;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.2;
+        display: inline-block;
+        margin-right: 5px;
+        word-break: break-word;
+    }
+    
+    .support-content {
+        font-size: 0.85rem;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background-color: #f9f9f9;
+        border-radius: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Animation for exclamation icon on urgent tickets */
+    @keyframes pulseAttention {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        50% {
+            transform: scale(1.15);
+            box-shadow: 0 5px 10px rgba(229, 62, 62, 0.5);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+    }
+
+    .urgent-ticket-icon {
+        position: relative;
+        top: -8px;
+        right: -8px;
+        background-color: #e53e3e;
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        animation: pulseAttention 1.5s infinite ease-in-out;
+        z-index: 99;
+        border: 2px solid white;
+    }
 </style>
 @endsection
 
@@ -1190,14 +1309,7 @@
                                 <div style="font-size: 0.85rem; color: #555; line-height: 1.5; margin-bottom: 10px;">
                                     {{ Str::limit($review->Nhanxet, 100) }}
                                 </div>
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn btn-sm mr-1" style="background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                        <i class="fas fa-reply mr-1" style="color: #4299e1;"></i> Trả lời
-                                    </button>
-                                    <button class="btn btn-sm" style="background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                        <i class="fas fa-eye mr-1" style="color: #48bb78;"></i> Xem chi tiết
-                                    </button>
-                                </div>
+                           
                             </div>
                             @empty
                             <div class="text-center py-5">
@@ -1309,7 +1421,7 @@
                             
                             <!-- Thêm nút xem chi tiết -->
                             <div class="d-flex justify-content-center mt-3">
-                                <a href="#" class="btn btn-sm" style="background-color: #ecc94b; color: white; border: none; padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">
+                                <a href="{{ route('admin.phong.index') ?? url('/admin/phong') }}" class="btn btn-sm" style="background-color: #ecc94b; color: white; border: none; padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">
                                     <i class="fas fa-eye mr-1" style="color: #fff;"></i> Xem chi tiết phòng
                                 </a>
                             </div>
@@ -1343,32 +1455,60 @@
                     </div>
                     
                     @forelse($openSupportTickets as $ticket)
-                    <div style="border: 1px solid #f0f0f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; position: relative;">
-                        <div style="position: absolute; top: -6px; right: 10px; background-color: #db7093; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px;">
-                            #{{ $ticket->MaphieuHT }}
+                    <div class="support-ticket-item" 
+                         style="@if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý') border-left: 3px solid #e53e3e; @endif"
+                         onclick="window.location.href='{{ route('admin.phieuhotro.show', $ticket->MaphieuHT) }}'">
+                        
+                        <div class="support-ticket-badge" 
+                            style="background-color: 
+                            @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                                #FFF2CC; color: #E6A700;
+                            @elseif($ticket->trangThai->Tentrangthai == 'Đang xử lý')
+                                #DEEEFF; color: #4299E1;
+                            @elseif($ticket->trangThai->Tentrangthai == 'Hoàn tất' || $ticket->trangThai->Tentrangthai == 'Đã hoàn tất')
+                                #D7FFE0; color: #38A169;
+                            @else
+                                #db7093; color: white;
+                            @endif
+                            ">
+                            <i class="fas 
+                            @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                                fa-clock
+                            @elseif($ticket->trangThai->Tentrangthai == 'Đang xử lý')
+                                fa-sync-alt
+                            @elseif($ticket->trangThai->Tentrangthai == 'Hoàn tất' || $ticket->trangThai->Tentrangthai == 'Đã hoàn tất')
+                                fa-check
+                            @else
+                                fa-circle
+                            @endif
+                            mr-1" style="font-size: 8px;"></i>{{ $ticket->trangThai->Tentrangthai ?? 'Đang xử lý' }}
                         </div>
+                        
+                        @if($ticket->trangThai->Tentrangthai == 'Đang chờ xử lý' || $ticket->trangThai->Tentrangthai == 'Chờ xử lý')
+                        <div class="urgent-ticket-icon">
+                            <i class="fas fa-exclamation" style="font-size: 12px; font-weight: bold;"></i>
+                        </div>
+                        @endif
+                        
                         <div class="d-flex align-items-center mb-2">
                             <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($ticket->user->Hoten ?? 'Khách hàng'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600;">
-                                {{ substr($ticket->user->Hoten ?? 'Khách hàng', 0, 1) }}
+                                {{ strtoupper(substr($ticket->user->Hoten ?? 'Khách hàng', 0, 1)) }}
                             </div>
                             <div>
                                 <div style="font-weight: 600; color: #333; font-size: 0.9rem;">{{ $ticket->user->Hoten ?? 'Khách hàng' }}</div>
-                                <div style="color: #888; font-size: 0.75rem; display: flex; align-items: center;">
-                                    <span class="badge mr-2" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px;">{{ $ticket->ptHoTro->Tenpt ?? 'N/A' }}</span>
-                                    <i class="fas fa-clock mr-1" style="color: #db7093;"></i> Đang xử lý
+                                <div style="color: #888; font-size: 0.75rem;">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="support-method-badge">
+                                            <i class="fas fa-headset mr-1"></i>{{ $ticket->ptHoTro->TenPT ?? 'N/A' }}
+                                        </span>
+                                    </div>
+                                 
                                 </div>
                             </div>
                         </div>
-                        <div style="font-size: 0.85rem; color: #555; line-height: 1.5; margin-bottom: 10px; padding: 8px 12px; background-color: #f9f9f9; border-radius: 6px;">
+                        
+                        <div class="support-content">
                             {{ Str::limit($ticket->Noidungyeucau, 100) }}
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-sm mr-1" style="background-color: rgba(72, 187, 120, 0.1); color: #48bb78; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-check mr-1" style="color: #48bb78;"></i> Hoàn thành
-                            </button>
-                            <button class="btn btn-sm" style="background-color: rgba(66, 153, 225, 0.1); color: #4299e1; border: none; padding: 3px 8px; font-size: 0.7rem;">
-                                <i class="fas fa-reply mr-1" style="color: #4299e1;"></i> Trả lời
-                            </button>
                         </div>
                     </div>
                     @empty
@@ -1376,9 +1516,9 @@
                         <i class="fas fa-check-circle" style="font-size: 3rem; color: #48bb78; margin-bottom: 15px; display: block;"></i>
                         <p style="color: #555; margin: 0 0 5px 0; font-weight: 500;">Tuyệt vời!</p>
                         <p style="color: #888; margin: 0;">Không có phiếu hỗ trợ nào đang mở</p>
-                        <button class="btn btn-sm mt-3" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; border: 1px solid rgba(219, 112, 147, 0.3); padding: 5px 15px; font-size: 0.8rem;">
+                        <a href="{{ route('admin.phieuhotro.create') }}" class="btn btn-sm mt-3" style="background-color: rgba(219, 112, 147, 0.1); color: #db7093; border: 1px solid rgba(219, 112, 147, 0.3); padding: 5px 15px; font-size: 0.8rem;">
                             <i class="fas fa-plus mr-1" style="color: #db7093;"></i> Tạo phiếu hỗ trợ
-                        </button>
+                        </a>
                     </div>
                     @endforelse
                     
