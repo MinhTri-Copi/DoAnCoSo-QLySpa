@@ -162,6 +162,7 @@
     .spa-header-subtitle i {
         margin-right: 0.5rem;
         font-size: 1.1rem;
+        color: #ffffff;
     }
 
     .spa-header-action {
@@ -195,6 +196,7 @@
         justify-content: center;
         border-radius: 50%;
         transition: var(--transition-fast);
+        color: var(--primary-pink);
     }
 
     .spa-btn-add:hover {
@@ -283,6 +285,7 @@
         justify-content: center;
         color: white;
         margin-bottom: 15px;
+        font-size: 1.2rem;
     }
 
     .stat-value {
@@ -738,7 +741,7 @@
     {{-- Sử dụng biến được truyền từ controller thay vì tính toán từ $datLichs --}}
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #28a745;">
             <i class="fas fa-calendar-day"></i>
         </div>
         <div class="stat-value">{{ $todayBookings }}</div>
@@ -749,7 +752,7 @@
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #ffc107;">
             <i class="fas fa-clock"></i>
         </div>
         <div class="stat-value">{{ $pendingBookings }}</div>
@@ -760,7 +763,7 @@
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #007bff;">
             <i class="fas fa-check-circle"></i>
         </div>
         <div class="stat-value">{{ $confirmedBookings }}</div>
@@ -771,7 +774,7 @@
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #17a2b8;">
             <i class="fas fa-flag-checkered"></i>
         </div>
         <div class="stat-value">{{ $completedBookings }}</div>
@@ -782,7 +785,7 @@
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">
+        <div class="stat-icon" style="background-color: #dc3545;">
             <i class="fas fa-ban"></i>
         </div>
         <div class="stat-value">{{ $cancelledBookings }}</div>
