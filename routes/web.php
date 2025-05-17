@@ -53,7 +53,57 @@ Route::get('/customer/home', function () {
     return view('customer.home');
 })->middleware('auth')->name('customer.home');
 
+// Customer routes
+Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(function () {
+    // Home and Dashboard
+    Route::get('/home', [App\Http\Controllers\Customer\HomeController::class, 'index'])->name('home');
+    Route::get('/profile', [App\Http\Controllers\Customer\HomeController::class, 'profile'])->name('profile');
+    Route::put('/profile', [App\Http\Controllers\Customer\HomeController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/password', [App\Http\Controllers\Customer\HomeController::class, 'updatePassword'])->name('password.update');
 
+    // Services
+    Route::get('/dich-vu', [App\Http\Controllers\Customer\DichVuController::class, 'index'])->name('dichvu.index');
+    Route::get('/dich-vu/{id}', [App\Http\Controllers\Customer\DichVuController::class, 'show'])->name('dichvu.show');
+
+    // Bookings
+    Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');
+    Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
+    Route::get('/check-availability', [App\Http\Controllers\Customer\DatLichController::class, 'checkAvailability'])->name('datlich.checkAvailability');
+    
+    // Booking History
+    Route::get('/lich-su-dat-lich', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'index'])->name('lichsudatlich.index');
+    Route::get('/lich-su-dat-lich/{id}', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'show'])->name('lichsudatlich.show');
+    Route::post('/lich-su-dat-lich/{id}/cancel', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'cancel'])->name('lichsudatlich.cancel');
+    Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'reschedule'])->name('lichsudatlich.reschedule');
+    
+    // Reviews
+    Route::get('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'index'])->name('danhgia.index');
+    Route::get('/danh-gia/create', [App\Http\Controllers\Customer\DanhGiaController::class, 'create'])->name('danhgia.create');
+    Route::post('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'store'])->name('danhgia.store');
+    Route::get('/danh-gia/{id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'show'])->name('danhgia.show');
+    Route::get('/danh-gia/{id}/edit', [App\Http\Controllers\Customer\DanhGiaController::class, 'edit'])->name('danhgia.edit');
+    Route::put('/danh-gia/{id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'update'])->name('danhgia.update');
+    
+    // Membership
+    Route::get('/hang-thanh-vien', [App\Http\Controllers\Customer\HangThanhVienController::class, 'index'])->name('thanhvien.index');
+    Route::get('/hang-thanh-vien/lich-su-diem', [App\Http\Controllers\Customer\HangThanhVienController::class, 'pointHistory'])->name('thanhvien.pointHistory');
+    Route::get('/hang-thanh-vien/cac-hang', [App\Http\Controllers\Customer\HangThanhVienController::class, 'allRanks'])->name('thanhvien.allRanks');
+    
+    // Invoices
+    Route::get('/hoa-don', [App\Http\Controllers\Customer\HoaDonController::class, 'index'])->name('hoadon.index');
+    Route::get('/hoa-don/{id}', [App\Http\Controllers\Customer\HoaDonController::class, 'show'])->name('hoadon.show');
+    Route::get('/hoa-don/{id}/pdf', [App\Http\Controllers\Customer\HoaDonController::class, 'downloadPdf'])->name('hoadon.pdf');
+    Route::get('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'showPayment'])->name('hoadon.showPayment');
+    Route::post('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'processPayment'])->name('hoadon.processPayment');
+    
+    // Advertisements
+    Route::get('/quang-cao', [App\Http\Controllers\Customer\QuangCaoController::class, 'index'])->name('quangcao.index');
+    Route::get('/quang-cao/{id}', [App\Http\Controllers\Customer\QuangCaoController::class, 'show'])->name('quangcao.show');
+    Route::get('/quang-cao-noi-bat', [App\Http\Controllers\Customer\QuangCaoController::class, 'getFeaturedAds'])->name('quangcao.featured');
+    Route::get('/khuyen-mai', [App\Http\Controllers\Customer\QuangCaoController::class, 'getPromotionAds'])->name('quangcao.promotions');
+    Route::get('/dich-vu-moi', [App\Http\Controllers\Customer\QuangCaoController::class, 'getNewServiceAds'])->name('quangcao.newservices');
+    Route::get('/su-kien', [App\Http\Controllers\Customer\QuangCaoController::class, 'getEventAds'])->name('quangcao.events');
+});
 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
     // Routes cho quản lý trạng thái quảng cáo
