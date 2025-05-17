@@ -4,6 +4,58 @@
 
 @section('styles')
 <style>
+    body {
+        background-color: #ffebf3 !important;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(135deg, #e83e8c, #fd7e97);
+        color: white;
+        border-radius: 10px;
+        padding: 20px 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(232, 62, 140, 0.3);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    .welcome-banner h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .welcome-banner p {
+        font-size: 1rem;
+        margin-bottom: 0;
+        opacity: 0.9;
+    }
+    
+    .shine-line {
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shine 3s infinite;
+        transform: skewX(-25deg);
+    }
+    
+    @keyframes shine {
+        0% { left: -150%; }
+        100% { left: 150%; }
+    }
+
     .custom-card {
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -15,54 +67,74 @@
     }
     .card-header {
         background-color: #f8f9fa;
-        border-bottom: 2px solid #ff6b95;
+        border-bottom: 2px solid #e83e8c;
     }
     .btn-pink {
-        background-color: #ff6b95;
-        border-color: #ff6b95;
+        background-color: #e83e8c;
+        border-color: #e83e8c;
         color: white;
+        transition: all 0.3s;
     }
     .btn-pink:hover {
-        background-color: #e84a78;
-        border-color: #e84a78;
+        background-color: #d33077;
+        border-color: #d33077;
         color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(232, 62, 140, 0.3);
     }
     .form-label {
         font-weight: 500;
         color: #495057;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #ff6b95;
-        box-shadow: 0 0 0 0.25rem rgba(255, 107, 149, 0.25);
+        border-color: #e83e8c;
+        box-shadow: 0 0 0 0.25rem rgba(232, 62, 140, 0.25);
     }
     .star-rating .form-check-inline {
         margin-right: 1rem;
     }
     .star-rating .form-check-input:checked {
-        background-color: #ff6b95;
-        border-color: #ff6b95;
+        background-color: #e83e8c;
+        border-color: #e83e8c;
     }
     .bg-pink-500 {
-        background-color: #ff6b95 !important;
+        background-color: #e83e8c !important;
+    }
+    
+    .btn-back {
+        background-color: white;
+        color: #e83e8c;
+        border: none;
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        background-color: #f8f9fa;
     }
 </style>
 @endsection
 
 @section('content')
 <div class="container-fluid px-4">
-    <div class="card bg-pink-500 text-white mb-4 custom-card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="mt-2">Thêm Đánh Giá Mới</h1>
-                    <p class="mb-0">
-                        <i class="fas fa-star me-1"></i> Ghi nhận đánh giá và phản hồi từ khách hàng
-                    </p>
-                </div>
-                <a href="{{ route('admin.danhgia.index') }}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
-                </a>
-            </div>
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-spa"></i> Thêm Đánh Giá Mới</h1>
+        <p>Ghi nhận đánh giá và phản hồi từ khách hàng</p>
+        <div class="shine-line"></div>
+        
+        <div class="position-absolute" style="top: 20px; right: 20px;">
+            <a href="{{ route('admin.danhgia.index') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
         </div>
     </div>
 

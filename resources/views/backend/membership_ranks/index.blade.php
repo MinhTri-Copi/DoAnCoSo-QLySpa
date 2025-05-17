@@ -33,36 +33,96 @@
     }
 
     /* ===== HEADER ===== */
-    .header-container {
-        background: linear-gradient(135deg, var(--primary-pink) 0%, #ff92b6 100%);
-        border-radius: var(--radius-lg);
-        padding: 2.2rem 3rem;
-        margin-bottom: 2.5rem;
+    .welcome-banner {
         position: relative;
         overflow: hidden;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(145deg, #f58cba, #e83e8c);
+        animation: softPulse 4s infinite alternate, floatAnimation 6s ease-in-out infinite;
+        transition: all 0.5s ease;
+        box-shadow: 0 5px 15px rgba(232, 62, 140, 0.3);
+        transform-origin: center center;
+        width: 100%;
+        padding: 2.2rem 3rem;
+        margin-bottom: 2.5rem;
+        color: white;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: var(--shadow-pink);
-        max-height: 160px;
     }
 
-    .header-container::before {
+    .welcome-banner:before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-        border-radius: 50%;
-        z-index: 1;
-        animation: pulse 6s infinite alternate;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        z-index: -1;
+        background: linear-gradient(45deg, 
+            #ff7eb3, #ff758c, #ff7eb3, #ff8e8c, 
+            #fdae9e, #ff7eb3, #ff758c, #ff7eb3);
+        background-size: 400%;
+        border-radius: 14px;
+        animation: borderGlow 12s linear infinite;
+        filter: blur(10px);
+        opacity: 0.7;
     }
 
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 0.5; }
-        100% { transform: scale(1.1); opacity: 0.8; }
+    @keyframes borderGlow {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 100% 100%; }
+    }
+
+    @keyframes softPulse {
+        0% {
+            box-shadow: 0 5px 15px rgba(232, 62, 140, 0.3);
+        }
+        100% {
+            box-shadow: 0 8px 25px rgba(232, 62, 140, 0.5);
+        }
+    }
+
+    @keyframes floatAnimation {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .shine-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 6px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.95);
+        z-index: 2;
+        animation: corner-to-corner 12s infinite cubic-bezier(0.25, 0.1, 0.25, 1);
+        opacity: 0;
+    }
+
+    @keyframes corner-to-corner {
+        0% {
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+        5% {
+            opacity: 1;
+        }
+        45% {
+            left: 100%;
+            top: 100%;
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 0;
+        }
     }
 
     .header-shimmer {
@@ -629,11 +689,10 @@
     }
 </style>
 
-<div class="header-container">
-    <div class="header-shimmer"></div>
+<div class="welcome-banner">
     <div>
-        <div class="header-title">Quản Lý Hạng Thành Viên</div>
-        <div class="header-subtitle">Tối ưu trải nghiệm và phục vụ khách hàng tốt nhất</div>
+        <h1><i class="fas fa-award"></i> Quản Lý Hạng Thành Viên</h1>
+        <p>Tối ưu trải nghiệm và phục vụ khách hàng tốt nhất</p>
     </div>
     <div class="header-buttons">
         <a href="{{ route('admin.membership_ranks.cleanup-duplicates') }}" class="btn-pink" style="margin-right: 10px; background-color: #e74c3c;" onclick="return confirm('Bạn có chắc chắn muốn dọn dẹp các hạng thành viên trùng lặp không?');">
@@ -646,6 +705,8 @@
             <i class="fas fa-plus"></i> Thêm Hạng Thành Viên Mới
         </a>
     </div>
+    <div class="shine-line"></div>
+    <div class="header-shimmer"></div>
 </div>
 
 <div class="stats-container">
