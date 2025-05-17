@@ -14,24 +14,7 @@
                     <strong>Tiêu đề:</strong> {{ $advertisement->Tieude }}<br>
                     <strong>Nội dung:</strong> {{ $advertisement->Noidung }}<br>
                     <strong>Người dùng:</strong> {{ $advertisement->user->Hoten ?? 'Không xác định' }} (Mã: {{ $advertisement->Manguoidung }})<br>
-                    <strong>Loại quảng cáo:</strong> 
-                    @php
-                        $displayText = '';
-                        switch($advertisement->Loaiquangcao) {
-                            case 'Khuyenmai':
-                                $displayText = 'Khuyến mãi';
-                                break;
-                            case 'Sukien':
-                                $displayText = 'Sự kiện';
-                                break;
-                            case 'Thongbao':
-                                $displayText = 'Thông báo';
-                                break;
-                            default:
-                                $displayText = $advertisement->Loaiquangcao;
-                        }
-                    @endphp
-                    {{ $displayText }}<br>
+                                        <strong>Loại quảng cáo:</strong> {{ $advertisement->Loaiquangcao ?? 'Chưa phân loại' }}<br>
                     <strong>Trạng thái:</strong> {{ $advertisement->trangThaiQC->TenTT }}<br>
                     <strong>Ngày bắt đầu:</strong> {{ $advertisement->Ngaybatdau }}<br>
                     <strong>Ngày kết thúc:</strong> {{ $advertisement->Ngayketthuc }}<br>

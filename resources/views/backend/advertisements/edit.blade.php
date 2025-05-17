@@ -99,25 +99,19 @@
             <div class="mb-3">
                 <label for="Loaiquangcao" class="form-label">Loại quảng cáo <span class="text-danger">*</span></label>
                 @php
-                    $loaiQuangCaoMapping = [
-                        'Khuyenmai' => 'Khuyến mãi',
-                        'Sukien' => 'Sự kiện',
-                        'Thongbao' => 'Thông báo'
-                    ];
                     $selectedType = old('Loaiquangcao', $advertisement->Loaiquangcao);
-                    $selectedDisplayText = $loaiQuangCaoMapping[$selectedType] ?? $selectedType;
                 @endphp
                 <div class="custom-select-wrapper">
                     <input type="hidden" name="Loaiquangcao" id="selected-type" value="{{ $selectedType }}">
                     <div class="form-control custom-select-trigger" id="selected-display" data-bs-toggle="dropdown">
-                        {{ $selectedDisplayText }}
+                        {{ $selectedType }}
                     </div>
                     <div class="dropdown-menu w-100">
                         @foreach ($adTypes as $type)
                             <a class="dropdown-item type-option" href="#" 
                                data-value="{{ $type }}" 
-                               data-display="{{ $loaiQuangCaoMapping[$type] ?? $type }}">
-                                {{ $loaiQuangCaoMapping[$type] ?? $type }}
+                               data-display="{{ $type }}">
+                                {{ $type }}
                             </a>
                         @endforeach
                     </div>

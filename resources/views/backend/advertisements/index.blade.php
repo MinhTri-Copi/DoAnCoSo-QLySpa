@@ -388,35 +388,8 @@
                                     <div style="font-weight: 500; color: #333; text-align: left;">{{ $advertisement->Tieude }}</div>
                                 </td>
                                 <td>{{ $advertisement->user->Hoten ?? 'Không xác định' }}</td>
-                                <td>
-                                    @php
-                                        $badgeClass = 'bg-secondary';
-                                        $adType = $advertisement->Loaiquangcao;
-                                        
-                                        if (empty($adType)) {
-                                            $displayText = 'Chưa phân loại';
-                                        } else {
-                                            switch(strtolower(trim($adType))) {
-                                                case 'khuyenmai':
-                                                    $badgeClass = 'bg-info';
-                                                    $displayText = 'Khuyến mãi';
-                                                    break;
-                                                case 'sukien':
-                                                    $badgeClass = 'bg-warning';
-                                                    $displayText = 'Sự kiện';
-                                                    break;
-                                                case 'thongbao':
-                                                    $badgeClass = 'bg-primary';
-                                                    $displayText = 'Thông báo';
-                                                    break;
-                                                default:
-                                                    $displayText = $adType;
-                                            }
-                                        }
-                                    @endphp
-                                    <span class="badge {{ $badgeClass }}" style="display: inline-block; padding: 6px 12px; font-size: 0.8rem; font-weight: 500; color: white;">
-                                        {{ $displayText }}
-                                    </span>
+                                <td>{{ $advertisement->Loaiquangcao ?? 'Chưa phân loại'}}</td>
+
                                 </td>
                                 <td>
                                     <span class="status-badge" style="background-color: rgba(232, 62, 140, 0.1); color: #e83e8c;">
