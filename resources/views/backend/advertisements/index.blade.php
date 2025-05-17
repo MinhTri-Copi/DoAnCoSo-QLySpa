@@ -371,7 +371,13 @@
                                 <td>{{ $advertisement->MaQC }}</td>
                                 <td>
                                     @if ($advertisement->Image)
-                                        <img src="{{ asset('storage/' . $advertisement->Image) }}" class="ad-thumbnail" alt="{{ $advertisement->Tieude }}">
+                                        @php
+                                            $imagePath = $advertisement->Image;
+                                        @endphp
+                                        <img src="{{ route('storage.image', ['path' => $imagePath]) }}" 
+                                             class="ad-thumbnail" 
+                                             alt="{{ $advertisement->Tieude }}"
+                                             onerror="this.onerror=null; this.src='{{ asset('images/default-ad.jpg') }}'; this.classList.add('error-image');">
                                     @else
                                         <div class="ad-thumbnail placeholder">
                                             <i class="fas fa-image"></i>
@@ -384,26 +390,33 @@
                                 <td>{{ $advertisement->user->Hoten ?? 'Không xác định' }}</td>
                                 <td>
                                     @php
-                                        $badgeClass = '';
-                                        switch($advertisement->Loaiquangcao) {
-                                            case 'Khuyenmai':
-                                                $badgeClass = 'bg-info';
-                                                $displayText = 'Khuyến mãi';
-                                                break;
-                                            case 'Sukien':
-                                                $badgeClass = 'bg-warning';
-                                                $displayText = 'Sự kiện';
-                                                break;
-                                            case 'Thongbao':
-                                                $badgeClass = 'bg-primary';
-                                                $displayText = 'Thông báo';
-                                                break;
-                                            default:
-                                                $badgeClass = 'bg-secondary';
-                                                $displayText = $advertisement->Loaiquangcao;
+                                        $badgeClass = 'bg-secondary';
+                                        $adType = $advertisement->Loaiquangcao;
+                                        
+                                        if (empty($adType)) {
+                                            $displayText = 'Chưa phân loại';
+                                        } else {
+                                            switch(strtolower(trim($adType))) {
+                                                case 'khuyenmai':
+                                                    $badgeClass = 'bg-info';
+                                                    $displayText = 'Khuyến mãi';
+                                                    break;
+                                                case 'sukien':
+                                                    $badgeClass = 'bg-warning';
+                                                    $displayText = 'Sự kiện';
+                                                    break;
+                                                case 'thongbao':
+                                                    $badgeClass = 'bg-primary';
+                                                    $displayText = 'Thông báo';
+                                                    break;
+                                                default:
+                                                    $displayText = $adType;
+                                            }
                                         }
                                     @endphp
-                                    <span class="badge {{ $badgeClass }}">{{ $displayText }}</span>
+                                    <span class="badge {{ $badgeClass }}" style="display: inline-block; padding: 6px 12px; font-size: 0.8rem; font-weight: 500; color: white;">
+                                        {{ $displayText }}
+                                    </span>
                                 </td>
                                 <td>
                                     <span class="status-badge" style="background-color: rgba(232, 62, 140, 0.1); color: #e83e8c;">

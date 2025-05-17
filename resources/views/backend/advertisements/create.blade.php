@@ -278,6 +278,54 @@
     .form-floating-input {
         padding-left: 45px !important;
     }
+    
+    .content-separator {
+        height: 1px;
+        background: linear-gradient(90deg, rgba(232, 62, 140, 0.1), rgba(232, 62, 140, 0.3), rgba(232, 62, 140, 0.1));
+        margin: 15px 0;
+    }
+    
+    /* Custom Select Styling */
+    .custom-select-wrapper {
+        position: relative;
+    }
+    
+    .custom-select-trigger {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .custom-select-trigger:after {
+        content: '\f078';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 0.8rem;
+        color: #e83e8c;
+        margin-left: 5px;
+    }
+    
+    .custom-select-wrapper .dropdown-menu {
+        width: 100%;
+        padding: 0;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid rgba(232, 62, 140, 0.2);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .custom-select-wrapper .dropdown-item {
+        padding: 12px 15px;
+        color: #333;
+        transition: all 0.3s;
+    }
+    
+    .custom-select-wrapper .dropdown-item:hover,
+    .custom-select-wrapper .dropdown-item:focus {
+        background-color: rgba(232, 62, 140, 0.1);
+        color: #e83e8c;
+    }
 </style>
 @endsection
 
@@ -397,29 +445,30 @@
                                 <i class="fas fa-tag" style="color: #e83e8c; margin-right: 8px;"></i>
                                 Loại quảng cáo<span class="required-star">*</span>
                             </label>
-                            <select name="Loaiquangcao" class="form-control" required>
-                                @foreach ($adTypes as $type)
-                                    @php
-                                        $displayText = '';
-                                        switch($type) {
-                                            case 'Khuyenmai':
-                                                $displayText = 'Khuyến mãi';
-                                                break;
-                                            case 'Sukien':
-                                                $displayText = 'Sự kiện';
-                                                break;
-                                            case 'Thongbao':
-                                                $displayText = 'Thông báo';
-                                                break;
-                                            default:
-                                                $displayText = $type;
-                                        }
-                                    @endphp
-                                    <option value="{{ $type }}" {{ old('Loaiquangcao') == $type ? 'selected' : '' }}>
-                                        {{ $displayText }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @php
+                                $loaiQuangCaoMapping = [
+                                    'Khuyenmai' => 'Khuyến mãi',
+                                    'Sukien' => 'Sự kiện',
+                                    'Thongbao' => 'Thông báo'
+                                ];
+                                $selectedType = old('Loaiquangcao', $adTypes[0] ?? '');
+                                $selectedDisplayText = $loaiQuangCaoMapping[$selectedType] ?? $selectedType;
+                            @endphp
+                            <div class="custom-select-wrapper">
+                                <input type="hidden" name="Loaiquangcao" id="selected-type" value="{{ $selectedType }}">
+                                <div class="form-control custom-select-trigger" id="selected-display" data-bs-toggle="dropdown">
+                                    {{ $selectedDisplayText }}
+                                </div>
+                                <div class="dropdown-menu w-100">
+                                    @foreach ($adTypes as $type)
+                                        <a class="dropdown-item type-option" href="#" 
+                                           data-value="{{ $type }}" 
+                                           data-display="{{ $loaiQuangCaoMapping[$type] ?? $type }}">
+                                            {{ $loaiQuangCaoMapping[$type] ?? $type }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="MaTTQC" class="form-label">
@@ -491,6 +540,22 @@
                 imagePreview.innerHTML = '';
                 imagePreview.style.display = 'none';
                 removeBtn.style.display = 'none';
+            });
+
+            // Xử lý cho dropdown tùy chỉnh loại quảng cáo
+            const typeOptions = document.querySelectorAll('.type-option');
+            const selectedTypeInput = document.getElementById('selected-type');
+            const selectedDisplay = document.getElementById('selected-display');
+            
+            typeOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const value = this.dataset.value;
+                    const display = this.dataset.display;
+                    
+                    selectedTypeInput.value = value;
+                    selectedDisplay.textContent = display;
+                });
             });
         });
     </script>
