@@ -28,11 +28,9 @@ use App\Models\HangThanhVien;
 
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -200,4 +198,30 @@ Route::middleware(['auth'])->group(function () {
 
 // Routes cho tìm kiếm
 Route::get('/search', [SearchController::class, 'searchByFunction'])->name('admin.search');
+
+// Thêm route để hiển thị hình ảnh quảng cáo
+Route::get('/ad-images/{filename}', [AdvertisementController::class, 'showImage'])->name('advertisement.image');
+
+// Route để hiển thị bất kỳ hình ảnh nào từ storage
+Route::get('/storage-image/{path}', [AdvertisementController::class, 'showAnyImage'])->name('storage.image')->where('path', '.*');
+
+// Route để debug hình ảnh trong storage
+Route::get('/debug-images', function() {
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    $files = $disk->allFiles();
+    $images = [];
+    
+    foreach ($files as $file) {
+        if (in_array(pathinfo($file, PATHINFO_EXTENSION), ['jpg', 'jpeg', 'png', 'gif'])) {
+            $images[] = [
+                'path' => $file,
+                'url' => route('storage.image', ['path' => $file]),
+                'size' => $disk->size($file),
+                'last_modified' => date('Y-m-d H:i:s', $disk->lastModified($file))
+            ];
+        }
+    }
+    
+    return view('debug.images', ['images' => $images]);
+});
 
