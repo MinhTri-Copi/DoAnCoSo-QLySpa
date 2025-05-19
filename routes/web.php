@@ -103,6 +103,17 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     Route::get('/khuyen-mai', [App\Http\Controllers\Customer\QuangCaoController::class, 'getPromotionAds'])->name('quangcao.promotions');
     Route::get('/dich-vu-moi', [App\Http\Controllers\Customer\QuangCaoController::class, 'getNewServiceAds'])->name('quangcao.newservices');
     Route::get('/su-kien', [App\Http\Controllers\Customer\QuangCaoController::class, 'getEventAds'])->name('quangcao.events');
+    Route::get('/lien-he', [App\Http\Controllers\Customer\LienHeController::class, 'index'])->name('lienhe');
+
+    // Phiếu hỗ trợ
+    Route::get('/phieu-ho-tro', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'index'])->name('phieuhotro.index');
+    Route::get('/phieu-ho-tro/create', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'create'])->name('phieuhotro.create');
+    Route::post('/phieu-ho-tro', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'store'])->name('phieuhotro.store');
+    Route::get('/phieu-ho-tro/{id}', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'show'])->name('phieuhotro.show');
+    Route::get('/phieu-ho-tro/{id}/edit', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'edit'])->name('phieuhotro.edit');
+    Route::put('/phieu-ho-tro/{id}', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'update'])->name('phieuhotro.update');
+    Route::post('/phieu-ho-tro/{id}/cancel', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'cancel'])->name('phieuhotro.cancel');
+    Route::post('/phieu-ho-tro/{id}/feedback', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'sendFeedback'])->name('phieuhotro.feedback');
 });
 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
