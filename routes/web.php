@@ -64,6 +64,9 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     // Services
     Route::get('/dich-vu', [App\Http\Controllers\Customer\DichVuController::class, 'index'])->name('dichvu.index');
     Route::get('/dich-vu/{id}', [App\Http\Controllers\Customer\DichVuController::class, 'show'])->name('dichvu.show');
+    Route::get('/dich-vu/api/featured', [App\Http\Controllers\Customer\DichVuController::class, 'getFeatured'])->name('dichvu.featured');
+    Route::get('/dich-vu/api/search', [App\Http\Controllers\Customer\DichVuController::class, 'search'])->name('dichvu.search');
+    Route::get('/dich-vu/api/check-availability', [App\Http\Controllers\Customer\DichVuController::class, 'checkAvailability'])->name('dichvu.availability');
 
     // Bookings
     Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');

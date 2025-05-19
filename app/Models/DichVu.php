@@ -38,11 +38,33 @@ class DichVu extends Model
     }
     
     /**
-     * Get ratings for this service
+     * Lấy đánh giá cho dịch vụ thông qua chuỗi quan hệ:
+     * DichVu → DatLich → HoaDonVaThanhToan → DanhGia
      */
     public function danhGia()
     {
-        return $this->hasMany(DanhGia::class, 'MaDV', 'MaDV');
+        // Không sử dụng quan hệ trực tiếp vì không có MaDV trong bảng DANHGIA
+        // Thay vào đó lấy đánh giá thông qua mối quan hệ với đặt lịch và hóa đơn
+        return DanhGia::whereIn('MaHD', function($query) {
+            $query->select('MaHD')
+                ->from('HOADON_VA_THANHTOAN')
+                ->whereIn('MaDL', function($subQuery) {
+                    $subQuery->select('MaDL')
+                        ->from('DATLICH')
+                        ->where('MaDV', $this->MaDV);
+                });
+        });
+    }
+
+    /**
+     * Get bookings with their invoices and ratings
+     */
+    public function datLichWithRatings() 
+    {
+        return $this->datLich()
+            ->with(['hoaDonVaThanhToan' => function($query) {
+                $query->with('danhGia');
+            }]);
     }
 
     /**
@@ -50,8 +72,18 @@ class DichVu extends Model
      */
     public function getAverageRatingAttribute()
     {
-        if ($this->danhGia && $this->danhGia->count() > 0) {
-            return round($this->danhGia->avg('rating'), 1);
+        $ratings = DanhGia::whereIn('MaHD', function($query) {
+            $query->select('MaHD')
+                ->from('HOADON_VA_THANHTOAN')
+                ->whereIn('MaDL', function($subQuery) {
+                    $subQuery->select('MaDL')
+                        ->from('DATLICH')
+                        ->where('MaDV', $this->MaDV);
+                });
+        })->get();
+
+        if ($ratings->count() > 0) {
+            return round($ratings->avg('Danhgiasao'), 1);
         }
         
         return 0;
