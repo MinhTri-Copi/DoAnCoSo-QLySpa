@@ -61,15 +61,49 @@
         
         .rosa-logo {
             font-weight: 750;
-            color: var(--accent-color) !important;
+            color: var(--accent-color);
             font-size: 1.8rem;
             text-decoration: none;
             display: flex;
             align-items: center;
             margin-right: -10px;
+            text-shadow: 0px 2px 4px rgba(255, 107, 107, 0.2);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            position: relative;
         }
         
-      
+        .rosa-logo i {
+            color: var(--accent-color);
+            filter: drop-shadow(0px 2px 3px rgba(255, 107, 107, 0.3));
+            transition: all 0.3s ease;
+        }
+        
+        .rosa-logo:hover {
+            transform: translateY(-2px);
+            color: #FF5B94;
+        }
+        
+        .rosa-logo:hover i {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .rosa-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 30px;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), transparent);
+            transform: scaleX(0.7);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .rosa-logo:hover::after {
+            transform: scaleX(1);
+        }
 
         .navbar-brand {
             font-weight: 700;
