@@ -447,7 +447,7 @@
                             </label>
                             @php
                                 $selectedType = old('Loaiquangcao', $adTypes[0] ?? '');
-                            @endphp
+                                    @endphp
                             <div class="custom-select-wrapper">
                                 <input type="hidden" name="Loaiquangcao" id="selected-type" value="{{ $selectedType }}">
                                 <div class="form-control custom-select-trigger" id="selected-display" data-bs-toggle="dropdown">
@@ -460,7 +460,7 @@
                                            data-display="{{ $type }}">
                                             {{ $type }}
                                         </a>
-                                    @endforeach
+                                @endforeach
                                 </div>
                             </div>
                         </div>
