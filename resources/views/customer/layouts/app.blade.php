@@ -261,37 +261,68 @@
             color: var(--accent-color);
         }
 
+        /* Footer styling */
         footer {
-            background-color: var(--light-bg);
-            padding: 3rem 0;
+            background: linear-gradient(to right, #FF9A9E, #FECFEF);
             margin-top: 3rem;
+            padding: 3rem 0;
+            color: white;
+            box-shadow: 0 -5px 15px rgba(255, 154, 158, 0.15);
         }
-
-        .footer-title {
-            color: var(--primary-color);
+        
+        footer .footer-title {
+            color: white;
             font-weight: 700;
             margin-bottom: 1.5rem;
+            position: relative;
         }
-
-        .footer-link {
-            color: var(--text-color);
+        
+        footer .footer-title:after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background-color: white;
+            margin-top: 8px;
+        }
+        
+        footer .footer-link {
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
             text-decoration: none;
-            transition: color 0.3s ease;
+            display: inline-block;
         }
-
-        .footer-link:hover {
-            color: var(--primary-color);
+        
+        footer .footer-link:hover {
+            color: white;
+            text-decoration: none;
+            padding-left: 5px;
         }
-
-        .social-links a {
-            color: var(--text-color);
-            margin-right: 1rem;
-            font-size: 1.5rem;
-            transition: color 0.3s ease;
+        
+        footer .social-links a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.3s;
         }
-
-        .social-links a:hover {
-            color: var(--primary-color);
+        
+        footer .social-links a:hover {
+            background-color: white;
+            color: #FF9A9E;
+            transform: translateY(-3px);
+        }
+        
+        footer hr {
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 2rem 0;
+            opacity: 0.3;
+            border-color: white;
         }
 
         /* Welcome banner style giống trang admin */

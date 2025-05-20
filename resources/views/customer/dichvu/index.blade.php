@@ -93,11 +93,100 @@
         </div>
     </div>
 
+    <!-- Featured Services Section - Only show if there are featured services -->
+    @php
+        $featuredServices = $services->filter(function($service) {
+            return $service->featured;
+        });
+    @endphp
+    
+    @if($featuredServices->count() > 0)
+    <div class="mb-5">
+        <div class="featured-header p-3 mb-4" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%); border-radius: 8px;">
+            <h3 class="text-white mb-0"><i class="fas fa-crown me-2"></i>Dịch vụ nổi bật</h3>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach($featuredServices as $service)
+                <div class="col">
+                    <div class="card h-100 shadow-sm hover-shadow">
+                        <div class="position-absolute top-0 start-0 p-2 z-index-1">
+                            <span class="badge bg-danger px-3 py-2 rounded-pill fw-bold">
+                                <i class="fas fa-star me-1"></i>Nổi bật
+                            </span>
+                        </div>
+                        @if($service->Hinhanh)
+                            <img src="{{ route('storage.image', ['path' => 'services/' . $service->Hinhanh]) }}" class="card-img-top" alt="{{ $service->Tendichvu }}" style="height: 200px; object-fit: cover;">
+                        @elseif($service->Image)
+                            <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}" style="height: 200px; object-fit: cover;">
+                        @else
+                            <div class="bg-light text-center py-5" style="height: 200px;">
+                                <i class="fas fa-spa fa-4x text-muted"></i>
+                            </div>
+                        @endif
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $service->Tendichvu }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-primary fw-bold">{{ number_format($service->Gia, 0, ',', '.') }} VNĐ</span>
+                            </div>
+                            
+                            <!-- Hiển thị đánh giá sao -->
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="me-2">
+                                    @php $avgRating = isset($service->average_rating) ? $service->average_rating : 0; @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $avgRating)
+                                            <i class="fas fa-star text-warning"></i>
+                                        @elseif($i - 0.5 <= $avgRating)
+                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                        @else
+                                            <i class="far fa-star text-warning"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <small class="text-muted">
+                                    {{ $avgRating }} 
+                                    <span class="ms-1">({{ isset($service->rating_count) ? $service->rating_count : 0 }})</span>
+                                </small>
+                            </div>
+                            
+                            <p class="card-text text-muted">{{ \Illuminate\Support\Str::limit($service->MoTa, 100) }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>Chi tiết
+                                </a>
+                                <a href="{{ $bookingRoute }}?service_id={{ $service->MaDV }}" class="btn btn-primary">
+                                    <i class="fas fa-calendar-check me-1"></i>Đặt lịch
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    <!-- All Services Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-4">Tất cả dịch vụ</h3>
+        </div>
+    </div>
+
     <!-- Service List -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @forelse($services as $service)
             <div class="col">
                 <div class="card h-100 shadow-sm hover-shadow">
+                    @if($service->featured)
+                    <div class="position-absolute top-0 start-0 p-2 z-index-1">
+                        <span class="badge bg-danger px-3 py-2 rounded-pill fw-bold">
+                            <i class="fas fa-star me-1"></i>Nổi bật
+                        </span>
+                    </div>
+                    @endif
                     @if($service->Hinhanh)
                         <img src="{{ route('storage.image', ['path' => 'services/' . $service->Hinhanh]) }}" class="card-img-top" alt="{{ $service->Tendichvu }}" style="height: 200px; object-fit: cover;">
                     @elseif($service->Image)
@@ -111,9 +200,6 @@
                         <h5 class="card-title">{{ $service->Tendichvu }}</h5>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-primary fw-bold">{{ number_format($service->Gia, 0, ',', '.') }} VNĐ</span>
-                            @if($service->featured)
-                                <span class="badge bg-info">Nổi bật</span>
-                            @endif
                         </div>
                         
                         <!-- Hiển thị đánh giá sao -->
@@ -223,6 +309,24 @@
         font-size: 0.75rem;
     }
     
+    /* Featured service card styling */
+    .card:has(.badge.bg-danger) {
+        border: 2px solid #FF9A9E;
+        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.2) !important;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .badge.bg-danger {
+        background: linear-gradient(135deg, #FF9A9E 0%, #F53844 99%) !important;
+        box-shadow: 0 2px 5px rgba(255, 154, 158, 0.4);
+        letter-spacing: 0.5px;
+    }
+    
+    .z-index-1 {
+        z-index: 1;
+    }
+    
     /* Custom pagination styling */
     .pagination {
         margin-bottom: 0;
@@ -270,66 +374,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    
-    /* Override footer styling to match pink theme */
-    footer {
-        background: linear-gradient(to right, #FF9A9E, #FECFEF);
-        margin-top: 3rem;
-        padding: 3rem 0;
-        color: white;
-        box-shadow: 0 -5px 15px rgba(255, 154, 158, 0.15);
-    }
-    
-    footer .footer-title {
-        color: white;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        position: relative;
-    }
-    
-    footer .footer-title:after {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 3px;
-        background-color: white;
-        margin-top: 8px;
-    }
-    
-    footer .footer-link {
-        color: rgba(255, 255, 255, 0.9);
-        transition: all 0.3s;
-    }
-    
-    footer .footer-link:hover {
-        color: white;
-        text-decoration: none;
-        padding-left: 5px;
-    }
-    
-    footer .social-links a {
-        color: white;
-        background-color: rgba(255, 255, 255, 0.2);
-        width: 36px;
-        height: 36px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin-right: 10px;
-        transition: all 0.3s;
-    }
-    
-    footer .social-links a:hover {
-        background-color: white;
-        color: #FF9A9E;
-        transform: translateY(-3px);
-    }
-    
-    footer hr {
-        background-color: rgba(255, 255, 255, 0.2);
-        margin: 2rem 0;
     }
 </style>
 @endsection 
