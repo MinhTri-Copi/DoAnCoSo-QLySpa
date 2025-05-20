@@ -12,9 +12,9 @@
     </div>
 
     <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('customer.home') }}">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('customer.dichvu.index') }}">Dịch vụ</a></li>
+        <ol class="custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('customer.home') }}"><i class="fas fa-home"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('customer.dichvu.index') }}"><i class="fas fa-hand-sparkles"></i> Dịch vụ</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $service->Tendichvu }}</li>
         </ol>
     </nav>
@@ -280,6 +280,62 @@
     .hover-shadow:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Custom breadcrumb styling */
+    .custom-breadcrumb {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        list-style: none;
+        background-color: #fff5f7;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(255, 154, 158, 0.15);
+    }
+    
+    .custom-breadcrumb .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+    
+    .custom-breadcrumb .breadcrumb-item a {
+        color: #FF9A9E;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        padding: 0.1rem 0.5rem;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .custom-breadcrumb .breadcrumb-item a:hover {
+        color: #db7093;
+        background-color: rgba(255, 154, 158, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .custom-breadcrumb .breadcrumb-item i {
+        margin-right: 6px;
+        font-size: 0.85rem;
+    }
+    
+    .custom-breadcrumb .breadcrumb-item + .breadcrumb-item {
+        padding-left: 0.5rem;
+    }
+    
+    .custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        display: inline-block;
+        padding-right: 0.5rem;
+        color: #FF9A9E;
+        content: "/";
+    }
+    
+    .custom-breadcrumb .breadcrumb-item.active {
+        color: #666;
+        font-weight: 500;
+        padding: 0.1rem 0.5rem;
     }
     
     /* Welcome banner */
