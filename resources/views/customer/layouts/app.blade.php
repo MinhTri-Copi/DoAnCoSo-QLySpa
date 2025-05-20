@@ -262,36 +262,49 @@
         }
 
         footer {
-            background-color: var(--light-bg);
+            background-color: #f986a6;
             padding: 3rem 0;
             margin-top: 3rem;
+            color: white;
         }
 
         .footer-title {
-            color: var(--primary-color);
+            color: white;
             font-weight: 700;
             margin-bottom: 1.5rem;
         }
 
         .footer-link {
-            color: var(--text-color);
+            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             transition: color 0.3s ease;
         }
 
         .footer-link:hover {
-            color: var(--primary-color);
+            color: white;
+            text-decoration: underline;
         }
 
         .social-links a {
-            color: var(--text-color);
+            color: white;
             margin-right: 1rem;
             font-size: 1.5rem;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            opacity: 0.9;
         }
 
         .social-links a:hover {
-            color: var(--primary-color);
+            color: white;
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+        
+        footer hr {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        footer .text-center p {
+            color: rgba(255, 255, 255, 0.9);
         }
 
         /* Welcome banner style giống trang admin */

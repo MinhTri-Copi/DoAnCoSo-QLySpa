@@ -8,7 +8,7 @@
     <div class="video-background">
         <div id="video-container">
             <video id="spa-video" muted playsinline autoplay>
-                <source src="{{ asset('videos/trailer/380867662404993031.mp4') }}" type="video/mp4" id="video-source">
+                <source src="{{ asset('videos/trailer/Standard_Mode_16x9_m_nh_c_n_b_n_t_o_cho_m_nh_1_vide.mp4') }}" type="video/mp4" id="video-source">
             </video>
         </div>
         <div class="video-overlay"></div>
@@ -231,13 +231,18 @@
 @endif
 
 <!-- Booking Form Section -->
-<section class="booking-cta py-5 bg-primary text-white">
-    <div class="container">
+<section class="booking-cta py-5 bg-pink text-white position-relative overflow-hidden animated-bg">
+    <div class="animation-circles">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-lg-10 text-center">
-                <h2 class="mb-4">Bạn muốn đặt lịch ngay?</h2>
-                <p class="lead mb-4">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
-                <a href="{{ route('customer.datlich.create') }}" class="btn btn-light btn-lg px-5">Đặt lịch ngay</a>
+                <h2 class="mb-4 animate__animated animate__fadeInDown">Bạn muốn đặt lịch ngay?</h2>
+                <p class="lead mb-4 animate__animated animate__fadeInUp">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
+                <a href="{{ route('customer.datlich.create') }}" class="btn btn-cta btn-lg px-5 py-3 animate__animated animate__pulse animate__infinite">Đặt lịch ngay</a>
             </div>
         </div>
     </div>
@@ -405,10 +410,173 @@
     .text-pink {
         color: #FF9A9E !important;
     }
+    
+    /* Booking CTA Section with Pink Background and Animation */
+    .bg-pink {
+        background: linear-gradient(135deg, #f76c82 0%, #e77c96 99%, #e28090 100%);
+        position: relative;
+    }
+    
+    .animated-bg {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .animation-circles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        animation: float 8s infinite ease-in-out;
+    }
+    
+    .circle-1 {
+        width: 150px;
+        height: 150px;
+        top: -50px;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .circle-2 {
+        width: 80px;
+        height: 80px;
+        bottom: 20px;
+        right: 20%;
+        animation-delay: 2s;
+    }
+    
+    .circle-3 {
+        width: 200px;
+        height: 200px;
+        bottom: -100px;
+        left: 40%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0.6;
+        }
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 0.9;
+        }
+        100% {
+            transform: translateY(0) rotate(360deg);
+            opacity: 0.6;
+        }
+    }
+    
+    /* Button CTA with glowing effect */
+    .btn-cta {
+        background: #ffffff;
+        color: #ff6b81;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(255, 107, 129, 0.4);
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+    
+    .btn-cta:hover, .btn-cta:focus {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(255, 107, 129, 0.6);
+        color: #ff4757;
+    }
+    
+    .btn-cta::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transform: translateX(-100%);
+        transition: 0.6s;
+        z-index: -1;
+    }
+    
+    .btn-cta:hover::after {
+        transform: translateX(100%);
+    }
+    
+    /* Import Animate.css classes */
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+    
+    /* Animation classes */
+    .animate__animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+    
+    .animate__fadeInDown {
+        animation-name: fadeInDown;
+    }
+    
+    .animate__fadeInUp {
+        animation-name: fadeInUp;
+    }
+    
+    .animate__pulse {
+        animation-name: pulse;
+        animation-duration: 2s;
+    }
+    
+    .animate__infinite {
+        animation-iteration-count: infinite;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translate3d(0, -20px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 20px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+    
+    @keyframes pulse {
+        from {
+            transform: scale3d(1, 1, 1);
+        }
+        50% {
+            transform: scale3d(1.05, 1.05, 1.05);
+        }
+        to {
+            transform: scale3d(1, 1, 1);
+        }
+    }
 </style>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const video = document.getElementById('spa-video');
@@ -416,8 +584,8 @@
         
         // Both video sources
         const videoSources = [
-            "{{ asset('videos/trailer/380867662404993031.mp4') }}",
-            "{{ asset('videos/trailer/Standard_Mode_16x9_m_nh_c_n_b_n_t_o_cho_m_nh_1_vide.mp4') }}"
+            "{{ asset('videos/trailer/Standard_Mode_16x9_m_nh_c_n_b_n_t_o_cho_m_nh_1_vide.mp4') }}",
+            "{{ asset('videos/trailer/380867662404993031.mp4') }}"
         ];
         
         let currentVideoIndex = 0;
@@ -478,4 +646,4 @@
         });
     });
 </script>
-@endsection
+@endpush
