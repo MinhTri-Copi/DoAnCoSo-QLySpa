@@ -7,16 +7,50 @@
 <section class="hero-section py-5" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%);">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+            <div class="col-md-5 text-center text-md-start">
                 <h1 class="display-4 text-white fw-bold mb-4">Chào mừng đến với dịch vụ spa của chúng tôi</h1>
                 <p class="lead text-white mb-4">Đắm chìm trong không gian thư giãn và trải nghiệm dịch vụ chăm sóc cơ thể chuyên nghiệp</p>
-                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start">
                     <a href="{{ route('customer.dichvu.index') }}" class="btn btn-light btn-lg px-4">Khám phá dịch vụ</a>
                     <a href="{{ route('customer.datlich.create') }}" class="btn btn-outline-light btn-lg px-4">Đặt lịch ngay</a>
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
+            <div class="col-md-7 mt-4 mt-md-0">
+                @if(count($activeAds) > 0)
+                <!-- Debug: Total active ads {{ count($activeAds) }} -->
+                <div id="adCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                    <div class="carousel-inner rounded-3 shadow">
+                        @foreach($activeAds as $index => $ad)
+                        <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                            <!-- Debug: Ad ID {{ $ad->MaQC }} -->
+                            @if($ad->Image)
+                            <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}">
+                                <img src="{{ route('storage.image', ['path' => $ad->Image]) }}" class="d-block w-100" alt="{{ $ad->Tieude }}" style="height: 460px; object-fit: contain;">
+                                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded position-absolute bottom-0 w-100 start-0 p-3">
+                                    <h5 class="mb-0">{{ $ad->Tieude }}</h5>
+                                </div>
+                            </a>
+                            @else
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 460px;">
+                                <i class="fas fa-image fa-3x"></i>
+                                <p>No image for Ad ID: {{ $ad->MaQC }}</p>
+                            </div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#adCarousel" data-bs-slide="prev" style="width: 10%; opacity: 0.8;">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-25 p-3 rounded" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#adCarousel" data-bs-slide="next" style="width: 10%; opacity: 0.8;">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-25 p-3 rounded" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                @else
                 <img src="{{ asset('images/hero-spa.png') }}" alt="Spa experience" class="img-fluid rounded-3 shadow" onerror="this.src='https://placehold.co/600x400?text=Spa+Experience'">
+                @endif
             </div>
         </div>
     </div>
@@ -245,34 +279,36 @@
         <h2 class="section-title text-center mb-5">Khách hàng nói gì về chúng tôi</h2>
         <div class="row">
             @foreach($latestReviews as $review)
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+            <div class="col-md-6 mb-4">
+                <div class="card review-card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between mb-3">
                             <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user"></i>
-                                    </div>
+                                <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0">{{ $review->Manguoidung }}</h6>
+                                    <h6 class="mb-0">{{ $review->Hoten ?? 'Khách hàng' }}</h6>
                                     <p class="text-muted small mb-0">{{ \Carbon\Carbon::parse($review->Ngaydanhgia)->format('d/m/Y') }}</p>
                                 </div>
                             </div>
-                            <div>
-                                <div class="rating">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= ($review->diemdanhgia ?? 5))
-                                            <i class="fas fa-star text-warning"></i>
-                                        @else
-                                            <i class="far fa-star text-warning"></i>
-                                        @endif
-                                    @endfor
-                                </div>
+                            <div class="rating">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= ($review->Danhgiasao ?? 5))
+                                        <i class="fas fa-star text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-warning"></i>
+                                    @endif
+                                @endfor
                             </div>
                         </div>
-                        <p class="card-text">{{ \Illuminate\Support\Str::limit($review->Noidungdanhgia ?? 'Không có nội dung đánh giá', 120) }}</p>
+                        <p class="card-text mb-3">{{ \Illuminate\Support\Str::limit($review->Nhanxet ?? 'Không có nội dung đánh giá', 100) }}</p>
+                        <div class="mt-auto text-end">
+                            <span class="badge bg-light text-pink rounded-pill px-3 py-2">
+                                <i class="fas fa-spa me-1"></i>
+                                {{ $review->TenDichVu ?? 'Dịch vụ spa' }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -304,7 +340,7 @@
         position: absolute;
         width: 60px;
         height: 3px;
-        background: linear-gradient(to right, #FF9A9E, #FECFEF);
+        background: linear-gradient(to right, #FF9500, #FFC107);
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
@@ -317,6 +353,33 @@
     .card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Review cards */
+    .review-card {
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+    }
+    
+    .review-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .avatar-circle {
+        background-color: #FF9A9E !important;
+    }
+    
+    .rating {
+        font-size: 1rem;
+    }
+    
+    .badge {
+        font-weight: normal;
+    }
+    
+    .text-pink {
+        color: #FF9A9E !important;
     }
 </style>
 @endsection

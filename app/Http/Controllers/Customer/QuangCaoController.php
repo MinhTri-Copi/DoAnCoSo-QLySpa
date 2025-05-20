@@ -20,7 +20,7 @@ class QuangCaoController extends Controller
     public function index(Request $request)
     {
         // Only get active advertisements with a valid date range
-        $query = QuangCao::where('TrangthaiQC', 1) // Assuming 1 is active status
+        $query = QuangCao::where('MaTTQC', 1) // Assuming 1 is active status
             ->whereDate('Ngaybatdau', '<=', Carbon::now())
             ->whereDate('Ngayketthuc', '>=', Carbon::now());
             
@@ -73,7 +73,7 @@ class QuangCaoController extends Controller
     {
         // Get the advertisement with active status and valid date
         $advertisement = QuangCao::where('MaQC', $id)
-            ->where('TrangthaiQC', 1)
+            ->where('MaTTQC', 1)
             ->whereDate('Ngaybatdau', '<=', Carbon::now())
             ->whereDate('Ngayketthuc', '>=', Carbon::now())
             ->firstOrFail();
@@ -81,7 +81,7 @@ class QuangCaoController extends Controller
         // Get related ads (same type)
         $relatedAds = QuangCao::where('MaQC', '!=', $id)
             ->where('Loaiquangcao', $advertisement->Loaiquangcao)
-            ->where('TrangthaiQC', 1)
+            ->where('MaTTQC', 1)
             ->whereDate('Ngaybatdau', '<=', Carbon::now())
             ->whereDate('Ngayketthuc', '>=', Carbon::now())
             ->orderBy('Douutien', 'desc')
@@ -104,7 +104,7 @@ class QuangCaoController extends Controller
     {
         // Cache this query for 30 minutes to improve performance
         return Cache::remember('featured_ads_' . $limit, 30, function () use ($limit) {
-            return QuangCao::where('TrangthaiQC', 1)
+            return QuangCao::where('MaTTQC', 1)
                 ->where('Douutien', '>=', 3) // High priority ads (assuming priority scale 1-5)
                 ->whereDate('Ngaybatdau', '<=', Carbon::now())
                 ->whereDate('Ngayketthuc', '>=', Carbon::now())
@@ -125,7 +125,7 @@ class QuangCaoController extends Controller
     {
         // Cache this query for 30 minutes to improve performance
         return Cache::remember('promotion_ads_' . $limit, 30, function () use ($limit) {
-            return QuangCao::where('TrangthaiQC', 1)
+            return QuangCao::where('MaTTQC', 1)
                 ->where('Loaiquangcao', 'Promotion')
                 ->whereDate('Ngaybatdau', '<=', Carbon::now())
                 ->whereDate('Ngayketthuc', '>=', Carbon::now())
@@ -146,7 +146,7 @@ class QuangCaoController extends Controller
     {
         // Cache this query for 30 minutes to improve performance
         return Cache::remember('new_service_ads_' . $limit, 30, function () use ($limit) {
-            return QuangCao::where('TrangthaiQC', 1)
+            return QuangCao::where('MaTTQC', 1)
                 ->where('Loaiquangcao', 'New Service')
                 ->whereDate('Ngaybatdau', '<=', Carbon::now())
                 ->whereDate('Ngayketthuc', '>=', Carbon::now())
@@ -167,7 +167,7 @@ class QuangCaoController extends Controller
     {
         // Cache this query for 30 minutes to improve performance
         return Cache::remember('event_ads_' . $limit, 30, function () use ($limit) {
-            return QuangCao::where('TrangthaiQC', 1)
+            return QuangCao::where('MaTTQC', 1)
                 ->where('Loaiquangcao', 'Event')
                 ->whereDate('Ngaybatdau', '<=', Carbon::now())
                 ->whereDate('Ngayketthuc', '>=', Carbon::now())
