@@ -48,6 +48,21 @@ class DichVuController extends Controller
             $query->where('featured', true);
         }
         
+        // Lọc theo khuyến mãi
+        if ($request->has('has_promotion') && $request->has_promotion == '1') {
+            $query->whereHas('quangCao', function($q) {
+                $q->where('Loaiquangcao', 'Khuyến mãi')
+                  ->where('Ngayketthuc', '>=', now());
+            });
+        }
+        
+        // Lọc theo dịch vụ mới
+        if ($request->has('is_new') && $request->is_new == '1') {
+            // Lấy dịch vụ mới trong vòng 30 ngày
+            $thirtyDaysAgo = now()->subDays(30);
+            $query->where('created_at', '>=', $thirtyDaysAgo);
+        }
+        
         // Always order by featured first, then apply other sorting
         $query->orderBy('featured', 'desc');
         

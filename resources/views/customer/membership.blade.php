@@ -9,14 +9,14 @@
             'min' => 0,
             'color' => '#b0c4de',
             'icon' => 'fa-certificate',
-            'benefit' => 'Tặng 1 voucher sinh nhật, ưu đãi 5% dịch vụ.'
+            'benefit' => 'Tặng 1 voucher, ưu đãi 5% dịch vụ.'
         ],
         [
             'name' => 'Thành viên Vàng',
             'min' => 100,
             'color' => '#ffd700',
             'icon' => 'fa-crown',
-            'benefit' => 'Tặng 2 voucher sinh nhật, ưu đãi 10% dịch vụ.'
+            'benefit' => 'Tặng 2 voucher, ưu đãi 10% dịch vụ.'
         ],
         [
             'name' => 'Thành viên Bạch Kim',
@@ -60,12 +60,12 @@
                         <i class="fas {{ $currentRank['icon'] }}" style="font-size: 2.5rem; color: {{ $currentRank['color'] }};"></i>
                     </div>
                     <h4 class="fw-bold mb-1" style="color: {{ $currentRank['color'] }};">Bạn đang là: {{ $currentRank['name'] }}</h4>
-                    <div class="mb-2" style="font-size: 1.1rem; color: var(--primary-color);">Tổng điểm tích lũy: <span style="color: var(--accent-color); font-weight: 700;">{{ number_format($total) }}</span></div>
+                    <div class="mb-2" style="font-size: 1.1rem; color: #333;">Tổng điểm tích lũy: <span style="color: #FF6B6B; font-weight: 700;">{{ number_format($total) }}</span></div>
                     @if($total > 0)
                         @if($nextRank)
-                            <div class="mb-2" style="color: #888;">Còn <span style="color: var(--accent-color); font-weight: 600;">{{ number_format($nextRank['min'] - $total) }}</span> điểm để lên hạng <span style="color: {{ $nextRank['color'] }}; font-weight: 600;">{{ $nextRank['name'] }}</span></div>
+                            <div class="mb-2" style="color: #555;">Còn <span style="color: #FF6B6B; font-weight: 600;">{{ number_format($nextRank['min'] - $total) }}</span> điểm để lên hạng <span style="color: {{ $nextRank['color'] }}; font-weight: 600;">{{ $nextRank['name'] }}</span></div>
                         @else
-                            <div class="mb-2" style="color: var(--accent-color); font-weight: 600;">Bạn đã đạt hạng cao nhất!</div>
+                            <div class="mb-2" style="color: #FF6B6B; font-weight: 600;">Bạn đã đạt hạng cao nhất!</div>
                         @endif
                         <div class="progress mx-auto" style="height: 18px; background: #ffe3ea; max-width: 400px;">
                             <div class="progress-bar" role="progressbar" style="width: {{ $progress }}%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color)); font-weight: 600;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100"></div>
@@ -83,7 +83,7 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <h5 class="fw-bold mb-3" style="color: var(--primary-color);">Các hạng thành viên & quyền lợi</h5>
+            <h5 class="fw-bold mb-3" style="color: #FF6B6B;">Các hạng thành viên & quyền lợi</h5>
             <div class="row g-4">
                 @foreach($ranks as $rank)
                 <div class="col-md-3">
@@ -91,8 +91,8 @@
                         <div class="card-body py-4">
                             <i class="fas {{ $rank['icon'] }} mb-2" style="font-size: 2.2rem; color: {{ $rank['color'] }};"></i>
                             <h6 class="fw-bold mb-1" style="color: {{ $rank['color'] }};">{{ $rank['name'] }}</h6>
-                            <div class="mb-2" style="font-size: 0.98rem; color: #888;">Từ {{ number_format($rank['min']) }} đ</div>
-                            <div class="mb-2" style="font-size: 0.97rem; color: var(--accent-color); min-height: 40px;">{{ $rank['benefit'] }}</div>
+                            <div class="mb-2" style="font-size: 0.98rem; color: #555;">Từ {{ number_format($rank['min']) }} đ</div>
+                            <div class="mb-2" style="font-size: 0.97rem; color: #333; min-height: 40px;">{{ $rank['benefit'] }}</div>
                             @if($currentRank['name'] === $rank['name'])
                                 <span class="badge rounded-pill" style="background: var(--primary-color); color: #fff; font-size: 0.95rem;">Hạng hiện tại</span>
                             @endif

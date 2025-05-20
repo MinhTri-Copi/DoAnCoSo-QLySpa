@@ -38,6 +38,14 @@ class DichVu extends Model
     }
     
     /**
+     * Lấy các quảng cáo liên quan đến dịch vụ
+     */
+    public function quangCao()
+    {
+        return $this->hasMany(QuangCao::class, 'MaDV', 'MaDV');
+    }
+    
+    /**
      * Lấy đánh giá cho dịch vụ thông qua chuỗi quan hệ:
      * DichVu → DatLich → HoaDonVaThanhToan → DanhGia
      */
