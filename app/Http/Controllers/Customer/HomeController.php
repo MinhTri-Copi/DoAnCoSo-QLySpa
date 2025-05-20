@@ -7,6 +7,7 @@ use App\Models\DichVu;
 use App\Models\DatLich;
 use App\Models\DanhGia;
 use App\Models\HangThanhVien;
+use App\Models\QuangCao;
 use App\Http\Controllers\Customer\QuangCaoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,9 +54,15 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
             
-        // Get latest reviews - without relationships to avoid errors
-        $latestReviews = DanhGia::orderBy('Ngaydanhgia', 'desc')
-            ->limit(3)
+        // Get latest reviews with highest ratings - limited to 4
+        $latestReviews = DanhGia::join('USER', 'DANHGIA.Manguoidung', '=', 'USER.Manguoidung')
+            ->leftJoin('HOADON_VA_THANHTOAN', 'DANHGIA.MaHD', '=', 'HOADON_VA_THANHTOAN.MaHD')
+            ->leftJoin('DATLICH', 'HOADON_VA_THANHTOAN.MaDL', '=', 'DATLICH.MaDL')
+            ->leftJoin('DICHVU', 'DATLICH.MaDV', '=', 'DICHVU.MaDV')
+            ->select('DANHGIA.*', 'USER.Hoten', 'DICHVU.Tendichvu as TenDichVu')
+            ->orderBy('DANHGIA.Danhgiasao', 'desc')
+            ->orderBy('DANHGIA.Ngaydanhgia', 'desc')
+            ->limit(4)
             ->get();
             
         // Calculate user points needed for next rank
@@ -70,6 +77,16 @@ class HomeController extends Controller
             if ($nextRank) {
                 $pointsNeeded = $nextRank->Diemtoithieu - $user->Diemtichluy;
             }
+        }
+        
+        // Get active advertisements for slideshow (status code = 1)
+        $activeAds = QuangCao::where('MaTTQC', 1)
+            ->get();
+            
+        // Log debug info for active ads
+        \Log::info('Active ads for slideshow: ' . $activeAds->count());
+        foreach($activeAds as $ad) {
+            \Log::info('Ad ID: ' . $ad->MaQC . ', Title: ' . $ad->Tieude . ', Image: ' . ($ad->Image ?? 'NULL'));
         }
         
         // Get advertisement data from QuangCaoController
@@ -96,7 +113,8 @@ class HomeController extends Controller
             'pointsNeeded',
             'featuredAds',
             'promotionAds',
-            'eventAds'
+            'eventAds',
+            'activeAds'
         ));
     }
     

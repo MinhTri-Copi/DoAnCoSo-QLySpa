@@ -221,7 +221,6 @@
                                 <span class="ms-1">({{ isset($service->rating_count) ? $service->rating_count : 0 }})</span>
                             </small>
                         </div>
-                        
                         <p class="card-text text-muted">{{ \Illuminate\Support\Str::limit($service->MoTa, 100) }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
@@ -307,73 +306,6 @@
     }
     .card .badge {
         font-size: 0.75rem;
-    }
-    
-    /* Featured service card styling */
-    .card:has(.badge.bg-danger) {
-        border: 2px solid #FF9A9E;
-        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.2) !important;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .badge.bg-danger {
-        background: linear-gradient(135deg, #FF9A9E 0%, #F53844 99%) !important;
-        box-shadow: 0 2px 5px rgba(255, 154, 158, 0.4);
-        letter-spacing: 0.5px;
-    }
-    
-    .z-index-1 {
-        z-index: 1;
-    }
-    
-    /* Custom pagination styling */
-    .pagination {
-        margin-bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .page-item:not(.active) .page-link {
-        color: #666;
-        background-color: #fff;
-        border-color: #dee2e6;
-    }
-    
-    .page-item.active .page-link {
-        background-color: #FF9A9E;
-        border-color: #FF9A9E;
-    }
-    
-    .page-item.disabled .page-link {
-        color: #ccc;
-    }
-    
-    .page-link {
-        width: 40px;
-        height: 40px;
-        line-height: 25px;
-        text-align: center;
-        font-weight: 500;
-        border-radius: 4px;
-        margin: 0 3px;
-        transition: all 0.2s;
-    }
-    
-    .page-link:hover {
-        background-color: #fff5f7;
-        color: #FF6B6B;
-        border-color: #ffd8db;
-    }
-    
-    .page-item:first-child .page-link,
-    .page-item:last-child .page-link {
-        width: 40px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 </style>
 @endsection 
