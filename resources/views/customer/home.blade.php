@@ -3,54 +3,25 @@
 @section('title', 'Trang chủ - Spa & Làm đẹp')
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero-section py-5" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%);">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-5 text-center text-md-start">
+<!-- Hero Section with Video Background -->
+<section class="hero-section position-relative">
+    <div class="video-background">
+        <div id="video-container">
+            <video id="spa-video" muted playsinline autoplay>
+                <source src="{{ asset('videos/trailer/380867662404993031.mp4') }}" type="video/mp4" id="video-source">
+            </video>
+        </div>
+        <div class="video-overlay"></div>
+    </div>
+    <div class="container position-relative z-index-2">
+        <div class="row min-vh-75 align-items-center py-5">
+            <div class="col-md-7 text-center text-md-start">
                 <h1 class="display-4 text-white fw-bold mb-4">Chào mừng đến với dịch vụ spa của chúng tôi</h1>
                 <p class="lead text-white mb-4">Đắm chìm trong không gian thư giãn và trải nghiệm dịch vụ chăm sóc cơ thể chuyên nghiệp</p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start">
                     <a href="{{ route('customer.dichvu.index') }}" class="btn btn-light btn-lg px-4">Khám phá dịch vụ</a>
                     <a href="{{ route('customer.datlich.create') }}" class="btn btn-outline-light btn-lg px-4">Đặt lịch ngay</a>
                 </div>
-            </div>
-            <div class="col-md-7 mt-4 mt-md-0">
-                @if(count($activeAds) > 0)
-                <!-- Debug: Total active ads {{ count($activeAds) }} -->
-                <div id="adCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-                    <div class="carousel-inner rounded-3 shadow">
-                        @foreach($activeAds as $index => $ad)
-                        <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                            <!-- Debug: Ad ID {{ $ad->MaQC }} -->
-                            @if($ad->Image)
-                            <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}">
-                                <img src="{{ route('storage.image', ['path' => $ad->Image]) }}" class="d-block w-100" alt="{{ $ad->Tieude }}" style="height: 460px; object-fit: contain;">
-                                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded position-absolute bottom-0 w-100 start-0 p-3">
-                                    <h5 class="mb-0">{{ $ad->Tieude }}</h5>
-                                </div>
-                            </a>
-                            @else
-                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 460px;">
-                                <i class="fas fa-image fa-3x"></i>
-                                <p>No image for Ad ID: {{ $ad->MaQC }}</p>
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#adCarousel" data-bs-slide="prev" style="width: 10%; opacity: 0.8;">
-                        <span class="carousel-control-prev-icon bg-dark bg-opacity-25 p-3 rounded" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#adCarousel" data-bs-slide="next" style="width: 10%; opacity: 0.8;">
-                        <span class="carousel-control-next-icon bg-dark bg-opacity-25 p-3 rounded" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-                @else
-                <img src="{{ asset('images/hero-spa.png') }}" alt="Spa experience" class="img-fluid rounded-3 shadow" onerror="this.src='https://placehold.co/600x400?text=Spa+Experience'">
-                @endif
             </div>
         </div>
     </div>
@@ -322,10 +293,63 @@
 
 @section('styles')
 <style>
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    /* Full screen hero section styles */
     .hero-section {
         position: relative;
         overflow: hidden;
-        padding: 80px 0;
+        min-height: 75vh;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .video-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+    }
+    
+    #video-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    #spa-video {
+        position: absolute;
+        min-width: 100%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        left: 0;
+        top: 0;
+    }
+    
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+    
+    .z-index-2 {
+        z-index: 2;
+        position: relative;
     }
     
     .section-title {
@@ -382,4 +406,76 @@
         color: #FF9A9E !important;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const video = document.getElementById('spa-video');
+        const videoSource = document.getElementById('video-source');
+        
+        // Both video sources
+        const videoSources = [
+            "{{ asset('videos/trailer/380867662404993031.mp4') }}",
+            "{{ asset('videos/trailer/Standard_Mode_16x9_m_nh_c_n_b_n_t_o_cho_m_nh_1_vide.mp4') }}"
+        ];
+        
+        let currentVideoIndex = 0;
+        
+        // Function to switch to the next video
+        function playNextVideo() {
+            // Log current state
+            console.log('Current video index before switch:', currentVideoIndex);
+            console.log('Current video source:', video.currentSrc);
+            
+            // Switch to next video
+            currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+            console.log('Switching to video index:', currentVideoIndex);
+            
+            // Update source and play
+            video.src = videoSources[currentVideoIndex];
+            video.load();
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('Video started playing successfully:', videoSources[currentVideoIndex]);
+                }).catch(error => {
+                    console.error('Error playing video:', error);
+                });
+            }
+        }
+        
+        // Add ended event listener to video element
+        video.addEventListener('ended', function() {
+            console.log('Video ended event triggered');
+            playNextVideo();
+        });
+        
+        // Remove loop attribute to ensure ended event fires
+        video.removeAttribute('loop');
+        
+        // Force logging of current video source for debugging
+        setInterval(() => {
+            if (video.currentTime > 0) {
+                console.log('Current playback time:', video.currentTime, 'of', video.duration);
+                console.log('Current video source is:', video.currentSrc);
+                
+                // If video is not playing, try to restart it
+                if (video.paused && !video.ended) {
+                    console.log('Video paused unexpectedly, trying to resume');
+                    video.play();
+                }
+            }
+        }, 5000);
+        
+        // Set up a backup timer to switch videos if ended event doesn't fire
+        video.addEventListener('timeupdate', function() {
+            // If we're near the end of the video (last 0.5 seconds)
+            if (video.duration > 0 && video.currentTime >= (video.duration - 0.5) && !video.paused) {
+                console.log('Near end of video, preparing to switch');
+            }
+        });
+    });
+</script>
 @endsection
