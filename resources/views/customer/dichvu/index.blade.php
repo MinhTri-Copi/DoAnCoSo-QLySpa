@@ -4,7 +4,12 @@
 
 @section('content')
 <div class="container py-5">
-    <h1 class="mb-4">Dịch vụ của chúng tôi</h1>
+    <!-- Welcome Banner Header Component - Giống với trang admin -->
+    <div class="welcome-banner animate__animated animate__fadeIn">
+        <h1><i class="fas fa-hand-sparkles"></i> Dịch vụ của chúng tôi</h1>
+        <p>Khám phá các dịch vụ cao cấp và chuyên nghiệp của Rosa Spa</p>
+        <div class="shine-line"></div>
+    </div>
 
     <!-- Filter and Search Section -->
     <div class="card shadow-sm mb-4">
