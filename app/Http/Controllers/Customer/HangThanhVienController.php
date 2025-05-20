@@ -19,55 +19,8 @@ class HangThanhVienController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        
-        // Get the user's current membership rank
-        $currentRank = null;
-        $nextRank = null;
-        $pointsNeeded = 0;
-        
-        if (isset($user->Diemtichluy)) {
-            $currentRank = HangThanhVien::where('Diemtoithieu', '<=', $user->Diemtichluy)
-                ->orderBy('Diemtoithieu', 'desc')
-                ->first();
-            
-            // Get the next rank
-            if ($currentRank) {
-                $nextRank = HangThanhVien::where('Diemtoithieu', '>', $currentRank->Diemtoithieu)
-                    ->orderBy('Diemtoithieu', 'asc')
-                    ->first();
-                
-                // Calculate points needed for next rank
-                if ($nextRank) {
-                    $pointsNeeded = $nextRank->Diemtoithieu - $user->Diemtichluy;
-                }
-            }
-        }
-        
-        // Get all available ranks for display
-        $allRanks = HangThanhVien::orderBy('Diemtoithieu', 'asc')->get();
-        
-        // Get recent point history
-        $pointHistory = PointHistory::where('Manguoidung', $user->id)
-            ->with(['hoaDon'])
-            ->orderBy('Thoigian', 'desc')
-            ->paginate(5);
-        
-        // Calculate points expiring soon
-        $expiringPoints = PointHistory::where('Manguoidung', $user->id)
-            ->where('Thoigianhethan', '>', Carbon::now())
-            ->where('Thoigianhethan', '<', Carbon::now()->addDays(30))
-            ->sum('Soluongdiem');
-        
-        return view('customer.thanhvien.index', compact(
-            'user',
-            'currentRank',
-            'nextRank',
-            'pointsNeeded',
-            'allRanks',
-            'pointHistory',
-            'expiringPoints'
-        ));
+        // Không lấy dữ liệu từ DB, chỉ render view giao diện mẫu
+        return view('customer.membership');
     }
     
     /**
