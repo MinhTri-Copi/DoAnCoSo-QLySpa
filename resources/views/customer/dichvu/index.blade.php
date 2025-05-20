@@ -4,7 +4,12 @@
 
 @section('content')
 <div class="container py-5">
-    <h1 class="mb-4">Dịch vụ của chúng tôi</h1>
+    <!-- Welcome Banner Header Component - Giống với trang admin -->
+    <div class="welcome-banner animate__animated animate__fadeIn">
+        <h1><i class="fas fa-hand-sparkles"></i> Dịch vụ của chúng tôi</h1>
+        <p>Khám phá các dịch vụ cao cấp và chuyên nghiệp của Rosa Spa</p>
+        <div class="shine-line"></div>
+    </div>
 
     <!-- Filter and Search Section -->
     <div class="card shadow-sm mb-4">
@@ -33,7 +38,48 @@
                         <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                         <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                        <option value="rating_desc" {{ request('sort') == 'rating_desc' ? 'selected' : '' }}>Đánh giá cao nhất</option>
+                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Phổ biến nhất</option>
                     </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Lọc theo đánh giá</label>
+                    <!-- Bộ lọc chi tiết theo từng mức sao -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body p-3">
+                            <h6 class="mb-3">Lọc chính xác theo số sao</h6>
+                            
+                            <div class="form-check d-flex align-items-center mb-2">
+                                <input class="form-check-input" type="radio" name="star_rating" 
+                                    id="star_rating_any" value="" 
+                                    {{ !request('star_rating') ? 'checked' : '' }}>
+                                <label class="form-check-label ms-2" for="star_rating_any">
+                                    Tất cả đánh giá
+                                </label>
+                            </div>
+                            
+                            @for($i = 5; $i >= 1; $i--)
+                                <div class="form-check d-flex align-items-center mb-2">
+                                    <input class="form-check-input" type="radio" name="star_rating" 
+                                        id="star_rating_{{ $i }}" value="{{ $i }}" 
+                                        {{ request('star_rating') == $i ? 'checked' : '' }}>
+                                    <label class="form-check-label ms-2 d-flex align-items-center" for="star_rating_{{ $i }}">
+                                        @for($j = 1; $j <= 5; $j++)
+                                            @if($j <= $i)
+                                                <i class="fas fa-star text-warning"></i>
+                                            @else
+                                                <i class="far fa-star text-warning"></i>
+                                            @endif
+                                        @endfor
+                                        <span class="ms-2 text-muted small">
+                                            ({{ $starRatingCounts[$i] }} đánh giá)
+                                        </span>
+                                    </label>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">
@@ -69,6 +115,27 @@
                                 <span class="badge bg-info">Nổi bật</span>
                             @endif
                         </div>
+                        
+                        <!-- Hiển thị đánh giá sao -->
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">
+                                @php $avgRating = isset($service->average_rating) ? $service->average_rating : 0; @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $avgRating)
+                                        <i class="fas fa-star text-warning"></i>
+                                    @elseif($i - 0.5 <= $avgRating)
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-warning"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <small class="text-muted">
+                                {{ $avgRating }} 
+                                <span class="ms-1">({{ isset($service->rating_count) ? $service->rating_count : 0 }})</span>
+                            </small>
+                        </div>
+                        
                         <p class="card-text text-muted">{{ \Illuminate\Support\Str::limit($service->MoTa, 100) }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
@@ -96,7 +163,9 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-5">
-        {{ $services->withQueryString()->links() }}
+        <nav aria-label="Page navigation">
+            {{ $services->withQueryString()->links('pagination::bootstrap-4') }}
+        </nav>
     </div>
 
     <!-- Info Section -->
@@ -152,6 +221,115 @@
     }
     .card .badge {
         font-size: 0.75rem;
+    }
+    
+    /* Custom pagination styling */
+    .pagination {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .page-item:not(.active) .page-link {
+        color: #666;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .page-item.active .page-link {
+        background-color: #FF9A9E;
+        border-color: #FF9A9E;
+    }
+    
+    .page-item.disabled .page-link {
+        color: #ccc;
+    }
+    
+    .page-link {
+        width: 40px;
+        height: 40px;
+        line-height: 25px;
+        text-align: center;
+        font-weight: 500;
+        border-radius: 4px;
+        margin: 0 3px;
+        transition: all 0.2s;
+    }
+    
+    .page-link:hover {
+        background-color: #fff5f7;
+        color: #FF6B6B;
+        border-color: #ffd8db;
+    }
+    
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        width: 40px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Override footer styling to match pink theme */
+    footer {
+        background: linear-gradient(to right, #FF9A9E, #FECFEF);
+        margin-top: 3rem;
+        padding: 3rem 0;
+        color: white;
+        box-shadow: 0 -5px 15px rgba(255, 154, 158, 0.15);
+    }
+    
+    footer .footer-title {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    footer .footer-title:after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 3px;
+        background-color: white;
+        margin-top: 8px;
+    }
+    
+    footer .footer-link {
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s;
+    }
+    
+    footer .footer-link:hover {
+        color: white;
+        text-decoration: none;
+        padding-left: 5px;
+    }
+    
+    footer .social-links a {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.2);
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        transition: all 0.3s;
+    }
+    
+    footer .social-links a:hover {
+        background-color: white;
+        color: #FF9A9E;
+        transform: translateY(-3px);
+    }
+    
+    footer hr {
+        background-color: rgba(255, 255, 255, 0.2);
+        margin: 2rem 0;
     }
 </style>
 @endsection 

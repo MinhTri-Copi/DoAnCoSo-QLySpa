@@ -12,6 +12,9 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <!-- Animate.css cho hiệu ứng header -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
         :root {
             --primary-color: #FF9A9E;
@@ -289,6 +292,186 @@
 
         .social-links a:hover {
             color: var(--primary-color);
+        }
+
+        /* Welcome banner style giống trang admin */
+        .welcome-banner {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #f58cba, #db7093);
+            animation: softPulse 4s infinite alternate, floatAnimation 6s ease-in-out infinite;
+            transition: all 0.5s ease;
+            box-shadow: 0 5px 15px rgba(219, 112, 147, 0.3);
+            transform-origin: center center;
+            width: 100%;
+            padding: 30px 35px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .welcome-banner:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, 
+                #ff7eb3, #ff758c, #ff7eb3, #ff8e8c, 
+                #fdae9e, #ff7eb3, #ff758c, #ff7eb3);
+            background-size: 400%;
+            border-radius: 14px;
+            animation: borderGlow 12s linear infinite;
+            filter: blur(10px);
+            opacity: 0.7;
+        }
+
+        .welcome-banner:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.1) 25%, 
+                rgba(255,255,255,0.2) 50%, 
+                rgba(255,255,255,0.1) 75%, 
+                rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 6s infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .welcome-banner h1, .welcome-banner p {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-banner h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .welcome-banner p {
+            font-size: 1.05rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+            max-width: 80%;
+        }
+
+        .shine-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.95);
+            z-index: 2;
+            animation: corner-to-corner 12s infinite cubic-bezier(0.25, 0.1, 0.25, 1);
+            opacity: 0;
+        }
+        
+        @keyframes softPulse {
+            0% {
+                box-shadow: 0 5px 15px rgba(219, 112, 147, 0.3);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(219, 112, 147, 0.5);
+            }
+        }
+
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes borderGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes corner-to-corner {
+            0% {
+                opacity: 0;
+                top: 2px;
+                left: 2px;
+                box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.7);
+            }
+            5% {
+                opacity: 1;
+                top: 2px;
+                left: 2px;
+                box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.8);
+            }
+            
+            30% {
+                top: 40%;
+                left: 2px;
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.9);
+                opacity: 1;
+            }
+            
+            60% {
+                top: calc(100% - 2px);
+                left: 60%;
+                box-shadow: 0 0 25px 6px rgba(255, 255, 255, 1);
+                opacity: 1;
+            }
+            
+            80% {
+                top: calc(100% - 2px);
+                left: calc(100% - 2px);
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.9);
+                opacity: 1;
+            }
+            
+            85% {
+                opacity: 0.7;
+            }
+            
+            90% {
+                opacity: 0;
+            }
+            
+            100% {
+                opacity: 0;
+                top: calc(100% - 2px);
+                left: calc(100% - 2px);
+            }
         }
 
         @yield('styles')

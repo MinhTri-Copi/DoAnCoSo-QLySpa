@@ -190,7 +190,7 @@ class DatabaseSeeder extends Seeder
              'Loaiquangcao' => 'Khuyến mãi',
              'Ngaybatdau' => '2025-06-1',
              'Ngayketthuc' => '2025-06-25',
-            'MaTTQC' => 4,
+            'MaTTQC' => 3,
             'Manguoidung' => 1],
 
             ['MaQC' => 3,
@@ -220,7 +220,7 @@ class DatabaseSeeder extends Seeder
              'Loaiquangcao' => 'Khuyến mãi',
              'Ngaybatdau' => '2025-06-01',
              'Ngayketthuc' => '2025-06-10',
-            'MaTTQC' => 4,
+            'MaTTQC' => 3,
             'Manguoidung' => 1],
 
             ['MaQC' => 5,
@@ -236,7 +236,7 @@ class DatabaseSeeder extends Seeder
              'Loaiquangcao' => 'Khuyến mãi',
              'Ngaybatdau' => '2025-07-12',
              'Ngayketthuc' => '2025-08-10',
-            'MaTTQC' => 4,
+            'MaTTQC' => 3,
             'Manguoidung' => 1],
 
             
@@ -253,7 +253,7 @@ class DatabaseSeeder extends Seeder
              'Loaiquangcao' => 'Khuyến mãi',
              'Ngaybatdau' => '2025-08-12',
              'Ngayketthuc' => '2025-09-10',
-            'MaTTQC' => 4,
+            'MaTTQC' => 3,
             'Manguoidung' => 1],
 
 
@@ -271,7 +271,7 @@ class DatabaseSeeder extends Seeder
              'Loaiquangcao' => 'Thông báo',
              'Ngaybatdau' => '2025-06-01',
              'Ngayketthuc' => '2025-06-10',
-            'MaTTQC' => 4,
+            'MaTTQC' => 3,
             'Manguoidung' => 1],
         ]);
     }
