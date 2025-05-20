@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\PhieuHoTro;
-use App\Models\PhuongThucHoTro;
+use App\Models\PTHoTro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -33,7 +33,7 @@ class PhieuHoTroController extends Controller
      */
     public function create()
     {
-        $phuongThucHoTro = PhuongThucHoTro::all();
+        $phuongThucHoTro = PTHoTro::all();
         return view('customer.phieuhotro.create', compact('phuongThucHoTro'));
     }
 
@@ -107,7 +107,7 @@ class PhieuHoTroController extends Controller
                 ->with('error', 'Bạn không thể chỉnh sửa phiếu hỗ trợ này vì nó đang được xử lý hoặc đã hoàn thành.');
         }
 
-        $phuongThucHoTro = PhuongThucHoTro::all();
+        $phuongThucHoTro = PTHoTro::all();
         return view('customer.phieuhotro.edit', compact('phieuHoTro', 'phuongThucHoTro'));
     }
 

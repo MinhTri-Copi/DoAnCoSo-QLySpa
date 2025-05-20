@@ -38,7 +38,7 @@
                             <select class="form-select @error('MaPTHT') is-invalid @enderror" id="MaPTHT" name="MaPTHT" required>
                                 <option value="">-- Chọn phương thức hỗ trợ --</option>
                                 @foreach($phuongThucHoTro as $pt)
-                                    <option value="{{ $pt->MaPTHT }}" {{ old('MaPTHT') == $pt->MaPTHT ? 'selected' : '' }}>{{ $pt->Ten }}</option>
+                                    <option value="{{ $pt->MaPTHT }}" {{ old('MaPTHT') == $pt->MaPTHT ? 'selected' : '' }}>{{ $pt->TenPT }}</option>
                                 @endforeach
                             </select>
                             @error('MaPTHT')
