@@ -48,6 +48,9 @@ class DichVuController extends Controller
             $query->where('featured', true);
         }
         
+        // Always order by featured first, then apply other sorting
+        $query->orderBy('featured', 'desc');
+        
         // Apply sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
