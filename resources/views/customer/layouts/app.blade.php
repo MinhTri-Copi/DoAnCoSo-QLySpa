@@ -263,32 +263,24 @@
 
         /* Footer styling */
         footer {
-            background: linear-gradient(to right, #FF9A9E, #FECFEF);
-            margin-top: 3rem;
+            background-color: #f986a6;
             padding: 3rem 0;
+            margin-top: 3rem;
             color: white;
-            box-shadow: 0 -5px 15px rgba(255, 154, 158, 0.15);
         }
-        
-        footer .footer-title {
+
+        .footer-title {
+
             color: white;
             font-weight: 700;
             margin-bottom: 1.5rem;
             position: relative;
         }
-        
-        footer .footer-title:after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 3px;
-            background-color: white;
-            margin-top: 8px;
-        }
-        
-        footer .footer-link {
+
+
+        .footer-link {
             color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s;
+
             text-decoration: none;
             display: inline-block;
         }
@@ -325,6 +317,34 @@
             border-color: white;
         }
 
+
+        .footer-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .social-links a {
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+        }
+
+        .social-links a:hover {
+            color: white;
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+        
+        footer hr {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        footer .text-center p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
         /* Welcome banner style giống trang admin */
         .welcome-banner {
             position: relative;
@@ -358,6 +378,7 @@
             filter: blur(10px);
             opacity: 0.7;
         }
+
 
         .welcome-banner:after {
             content: '';

@@ -13,7 +13,13 @@
 
     <!-- Filter and Search Section -->
     <div class="card shadow-sm mb-4">
-        <div class="card-body">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="fas fa-search text-primary me-2"></i>Tìm kiếm dịch vụ</h5>
+            <button type="button" class="btn-filter-toggle" id="toggleSearchForm">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        <div class="card-body" id="searchFormContainer">
             <form action="{{ route('customer.dichvu.index') }}" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <label for="search" class="form-label">Tìm kiếm</label>
@@ -296,7 +302,6 @@
                                 <span class="ms-1">({{ isset($service->rating_count) ? $service->rating_count : 0 }})</span>
                             </small>
                         </div>
-                        
                         <p class="card-text text-muted">{{ \Illuminate\Support\Str::limit($service->MoTa, 100) }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
@@ -454,71 +459,86 @@
         font-size: 0.75rem;
     }
     
-    /* Featured service card styling */
-    .card:has(.badge.bg-danger) {
-        border: 2px solid #FF9A9E;
-        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.2) !important;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .badge.bg-danger {
-        background: linear-gradient(135deg, #FF9A9E 0%, #F53844 99%) !important;
-        box-shadow: 0 2px 5px rgba(255, 154, 158, 0.4);
-        letter-spacing: 0.5px;
-    }
-    
-    .z-index-1 {
-        z-index: 1;
-    }
-    
-    /* Custom pagination styling */
-    .pagination {
-        margin-bottom: 0;
+    /* Style cho nút toggle bộ lọc */
+    .btn-filter-toggle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #FF9A9E;
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
     
-    .page-item:not(.active) .page-link {
-        color: #666;
-        background-color: #fff;
-        border-color: #dee2e6;
-    }
-    
-    .page-item.active .page-link {
+    .btn-filter-toggle:hover {
         background-color: #FF9A9E;
-        border-color: #FF9A9E;
+        color: white;
+        box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
     }
     
-    .page-item.disabled .page-link {
-        color: #ccc;
+    .btn-filter-toggle.active {
+        background-color: #FF9A9E;
+        color: white;
+        transform: rotate(180deg);
     }
     
-    .page-link {
-        width: 40px;
-        height: 40px;
-        line-height: 25px;
-        text-align: center;
-        font-weight: 500;
-        border-radius: 4px;
-        margin: 0 3px;
-        transition: all 0.2s;
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     
-    .page-link:hover {
-        background-color: #fff5f7;
-        color: #FF6B6B;
-        border-color: #ffd8db;
+    /* Hiệu ứng cho phần searchFormContainer */
+    #searchFormContainer {
+        transition: all 0.3s ease;
+        overflow: hidden;
     }
     
-    .page-item:first-child .page-link,
-    .page-item:last-child .page-link {
-        width: 40px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .collapsed {
+        max-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+        border: none !important;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle search form visibility
+    const toggleBtn = document.getElementById('toggleSearchForm');
+    const searchFormContainer = document.getElementById('searchFormContainer');
+    
+    // Check if there's a stored preference
+    const isCollapsed = localStorage.getItem('searchFormCollapsed') === 'true';
+    
+    // Set initial state based on stored preference
+    if (isCollapsed) {
+        searchFormContainer.classList.add('collapsed');
+        toggleBtn.classList.add('active');
+    }
+    
+    // Add click event to toggle button
+    toggleBtn.addEventListener('click', function() {
+        searchFormContainer.classList.toggle('collapsed');
+        toggleBtn.classList.toggle('active');
+        
+        // Store the preference
+        localStorage.setItem('searchFormCollapsed', searchFormContainer.classList.contains('collapsed'));
+    });
+    
+    // If any filter is active, expand the form automatically
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search') || urlParams.has('min_price') || urlParams.has('max_price') || 
+        urlParams.has('sort') || urlParams.has('star_rating') || urlParams.has('featured') || 
+        urlParams.has('has_promotion') || urlParams.has('is_new')) {
+        
+        searchFormContainer.classList.remove('collapsed');
+        toggleBtn.classList.remove('active');
+        localStorage.setItem('searchFormCollapsed', 'false');
+    }
+});
+</script>
 @endsection 
