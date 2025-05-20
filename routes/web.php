@@ -89,7 +89,9 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     
     // Membership
     Route::get('/hang-thanh-vien', [App\Http\Controllers\Customer\HangThanhVienController::class, 'index'])->name('thanhvien.index');
-    Route::get('/hang-thanh-vien/lich-su-diem', [App\Http\Controllers\Customer\HangThanhVienController::class, 'pointHistory'])->name('thanhvien.pointHistory');
+    Route::get('/hang-thanh-vien/lich-su-diem', function () {
+        return view('customer.diemthuong');
+    })->name('thanhvien.pointHistory');
     Route::get('/hang-thanh-vien/cac-hang', [App\Http\Controllers\Customer\HangThanhVienController::class, 'allRanks'])->name('thanhvien.allRanks');
     
     // Invoices
@@ -288,4 +290,8 @@ Route::get('/debug-images', function() {
     
     return view('debug.images', ['images' => $images]);
 });
+
+Route::get('/customer/diem-thuong', function () {
+    return view('customer.diemthuong');
+})->name('customer.diemthuong.index');
 
