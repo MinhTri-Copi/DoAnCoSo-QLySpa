@@ -73,19 +73,19 @@ class DanhGiaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'MaHD' => 'required|exists:HOADON_VA_THANHTOAN,MaHD',
+            'invoice_id' => 'required|exists:HOADON_VA_THANHTOAN,MaHD',
             'Diemdanhgia' => 'required|integer|min:1|max:5',
             'Noidungdanhgia' => 'required|string|max:500',
-            'review_photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ], [
             'Diemdanhgia.required' => 'Vui lòng chọn số sao đánh giá.',
             'Diemdanhgia.min' => 'Vui lòng chọn ít nhất 1 sao.',
             'Diemdanhgia.max' => 'Đánh giá tối đa 5 sao.',
             'Noidungdanhgia.required' => 'Vui lòng nhập nội dung đánh giá.',
             'Noidungdanhgia.max' => 'Nội dung đánh giá không quá 500 ký tự.',
-            'review_photos.*.image' => 'File phải là hình ảnh.',
-            'review_photos.*.mimes' => 'Định dạng hình ảnh phải là: jpeg, png, jpg, gif.',
-            'review_photos.*.max' => 'Kích thước hình ảnh không quá 2MB.'
+            'photos.*.image' => 'File phải là hình ảnh.',
+            'photos.*.mimes' => 'Định dạng hình ảnh phải là: jpeg, png, jpg, gif.',
+            'photos.*.max' => 'Kích thước hình ảnh không quá 2MB.'
         ]);
         
         $user = Auth::user();
@@ -93,7 +93,7 @@ class DanhGiaController extends Controller
             ->whereHas('datLich', function($query) use ($user) {
                 $query->where('Manguoidung', $user->id);
             })
-            ->where('MaHD', $request->MaHD)
+            ->where('MaHD', $request->invoice_id)
             ->firstOrFail();
         
         // Generate a unique review ID
@@ -102,8 +102,8 @@ class DanhGiaController extends Controller
         
         // Handle photo uploads
         $photos = [];
-        if ($request->hasFile('review_photos')) {
-            foreach ($request->file('review_photos') as $photo) {
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
                 $filename = 'review-' . time() . '-' . rand(1000, 9999) . '.' . $photo->getClientOriginalExtension();
                 $photo->move(public_path('images/reviews'), $filename);
                 $photos[] = 'images/reviews/' . $filename;
@@ -191,8 +191,8 @@ class DanhGiaController extends Controller
         $request->validate([
             'Diemdanhgia' => 'required|integer|min:1|max:5',
             'Noidungdanhgia' => 'required|string|max:500',
-            'new_photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'remove_photos' => 'nullable|array',
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'delete_photos' => 'nullable|array',
         ]);
         
         $user = Auth::user();
@@ -214,12 +214,13 @@ class DanhGiaController extends Controller
         }
         
         // Remove selected photos
-        if ($request->has('remove_photos')) {
-            foreach ($request->remove_photos as $index) {
-                if (isset($photos[$index])) {
+        if ($request->has('delete_photos')) {
+            foreach ($request->delete_photos as $photoPath) {
+                $index = array_search($photoPath, $photos);
+                if ($index !== false) {
                     // Delete file if exists
-                    if (file_exists(public_path($photos[$index]))) {
-                        unlink(public_path($photos[$index]));
+                    if (file_exists(public_path($photoPath))) {
+                        unlink(public_path($photoPath));
                     }
                     unset($photos[$index]);
                 }
@@ -228,8 +229,8 @@ class DanhGiaController extends Controller
         }
         
         // Add new photos
-        if ($request->hasFile('new_photos')) {
-            foreach ($request->file('new_photos') as $photo) {
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
                 $filename = 'review-' . time() . '-' . rand(1000, 9999) . '.' . $photo->getClientOriginalExtension();
                 $photo->move(public_path('images/reviews'), $filename);
                 $photos[] = 'images/reviews/' . $filename;

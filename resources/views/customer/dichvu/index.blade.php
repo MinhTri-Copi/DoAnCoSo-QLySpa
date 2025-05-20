@@ -17,77 +17,152 @@
             <form action="{{ route('customer.dichvu.index') }}" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <label for="search" class="form-label">Tìm kiếm</label>
-                    <input type="text" class="form-control" id="search" name="search" value="{{ request('search') }}" placeholder="Tên dịch vụ...">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="search" name="search" value="{{ request('search') }}" placeholder="Tên dịch vụ...">
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Khoảng giá (VNĐ)</label>
                     <div class="row">
                         <div class="col">
-                            <input type="number" class="form-control" name="min_price" value="{{ request('min_price') }}" placeholder="Từ" min="0" step="10000">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-tag text-primary"></i>
+                                </span>
+                                <input type="number" class="form-control border-start-0" name="min_price" value="{{ request('min_price') }}" placeholder="Từ" min="0" step="10000">
+                            </div>
                         </div>
                         <div class="col-auto pt-2">đến</div>
                         <div class="col">
-                            <input type="number" class="form-control" name="max_price" value="{{ request('max_price') }}" placeholder="Đến" min="0" step="10000">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-tags text-primary"></i>
+                                </span>
+                                <input type="number" class="form-control border-start-0" name="max_price" value="{{ request('max_price') }}" placeholder="Đến" min="0" step="10000">
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <label for="sort" class="form-label">Sắp xếp</label>
-                    <select class="form-select" id="sort" name="sort">
-                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Tên A-Z</option>
-                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
-                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
-                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
-                        <option value="rating_desc" {{ request('sort') == 'rating_desc' ? 'selected' : '' }}>Đánh giá cao nhất</option>
-                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
-                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Phổ biến nhất</option>
-                    </select>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-sort text-primary"></i>
+                        </span>
+                        <select class="form-select border-start-0" id="sort" name="sort">
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Tên A-Z</option>
+                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
+                            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
+                            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                            <option value="rating_desc" {{ request('sort') == 'rating_desc' ? 'selected' : '' }}>Đánh giá cao nhất</option>
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Phổ biến nhất</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-12">
-                    <label class="form-label">Lọc theo đánh giá</label>
-                    <!-- Bộ lọc chi tiết theo từng mức sao -->
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body p-3">
-                            <h6 class="mb-3">Lọc chính xác theo số sao</h6>
-                            
-                            <div class="form-check d-flex align-items-center mb-2">
-                                <input class="form-check-input" type="radio" name="star_rating" 
-                                    id="star_rating_any" value="" 
-                                    {{ !request('star_rating') ? 'checked' : '' }}>
-                                <label class="form-check-label ms-2" for="star_rating_any">
-                                    Tất cả đánh giá
-                                </label>
-                            </div>
-                            
-                            @for($i = 5; $i >= 1; $i--)
-                                <div class="form-check d-flex align-items-center mb-2">
-                                    <input class="form-check-input" type="radio" name="star_rating" 
-                                        id="star_rating_{{ $i }}" value="{{ $i }}" 
-                                        {{ request('star_rating') == $i ? 'checked' : '' }}>
-                                    <label class="form-check-label ms-2 d-flex align-items-center" for="star_rating_{{ $i }}">
-                                        @for($j = 1; $j <= 5; $j++)
-                                            @if($j <= $i)
-                                                <i class="fas fa-star text-warning"></i>
-                                            @else
-                                                <i class="far fa-star text-warning"></i>
-                                            @endif
-                                        @endfor
-                                        <span class="ms-2 text-muted small">
-                                            ({{ $starRatingCounts[$i] }} đánh giá)
-                                        </span>
-                                    </label>
+                
+                <!-- Lọc theo đặc điểm -->
+                <div class="col-md-12 mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Lọc theo đánh giá - Giữ nguyên phần này -->
+                            <label class="form-label fw-bold">Lọc theo đánh giá</label>
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-body p-3">
+                                    <h6 class="mb-3 d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-2"></i>
+                                        Lọc chính xác theo số sao
+                                    </h6>
+                                    
+                                    <div class="form-check d-flex align-items-center mb-2">
+                                        <input class="form-check-input" type="radio" name="star_rating" 
+                                            id="star_rating_any" value="" 
+                                            {{ !request('star_rating') ? 'checked' : '' }}>
+                                        <label class="form-check-label ms-2" for="star_rating_any">
+                                            Tất cả đánh giá
+                                        </label>
+                                    </div>
+                                    
+                                    @for($i = 5; $i >= 1; $i--)
+                                        <div class="form-check d-flex align-items-center mb-2">
+                                            <input class="form-check-input" type="radio" name="star_rating" 
+                                                id="star_rating_{{ $i }}" value="{{ $i }}" 
+                                                {{ request('star_rating') == $i ? 'checked' : '' }}>
+                                            <label class="form-check-label ms-2 d-flex align-items-center" for="star_rating_{{ $i }}">
+                                                @for($j = 1; $j <= 5; $j++)
+                                                    @if($j <= $i)
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    @else
+                                                        <i class="far fa-star text-warning"></i>
+                                                    @endif
+                                                @endfor
+                                                <span class="ms-2 text-muted small">
+                                                    ({{ $starRatingCounts[$i] }} đánh giá)
+                                                </span>
+                                            </label>
+                                        </div>
+                                    @endfor
                                 </div>
-                            @endfor
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <!-- Bộ lọc theo loại dịch vụ -->
+                            <label class="form-label fw-bold">Loại dịch vụ</label>
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-body p-3">
+                                    <h6 class="mb-3 d-flex align-items-center">
+                                        <i class="fas fa-list-alt text-primary me-2"></i>
+                                        Chọn loại dịch vụ
+                                    </h6>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="featured" id="filter_featured" value="1" {{ request('featured') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="filter_featured">
+                                            <span class="badge bg-danger px-2 me-1">
+                                                <i class="fas fa-star me-1"></i>Nổi bật
+                                            </span>
+                                            Chỉ hiển thị dịch vụ nổi bật
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="has_promotion" id="filter_promotion" value="1" {{ request('has_promotion') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="filter_promotion">
+                                            <span class="badge bg-success px-2 me-1">
+                                                <i class="fas fa-percent me-1"></i>Khuyến mãi
+                                            </span>
+                                            Có khuyến mãi
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="is_new" id="filter_new" value="1" {{ request('is_new') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="filter_new">
+                                            <span class="badge bg-info px-2 me-1">
+                                                <i class="fas fa-fire me-1"></i>Mới
+                                            </span>
+                                            Dịch vụ mới
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>Lọc kết quả
-                    </button>
-                    <a href="{{ route('customer.dichvu.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-undo me-2"></i>Đặt lại bộ lọc
-                    </a>
+                
+                <div class="col-12 mt-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-search me-2"></i>Lọc kết quả
+                        </button>
+                        <a href="{{ route('customer.dichvu.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-undo me-2"></i>Đặt lại bộ lọc
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -298,6 +373,76 @@
 </div>
 
 <style>
+    /* Thêm style cho thanh tìm kiếm và bộ lọc */
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #FF9A9E;
+        box-shadow: 0 0 0 0.25rem rgba(255, 154, 158, 0.25);
+    }
+    
+    .input-group-text {
+        color: #FF9A9E;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #FF9A9E 0%, #FF6B6B 100%);
+        border-color: #FF9A9E;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+        border-color: #FF6B6B;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        color: #666;
+        border-color: #ccc;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #333;
+        border-color: #bbb;
+    }
+    
+    /* Hiệu ứng cho các card */
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Kiểu dáng cho các badge */
+    .badge {
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.7rem;
+    }
+    
+    /* Kiểu dáng cho các checkbox và radio */
+    .form-check-input:checked {
+        background-color: #FF9A9E;
+        border-color: #FF9A9E;
+    }
+    
+    .form-check-input:focus {
+        border-color: #FF9A9E;
+        box-shadow: 0 0 0 0.25rem rgba(255, 154, 158, 0.25);
+    }
+    
+    /* Giữ nguyên các style khác */
     .hover-shadow {
         transition: all 0.3s ease;
     }
