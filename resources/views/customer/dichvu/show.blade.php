@@ -119,6 +119,112 @@
     <div class="mt-5">
         <h3 class="mb-4">Đánh giá từ khách hàng</h3>
         
+        <!-- Hiển thị đánh giá trung bình -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <h1 class="display-4 fw-bold text-primary mb-0">{{ $averageRating }}</h1>
+                        <p class="text-muted">trên 5</p>
+                        <div class="mb-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= $averageRating)
+                                    <i class="fas fa-star text-warning fa-lg"></i>
+                                @elseif($i - 0.5 <= $averageRating)
+                                    <i class="fas fa-star-half-alt text-warning fa-lg"></i>
+                                @else
+                                    <i class="far fa-star text-warning fa-lg"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <p class="mb-0">{{ $ratingCount }} đánh giá</p>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-3 text-end">
+                                <span>5 <i class="fas fa-star text-warning"></i></span>
+                            </div>
+                            <div class="col-7">
+                                <div class="progress" style="height: 8px;">
+                                    @php
+                                        $fiveStars = $ratingCount > 0 ? round($reviews->where('Danhgiasao', 5)->count() / $ratingCount * 100) : 0;
+                                    @endphp
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ $fiveStars }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <span class="text-muted small">{{ $fiveStars }}%</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-3 text-end">
+                                <span>4 <i class="fas fa-star text-warning"></i></span>
+                            </div>
+                            <div class="col-7">
+                                <div class="progress" style="height: 8px;">
+                                    @php
+                                        $fourStars = $ratingCount > 0 ? round($reviews->where('Danhgiasao', 4)->count() / $ratingCount * 100) : 0;
+                                    @endphp
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ $fourStars }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <span class="text-muted small">{{ $fourStars }}%</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-3 text-end">
+                                <span>3 <i class="fas fa-star text-warning"></i></span>
+                            </div>
+                            <div class="col-7">
+                                <div class="progress" style="height: 8px;">
+                                    @php
+                                        $threeStars = $ratingCount > 0 ? round($reviews->where('Danhgiasao', 3)->count() / $ratingCount * 100) : 0;
+                                    @endphp
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ $threeStars }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <span class="text-muted small">{{ $threeStars }}%</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-3 text-end">
+                                <span>2 <i class="fas fa-star text-warning"></i></span>
+                            </div>
+                            <div class="col-7">
+                                <div class="progress" style="height: 8px;">
+                                    @php
+                                        $twoStars = $ratingCount > 0 ? round($reviews->where('Danhgiasao', 2)->count() / $ratingCount * 100) : 0;
+                                    @endphp
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $twoStars }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <span class="text-muted small">{{ $twoStars }}%</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-3 text-end">
+                                <span>1 <i class="fas fa-star text-warning"></i></span>
+                            </div>
+                            <div class="col-7">
+                                <div class="progress" style="height: 8px;">
+                                    @php
+                                        $oneStar = $ratingCount > 0 ? round($reviews->where('Danhgiasao', 1)->count() / $ratingCount * 100) : 0;
+                                    @endphp
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $oneStar }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <span class="text-muted small">{{ $oneStar }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         @if(count($reviews) > 0)
             <div class="card border-0 shadow-sm">
                 <div class="card-body">

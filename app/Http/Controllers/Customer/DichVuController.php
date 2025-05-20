@@ -116,6 +116,15 @@ class DichVuController extends Controller
             ->select('DANHGIA.*', 'USER.Hoten', 'USER.Manguoidung')
             ->get();
         
+        // Tính điểm đánh giá trung bình
+        $averageRating = 0;
+        $ratingCount = count($reviews);
+        
+        if ($ratingCount > 0) {
+            $totalRating = $reviews->sum('Danhgiasao');
+            $averageRating = round($totalRating / $ratingCount, 1);
+        }
+        
         // Get related services (similar price range)
         $relatedServices = DichVu::where('MaDV', '!=', $id)
             ->whereBetween('Gia', [$service->Gia * 0.8, $service->Gia * 1.2])
@@ -125,7 +134,7 @@ class DichVuController extends Controller
         // Generate booking URL for this service
         $bookingUrl = route('customer.datlich.create', ['service_id' => $service->MaDV]);
         
-        return view('customer.dichvu.show', compact('service', 'relatedServices', 'bookingUrl', 'reviews'));
+        return view('customer.dichvu.show', compact('service', 'relatedServices', 'bookingUrl', 'reviews', 'averageRating', 'ratingCount'));
     }
     
     /**
