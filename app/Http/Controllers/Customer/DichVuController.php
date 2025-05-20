@@ -79,7 +79,65 @@ class DichVuController extends Controller
             $query->orderBy('MaDV', 'desc');
         }
         
-        $services = $query->paginate(12)->withQueryString();
+        // Lấy tất cả dịch vụ
+        $allServices = $query->get();
+        
+        // Tính toán điểm đánh giá sao cho mỗi dịch vụ
+        foreach ($allServices as $service) {
+            $ratings = DB::table('DANHGIA')
+                ->join('HOADON_VA_THANHTOAN', 'DANHGIA.MaHD', '=', 'HOADON_VA_THANHTOAN.MaHD')
+                ->join('DATLICH', 'HOADON_VA_THANHTOAN.MaDL', '=', 'DATLICH.MaDL')
+                ->where('DATLICH.MaDV', $service->MaDV)
+                ->select('DANHGIA.Danhgiasao')
+                ->get();
+                
+            $ratingCount = $ratings->count();
+            if ($ratingCount > 0) {
+                $service->average_rating = round($ratings->avg('Danhgiasao'), 1);
+                $service->rating_count = $ratingCount;
+                
+                // Tính số lượng từng mức sao
+                $service->star_counts = [
+                    1 => $ratings->where('Danhgiasao', 1)->count(),
+                    2 => $ratings->where('Danhgiasao', 2)->count(),
+                    3 => $ratings->where('Danhgiasao', 3)->count(),
+                    4 => $ratings->where('Danhgiasao', 4)->count(),
+                    5 => $ratings->where('Danhgiasao', 5)->count()
+                ];
+            } else {
+                $service->average_rating = 0;
+                $service->rating_count = 0;
+                $service->star_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+            }
+        }
+        
+        // Lọc theo đánh giá sao
+        if ($request->has('star_rating') && $request->star_rating != '') {
+            $starRating = (int) $request->star_rating;
+            $allServices = $allServices->filter(function($service) use ($starRating) {
+                // Lọc theo mức sao chính xác (1, 2, 3, 4, 5 sao)
+                return floor($service->average_rating) == $starRating;
+            });
+        }
+        
+        // Sắp xếp theo đánh giá nếu được chọn
+        if ($request->has('sort') && $request->sort == 'rating_desc') {
+            $allServices = $allServices->sortByDesc('average_rating');
+        }
+        
+        // Thực hiện phân trang thủ công
+        $perPage = 12;
+        $currentPage = $request->input('page', 1);
+        $total = $allServices->count();
+        $currentPageItems = $allServices->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        
+        $services = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentPageItems,
+            $total,
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
         
         // Get min and max prices for filter
         $minServicePrice = DichVu::min('Gia');
@@ -88,11 +146,27 @@ class DichVuController extends Controller
         // Pass booking route to view for "Đặt lịch" buttons
         $bookingRoute = route('customer.datlich.create');
         
+        // Tính tổng số đánh giá cho mỗi mức sao để hiển thị trong bộ lọc
+        $starRatingCounts = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0
+        ];
+        
+        foreach ($allServices as $service) {
+            foreach ($service->star_counts as $star => $count) {
+                $starRatingCounts[$star] += $count;
+            }
+        }
+        
         return view('customer.dichvu.index', compact(
             'services', 
             'minServicePrice', 
             'maxServicePrice', 
-            'bookingRoute'
+            'bookingRoute',
+            'starRatingCounts'
         ));
     }
 

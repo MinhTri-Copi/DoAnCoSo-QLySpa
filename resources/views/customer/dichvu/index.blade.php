@@ -33,7 +33,48 @@
                         <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                         <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                        <option value="rating_desc" {{ request('sort') == 'rating_desc' ? 'selected' : '' }}>Đánh giá cao nhất</option>
+                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Phổ biến nhất</option>
                     </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Lọc theo đánh giá</label>
+                    <!-- Bộ lọc chi tiết theo từng mức sao -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body p-3">
+                            <h6 class="mb-3">Lọc chính xác theo số sao</h6>
+                            
+                            <div class="form-check d-flex align-items-center mb-2">
+                                <input class="form-check-input" type="radio" name="star_rating" 
+                                    id="star_rating_any" value="" 
+                                    {{ !request('star_rating') ? 'checked' : '' }}>
+                                <label class="form-check-label ms-2" for="star_rating_any">
+                                    Tất cả đánh giá
+                                </label>
+                            </div>
+                            
+                            @for($i = 5; $i >= 1; $i--)
+                                <div class="form-check d-flex align-items-center mb-2">
+                                    <input class="form-check-input" type="radio" name="star_rating" 
+                                        id="star_rating_{{ $i }}" value="{{ $i }}" 
+                                        {{ request('star_rating') == $i ? 'checked' : '' }}>
+                                    <label class="form-check-label ms-2 d-flex align-items-center" for="star_rating_{{ $i }}">
+                                        @for($j = 1; $j <= 5; $j++)
+                                            @if($j <= $i)
+                                                <i class="fas fa-star text-warning"></i>
+                                            @else
+                                                <i class="far fa-star text-warning"></i>
+                                            @endif
+                                        @endfor
+                                        <span class="ms-2 text-muted small">
+                                            ({{ $starRatingCounts[$i] }} đánh giá)
+                                        </span>
+                                    </label>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">
@@ -69,6 +110,27 @@
                                 <span class="badge bg-info">Nổi bật</span>
                             @endif
                         </div>
+                        
+                        <!-- Hiển thị đánh giá sao -->
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">
+                                @php $avgRating = isset($service->average_rating) ? $service->average_rating : 0; @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $avgRating)
+                                        <i class="fas fa-star text-warning"></i>
+                                    @elseif($i - 0.5 <= $avgRating)
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-warning"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <small class="text-muted">
+                                {{ $avgRating }} 
+                                <span class="ms-1">({{ isset($service->rating_count) ? $service->rating_count : 0 }})</span>
+                            </small>
+                        </div>
+                        
                         <p class="card-text text-muted">{{ \Illuminate\Support\Str::limit($service->MoTa, 100) }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
