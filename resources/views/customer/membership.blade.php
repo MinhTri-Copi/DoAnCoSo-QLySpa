@@ -49,6 +49,11 @@
 <div class="container py-5">
     <div class="row justify-content-center mb-4">
         <div class="col-md-8">
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ route('customer.diemthuong.index') }}" class="btn btn-outline-primary btn-lg fw-bold" style="border-radius: 30px; background: #fff5f7; color: var(--accent-color); border: 2px solid var(--primary-color); box-shadow: 0 2px 8px rgba(255,154,158,0.08);">
+                    <i class="fas fa-history me-2"></i> Lịch sử điểm thưởng
+                </a>
+            </div>
             <div class="card shadow-sm text-center mb-4" style="border: none;">
                 <div class="card-body py-4">
                     <div class="mb-2">
