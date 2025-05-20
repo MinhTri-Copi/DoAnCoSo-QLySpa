@@ -163,7 +163,9 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-5">
-        {{ $services->withQueryString()->links() }}
+        <nav aria-label="Page navigation">
+            {{ $services->withQueryString()->links('pagination::bootstrap-4') }}
+        </nav>
     </div>
 
     <!-- Info Section -->
@@ -219,6 +221,115 @@
     }
     .card .badge {
         font-size: 0.75rem;
+    }
+    
+    /* Custom pagination styling */
+    .pagination {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .page-item:not(.active) .page-link {
+        color: #666;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .page-item.active .page-link {
+        background-color: #FF9A9E;
+        border-color: #FF9A9E;
+    }
+    
+    .page-item.disabled .page-link {
+        color: #ccc;
+    }
+    
+    .page-link {
+        width: 40px;
+        height: 40px;
+        line-height: 25px;
+        text-align: center;
+        font-weight: 500;
+        border-radius: 4px;
+        margin: 0 3px;
+        transition: all 0.2s;
+    }
+    
+    .page-link:hover {
+        background-color: #fff5f7;
+        color: #FF6B6B;
+        border-color: #ffd8db;
+    }
+    
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        width: 40px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Override footer styling to match pink theme */
+    footer {
+        background: linear-gradient(to right, #FF9A9E, #FECFEF);
+        margin-top: 3rem;
+        padding: 3rem 0;
+        color: white;
+        box-shadow: 0 -5px 15px rgba(255, 154, 158, 0.15);
+    }
+    
+    footer .footer-title {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    footer .footer-title:after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 3px;
+        background-color: white;
+        margin-top: 8px;
+    }
+    
+    footer .footer-link {
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s;
+    }
+    
+    footer .footer-link:hover {
+        color: white;
+        text-decoration: none;
+        padding-left: 5px;
+    }
+    
+    footer .social-links a {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.2);
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        transition: all 0.3s;
+    }
+    
+    footer .social-links a:hover {
+        background-color: white;
+        color: #FF9A9E;
+        transform: translateY(-3px);
+    }
+    
+    footer hr {
+        background-color: rgba(255, 255, 255, 0.2);
+        margin: 2rem 0;
     }
 </style>
 @endsection 
