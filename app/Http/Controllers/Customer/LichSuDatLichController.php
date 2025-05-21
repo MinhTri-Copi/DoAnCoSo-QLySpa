@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\DatLich;
 use App\Models\HoaDonVaThanhToan;
+use App\Models\DichVu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LichSuDatLichController extends Controller
 {
@@ -20,8 +22,8 @@ class LichSuDatLichController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = DatLich::where('Manguoidung', $user->id)
-            ->with(['dichVu', 'trangThai', 'hoaDon']);
+        $query = DatLich::where('Manguoidung', $user->Manguoidung)
+            ->with(['dichVu', 'hoaDon']);
             
         // Filter by status if provided
         if ($request->has('status') && $request->status != '') {
@@ -64,14 +66,17 @@ class LichSuDatLichController extends Controller
         
         // Get available statuses for filter
         $statuses = [
-            '1' => 'Chờ xác nhận',
-            '2' => 'Đã xác nhận',
-            '3' => 'Đang thực hiện',
-            '4' => 'Đã hủy',
-            '5' => 'Hoàn thành'
+            'Chờ xác nhận' => 'Chờ xác nhận',
+            'Đã xác nhận' => 'Đã xác nhận',
+            'Đang thực hiện' => 'Đang thực hiện',
+            'Đã hủy' => 'Đã hủy',
+            'Hoàn thành' => 'Hoàn thành'
         ];
         
-        return view('customer.lichsudatlich.index', compact('bookings', 'statuses'));
+        // Get all services for filter
+        $services = DichVu::pluck('Tendichvu', 'MaDV');
+        
+        return view('customer.lichsudatlich.index', compact('bookings', 'statuses', 'services'));
     }
     
     /**
@@ -83,15 +88,20 @@ class LichSuDatLichController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        $booking = DatLich::with(['dichVu', 'trangThai', 'hoaDon.phuongThuc'])
-            ->where('Manguoidung', $user->id)
+        $booking = DatLich::with(['dichVu', 'hoaDon.phuongThuc', 'user'])
+            ->where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
             ->firstOrFail();
             
         // Check if the booking has a review
         $hasReview = false;
         if ($booking->hoaDon) {
-            $hasReview = $booking->hoaDon->danhGia()->exists();
+            foreach ($booking->hoaDon as $hoaDon) {
+                if ($hoaDon->danhGia()->exists()) {
+                    $hasReview = true;
+                    break;
+                }
+            }
         }
         
         // Calculate time left until booking
@@ -110,7 +120,22 @@ class LichSuDatLichController extends Controller
             }
         }
         
-        return view('customer.lichsudatlich.show', compact('booking', 'hasReview', 'timeLeftData'));
+        // Generate QR code data for booking
+        $qrCodeData = route('customer.lichsudatlich.show', $id);
+        
+        // Get booking status history (if available)
+        $statusHistory = DB::table('LICHSU_TRANGTHAI')
+            ->where('MaDL', $id)
+            ->orderBy('ThoigianCapNhat', 'desc')
+            ->get();
+            
+        return view('customer.lichsudatlich.show', compact(
+            'booking', 
+            'hasReview', 
+            'timeLeftData', 
+            'qrCodeData',
+            'statusHistory'
+        ));
     }
     
     /**
@@ -122,12 +147,12 @@ class LichSuDatLichController extends Controller
     public function cancel($id)
     {
         $user = Auth::user();
-        $booking = DatLich::where('Manguoidung', $user->id)
+        $booking = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
             ->firstOrFail();
             
         // Check if booking can be cancelled
-        if (in_array($booking->Trangthai_, [4, 5])) {
+        if (in_array($booking->Trangthai_, ['Đã hủy', 'Hoàn thành'])) {
             return redirect()->route('customer.lichsudatlich.show', $id)
                 ->with('error', 'Lịch đặt này không thể hủy (đã hoàn thành hoặc đã hủy trước đó).');
         }
@@ -142,8 +167,20 @@ class LichSuDatLichController extends Controller
         }
         
         // Cancel the booking
-        $booking->Trangthai_ = 4; // Cancelled status
+        $booking->Trangthai_ = 'Đã hủy';
         $booking->save();
+        
+        // Log status change if you have a status history table
+        if (class_exists('App\Models\LichSuTrangThai')) {
+            DB::table('LICHSU_TRANGTHAI')->insert([
+                'MaDL' => $id,
+                'TrangthaiCu' => $booking->getOriginal('Trangthai_'),
+                'TrangthaiMoi' => 'Đã hủy',
+                'ThoigianCapNhat' => now(),
+                'NguoiCapNhat' => $user->Manguoidung,
+                'GhiChu' => 'Khách hàng tự hủy lịch'
+            ]);
+        }
         
         return redirect()->route('customer.lichsudatlich.index')
             ->with('success', 'Lịch đặt đã được hủy thành công.');
@@ -165,27 +202,50 @@ class LichSuDatLichController extends Controller
         ]);
         
         $user = Auth::user();
-        $booking = DatLich::where('Manguoidung', $user->id)
+        $booking = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
             ->firstOrFail();
             
         // Check if booking can be rescheduled
-        if (!in_array($booking->Trangthai_, [1, 2])) {
+        if (!in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận'])) {
             return redirect()->route('customer.lichsudatlich.show', $id)
                 ->with('error', 'Lịch đặt này không thể đổi lịch (đã hoàn thành, đang thực hiện hoặc đã hủy).');
         }
         
         // Check if the new time is available
-        $newDateTime = $request->new_date . ' ' . $request->new_time;
-        $existingBooking = DatLich::where('MaDV', $booking->MaDV)
-            ->where('Thoigiandatlich', $newDateTime)
-            ->where('MaDL', '!=', $id)
-            ->where('Trangthai_', '!=', 4) // Not cancelled
-            ->exists();
-            
-        if ($existingBooking) {
+        $newDateTime = Carbon::parse($request->new_date . ' ' . $request->new_time);
+        
+        // Get service information
+        $dichVu = $booking->dichVu;
+        
+        // Check if service is available on selected day
+        $dayOfWeek = $newDateTime->format('l');
+        if (!$dichVu->isAvailableOn($dayOfWeek)) {
             return back()->withInput()->withErrors([
-                'new_time' => 'Khung giờ này đã được đặt. Vui lòng chọn khung giờ khác.'
+                'new_date' => 'Dịch vụ này không hoạt động vào ' . $dayOfWeek
+            ]);
+        }
+        
+        // Check for overlapping bookings
+        $serviceTime = $dichVu->Thoigian;
+        $endTime = (clone $newDateTime)->addMinutes($serviceTime);
+        
+        $overlappingBookings = DatLich::where('MaDV', $booking->MaDV)
+            ->where('MaDL', '!=', $id)
+            ->where('Trangthai_', '!=', 'Đã hủy')
+            ->where(function($query) use ($newDateTime, $endTime) {
+                $query->whereBetween('Thoigiandatlich', [$newDateTime, $endTime])
+                    ->orWhere(function($q) use ($newDateTime, $endTime) {
+                        $q->where('Thoigiandatlich', '<=', $newDateTime)
+                          ->whereRaw("DATE_ADD(Thoigiandatlich, INTERVAL (SELECT Thoigian FROM DICHVU WHERE MaDV = DATLICH.MaDV) MINUTE) >= ?", [$newDateTime]);
+                    });
+            })
+            ->count();
+            
+        $maxConcurrentBookings = 2;
+        if ($overlappingBookings >= $maxConcurrentBookings) {
+            return back()->withInput()->withErrors([
+                'new_time' => 'Khung giờ này đã đủ lịch đặt. Vui lòng chọn khung giờ khác.'
             ]);
         }
         
@@ -196,9 +256,19 @@ class LichSuDatLichController extends Controller
         $booking->Thoigiandatlich = $newDateTime;
         $booking->save();
         
-        // Could send notification to admin about reschedule here
+        // Log reschedule request
+        if (class_exists('App\Models\LichSuTrangThai')) {
+            DB::table('LICHSU_TRANGTHAI')->insert([
+                'MaDL' => $id,
+                'TrangthaiCu' => $booking->Trangthai_,
+                'TrangthaiMoi' => $booking->Trangthai_,
+                'ThoigianCapNhat' => now(),
+                'NguoiCapNhat' => $user->Manguoidung,
+                'GhiChu' => 'Đổi lịch từ ' . $oldDateTime . ' sang ' . $newDateTime . '. Lý do: ' . $request->reason
+            ]);
+        }
         
         return redirect()->route('customer.lichsudatlich.show', $id)
             ->with('success', 'Yêu cầu đổi lịch đã được gửi thành công.');
     }
-} 
+}

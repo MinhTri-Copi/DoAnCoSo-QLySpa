@@ -69,15 +69,19 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     Route::get('/dich-vu/api/check-availability', [App\Http\Controllers\Customer\DichVuController::class, 'checkAvailability'])->name('dichvu.availability');
 
     // Bookings
-    Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');
-    Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
-    Route::get('/check-availability', [App\Http\Controllers\Customer\DatLichController::class, 'checkAvailability'])->name('datlich.checkAvailability');
-    
-    // Booking History
-    Route::get('/lich-su-dat-lich', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'index'])->name('lichsudatlich.index');
-    Route::get('/lich-su-dat-lich/{id}', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'show'])->name('lichsudatlich.show');
-    Route::post('/lich-su-dat-lich/{id}/cancel', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'cancel'])->name('lichsudatlich.cancel');
-    Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'reschedule'])->name('lichsudatlich.reschedule');
+   // Bookings
+Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');
+Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
+Route::get('/dat-lich/check-availability', [App\Http\Controllers\Customer\DatLichController::class, 'checkAvailability'])->name('datlich.checkAvailability');
+Route::get('/dat-lich/search-services', [App\Http\Controllers\Customer\DatLichController::class, 'searchServices'])->name('datlich.searchServices');
+Route::get('/dat-lich/calendar-bookings', [App\Http\Controllers\Customer\DatLichController::class, 'getCalendarBookings'])->name('datlich.calendarBookings');
+Route::get('/dat-lich/recommend-times', [App\Http\Controllers\Customer\DatLichController::class, 'recommendTimes'])->name('datlich.recommendTimes');
+
+// Booking History
+Route::get('/lich-su-dat-lich', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'index'])->name('lichsudatlich.index');
+Route::get('/lich-su-dat-lich/{id}', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'show'])->name('lichsudatlich.show');
+Route::post('/lich-su-dat-lich/{id}/cancel', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'cancel'])->name('lichsudatlich.cancel');
+Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'reschedule'])->name('lichsudatlich.reschedule');
     
     // Reviews
     Route::get('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'index'])->name('danhgia.index');
