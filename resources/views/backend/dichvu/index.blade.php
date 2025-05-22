@@ -1075,8 +1075,7 @@
                         
                         <div class="service-time">
                             <i class="far fa-clock"></i> 
-                            {{ $dichVu->Thoigian ? $dichVu->Thoigian->format('H:i') : 'N/A' }}
-                        </div>
+                            {{ $dichVu->Thoigian ? $dichVu->Thoigian . ' phút' : '-' }}                        </div>
                     </div>
                     
                     <div class="service-card-footer">

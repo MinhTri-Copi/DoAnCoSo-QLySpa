@@ -604,7 +604,7 @@
                     <div class="service-meta">
                         <div class="meta-item">
                             <i class="far fa-clock"></i>
-                            <span>Thời lượng: {{ $dichVu->Thoigian ? $dichVu->Thoigian->format('H:i') : 'N/A' }}</span>
+                            <span>Thời lượng: {{ $dichVu->Thoigian ? $dichVu->Thoigian . ' phút' : '-' }}</span>
                         </div>
                         
                         @if($dichVu->featured ?? false)
