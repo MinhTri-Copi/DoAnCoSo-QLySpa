@@ -605,12 +605,12 @@
                         <h5 class="card-title">Thông tin khách hàng</h5>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Họ tên:</strong> <span class="user-info-hoten">{{ Auth::user()->Hoten ?: 'Chưa cập nhật' }}</span></p>
-                                <p class="mb-1"><strong>Email:</strong> <span class="user-info-email">{{ Auth::user()->Email ?: 'Chưa cập nhật' }}</span></p>
+                                <p class="mb-1"><strong>Họ tên:</strong> <span class="user-info-hoten" id="user-info-hoten">Đang tải...</span></p>
+                                <p class="mb-1"><strong>Email:</strong> <span class="user-info-email" id="user-info-email">Đang tải...</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Số điện thoại:</strong> <span class="user-info-sdt">{{ Auth::user()->SDT ?: 'Chưa cập nhật' }}</span></p>
-                                <p class="mb-1"><strong>Địa chỉ:</strong> <span class="user-info-diachi">{{ Auth::user()->DiaChi ?: 'Chưa cập nhật' }}</span></p>
+                                <p class="mb-1"><strong>Số điện thoại:</strong> <span class="user-info-sdt" id="user-info-sdt">Đang tải...</span></p>
+                                <p class="mb-1"><strong>Địa chỉ:</strong> <span class="user-info-diachi" id="user-info-diachi">Đang tải...</span></p>
                             </div>
                         </div>
                     </div>
@@ -738,13 +738,26 @@
                 alert('Vui lòng chọn giờ');
                 return;
             }
+            
+            // Update hidden fields in the form
+            $('#service_id').val(selectedService.MaDV);
+            $('#booking_date').val(selectedDate);
+            $('#booking_time').val(selectedTime);
+            
+            // Show confirmation step
             $('#datetime-selection').hide();
             $('#booking-confirmation').show();
             $('#step2').removeClass('active');
             $('#step3').addClass('active');
             
-            // Ensure customer info is loaded properly
+            // Load customer info immediately
             loadUserInfo();
+            
+            console.log('Form values before confirmation step:', {
+                service_id: $('#service_id').val(),
+                booking_date: $('#booking_date').val(),
+                booking_time: $('#booking_time').val()
+            });
         });
 
         // Back to datetime selection
@@ -863,7 +876,14 @@
         // Function to load user information
         function loadUserInfo() {
             console.log('Loading user information...');
-            // Get user data from server to ensure it's fresh
+            
+            // Show loading indicators
+            $('#user-info-hoten').text('Đang tải...');
+            $('#user-info-email').text('Đang tải...');
+            $('#user-info-sdt').text('Đang tải...');
+            $('#user-info-diachi').text('Đang tải...');
+            
+            // Get user data from server
             $.ajax({
                 url: "{{ route('customer.getUserInfo') }}",
                 type: "GET",
@@ -874,38 +894,33 @@
                         updateUserInfoDisplay(response.user);
                     } else {
                         console.error('Error in user info response:', response.message);
+                        $('#user-info-hoten').text('Chưa cập nhật');
+                        $('#user-info-email').text('Chưa cập nhật');
+                        $('#user-info-sdt').text('Chưa cập nhật');
+                        $('#user-info-diachi').text('Chưa cập nhật');
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error("Error loading user information:", error);
                     console.error("Response:", xhr.responseText);
-                    // Fall back to using the existing DOM content
-                    updateUserInfoDisplay();
+                    $('#user-info-hoten').text('Chưa cập nhật');
+                    $('#user-info-email').text('Chưa cập nhật');
+                    $('#user-info-sdt').text('Chưa cập nhật');
+                    $('#user-info-diachi').text('Chưa cập nhật');
                 }
             });
         }
         
         // Update user info display
         function updateUserInfoDisplay(user) {
-    console.log('Updating user info display with:', user);
-    
-    // Nếu không có dữ liệu từ API, sử dụng dữ liệu từ Blade
-    if (!user) {
-        user = {
-            Hoten: "{{ Auth::user()->Hoten }}",
-            Email: "{{ Auth::user()->Email }}",
-            SDT: "{{ Auth::user()->SDT }}",
-            DiaChi: "{{ Auth::user()->DiaChi }}"
-        };
-        console.log('Using fallback user data:', user);
-    }
-    
-    // Cập nhật từng trường
-    $('.user-info-hoten').text(user.Hoten && user.Hoten.trim() ? user.Hoten : 'Chưa cập nhật');
-    $('.user-info-email').text(user.Email && user.Email.trim() ? user.Email : 'Chưa cập nhật');
-    $('.user-info-sdt').text(user.SDT && user.SDT.trim() ? user.SDT : 'Chưa cập nhật');
-    $('.user-info-diachi').text(user.DiaChi && user.DiaChi.trim() ? user.DiaChi : 'Chưa cập nhật');
-}
+            console.log('Updating user info display with:', user);
+            
+            // Update each field directly by ID
+            $('#user-info-hoten').text(user.Hoten);
+            $('#user-info-email').text(user.Email);
+            $('#user-info-sdt').text(user.SDT);
+            $('#user-info-diachi').text(user.DiaChi);
+        }
     });
 </script>
 @endsection

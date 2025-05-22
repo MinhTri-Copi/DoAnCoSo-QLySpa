@@ -606,21 +606,31 @@ class DatLichController extends Controller
     public function getUserInfo()
     {
         try {
-            $user = Auth::user();
+            $account = Auth::user();
             
-            if (!$user) {
+            if (!$account) {
                 return response()->json([
                     'success' => false,
                     'message' => 'User not authenticated'
                 ], 401);
             }
             
+            // Get the user related to this account
+            $user = User::where('MaTK', $account->MaTK)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User profile not found'
+                ], 404);
+            }
+            
             // Format phone number and address if they're missing
             $userData = [
-                'Hoten' => $user->Hoten ?: '',
-                'Email' => $user->Email ?: '',
-                'SDT' => $user->SDT ?: '',
-                'DiaChi' => $user->DiaChi ?: ''
+                'Hoten' => $user->Hoten ?: 'Chưa cập nhật',
+                'Email' => $user->Email ?: 'Chưa cập nhật',
+                'SDT' => $user->SDT ?: 'Chưa cập nhật',
+                'DiaChi' => $user->DiaChi ?: 'Chưa cập nhật'
             ];
             
             return response()->json([
