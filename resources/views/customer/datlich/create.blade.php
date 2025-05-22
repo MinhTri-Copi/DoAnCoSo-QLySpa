@@ -561,7 +561,7 @@
 
             <!-- Step 2: Date & Time Selection -->
             <div id="datetime-selection" style="{{ $step == 2 ? '' : 'display: none;' }}" class="mb-4">                <h3 class="section-title">Chọn ngày và giờ</h3>
-            <input type="hidden" id="booking_date" name="booking_date" value="{{ $selectedDate }}">
+            <input type="hidden" id="booking_date_display" value="{{ $selectedDate }}">
     <div class="mb-3">
         <strong>Ngày đã chọn:</strong> <span id="summary-date">{{ Carbon\Carbon::parse($selectedDate)->format('l, d/m/Y') }}</span>
     </div>
@@ -633,7 +633,7 @@
                         <button type="button" class="btn btn-outline-secondary back-to-datetime">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary btn-submit-booking" onclick="return validateBookingForm()">
                             Xác nhận đặt lịch <i class="fas fa-check"></i>
                         </button>
                     </div>
@@ -678,29 +678,93 @@
 
 @section('scripts')
 <script>
+    // Validation function for the booking form (placed outside document.ready to be globally accessible)
+    function validateBookingForm() {
+        // Get the values from the hidden inputs
+        var serviceId = $('#service_id').val();
+        var bookingDate = $('#booking_date').val();
+        var bookingTime = $('#booking_time').val();
+        
+        console.log('Validating form with values:', {
+            serviceId: serviceId,
+            bookingDate: bookingDate,
+            bookingTime: bookingTime
+        });
+        
+        // Attempt to re-set values from the global variables if needed
+        if (!serviceId && window.selectedService) {
+            serviceId = window.selectedService.MaDV;
+            $('#service_id').val(serviceId);
+        }
+        
+        if (!bookingDate && window.selectedDate) {
+            bookingDate = window.selectedDate;
+            $('#booking_date').val(bookingDate);
+        }
+        
+        if (!bookingTime && window.selectedTime) {
+            bookingTime = window.selectedTime;
+            $('#booking_time').val(bookingTime);
+        }
+        
+        // Final validation
+        if (!serviceId) {
+            alert('Vui lòng chọn dịch vụ');
+            return false;
+        }
+        
+        if (!bookingDate) {
+            alert('Vui lòng chọn ngày đặt lịch');
+            return false;
+        }
+        
+        if (!bookingTime) {
+            alert('Vui lòng chọn giờ đặt lịch');
+            return false;
+        }
+        
+        console.log('Form validation passed. Final values:', {
+            service_id: $('#service_id').val(),
+            booking_date: $('#booking_date').val(),
+            booking_time: $('#booking_time').val()
+        });
+        
+        return true;
+    }
+
     $(document).ready(function() {
-        let selectedService = @json($selectedService ?? null);
-        let selectedDate = "{{ $selectedDate }}";
-        let selectedTime = null;
+        // Make variables accessible from outside this scope
+        window.selectedService = @json($selectedService ?? null);
+        window.selectedDate = "{{ $selectedDate }}";
+        window.selectedTime = null;
         let isLoading = false;
 
         // Initialize user info on page load for step 3
         if ("{{ $step }}" == 3) {
             console.log('Page loaded directly to step 3, loading user info...');
             loadUserInfo();
+            
+            // Make sure the hidden fields are correctly set for step 3
+            if (window.selectedService) {
+                $('#service_id').val(window.selectedService.MaDV);
+            }
+            $('#booking_date').val(window.selectedDate);
+            if (window.selectedTime) {
+                $('#booking_time').val(window.selectedTime);
+            }
         }
 
         // Khởi tạo thông tin tóm tắt nếu đã chọn dịch vụ
-        if (selectedService) {
-            $('#summary-service').text(selectedService.Tendichvu);
-            $('#summary-duration').text(selectedService.Thoigian + ' phút');
-            $('#summary-price').text(selectedService.getFormattedPriceAttribute);
-            $('#service_id').val(selectedService.MaDV);
+        if (window.selectedService) {
+            $('#summary-service').text(window.selectedService.Tendichvu);
+            $('#summary-duration').text(window.selectedService.Thoigian + ' phút');
+            $('#summary-price').text(window.selectedService.getFormattedPriceAttribute);
+            $('#service_id').val(window.selectedService.MaDV);
             $('#empty-summary').hide();
             $('#booking-summary-content').show();
             
             // Hiển thị ngày được chọn trong phần tóm tắt
-            updateDateDisplay(selectedDate);
+            updateDateDisplay(window.selectedDate);
             
             loadTimeSlots();
         }
@@ -709,14 +773,18 @@
         $('.date-item').click(function() {
             $('.date-item').removeClass('active');
             $(this).addClass('active');
-            selectedDate = $(this).data('date');
-            $('#booking_date').val(selectedDate);
-            updateDateDisplay(selectedDate);
-            selectedTime = null;
+            window.selectedDate = $(this).data('date');
+            $('#booking_date_display').val(window.selectedDate);
+            $('#booking_date').val(window.selectedDate);
+            updateDateDisplay(window.selectedDate);
+            window.selectedTime = null;
             $('#booking_time').val('');
             $('#summary-time').text('-');
             $('.continue-to-confirm').prop('disabled', true);
             loadTimeSlots();
+            
+            console.log('Date selected:', window.selectedDate);
+            console.log('booking_date value:', $('#booking_date').val());
         });
 
         // Back to service selection
@@ -726,23 +794,23 @@
 
         // Continue to confirmation
         $('.continue-to-confirm').click(function() {
-            if (!selectedService) {
+            if (!window.selectedService) {
                 alert('Vui lòng chọn dịch vụ');
                 return;
             }
-            if (!selectedDate) {
+            if (!window.selectedDate) {
                 alert('Vui lòng chọn ngày');
                 return;
             }
-            if (!selectedTime) {
+            if (!window.selectedTime) {
                 alert('Vui lòng chọn giờ');
                 return;
             }
             
             // Update hidden fields in the form
-            $('#service_id').val(selectedService.MaDV);
-            $('#booking_date').val(selectedDate);
-            $('#booking_time').val(selectedTime);
+            $('#service_id').val(window.selectedService.MaDV);
+            $('#booking_date').val(window.selectedDate);
+            $('#booking_time').val(window.selectedTime);
             
             // Show confirmation step
             $('#datetime-selection').hide();
@@ -770,7 +838,7 @@
 
         // Load time slots
         function loadTimeSlots() {
-    if (!selectedService || !selectedDate) {
+    if (!window.selectedService || !window.selectedDate) {
         $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
         return;
     }
@@ -788,8 +856,8 @@
         url: "{{ route('customer.datlich.checkAvailability') }}",
         type: "GET",
         data: {
-            service_id: selectedService.MaDV,
-            date: selectedDate
+            service_id: window.selectedService.MaDV,
+            date: window.selectedDate
         },
         success: function(response) {
             if (!response.available) {
@@ -825,9 +893,9 @@
             $('.time-slot:not(.disabled)').click(function() {
                 $('.time-slot').removeClass('active');
                 $(this).addClass('active');
-                selectedTime = $(this).data('time');
-                $('#booking_time').val(selectedTime);
-                $('#summary-time').text(selectedTime);
+                window.selectedTime = $(this).data('time');
+                $('#booking_time').val(window.selectedTime);
+                $('#summary-time').text(window.selectedTime);
                 $('.continue-to-confirm').prop('disabled', false);
             });
         },
@@ -921,6 +989,25 @@
             $('#user-info-sdt').text(user.SDT);
             $('#user-info-diachi').text(user.DiaChi);
         }
+
+        // Form submission check
+        $('#booking-form').submit(function(e) {
+            console.log('Form submission checking values:');
+            console.log('Service ID:', $('#service_id').val());
+            console.log('Booking Date:', $('#booking_date').val());
+            console.log('Booking Time:', $('#booking_time').val());
+            
+            // Re-populate hidden fields right before submission
+            $('#service_id').val(window.selectedService.MaDV);
+            $('#booking_date').val(window.selectedDate);
+            $('#booking_time').val(window.selectedTime);
+            
+            if (!$('#service_id').val() || !$('#booking_date').val() || !$('#booking_time').val()) {
+                e.preventDefault();
+                alert('Vui lòng chọn đầy đủ thông tin dịch vụ, ngày và giờ đặt lịch');
+                return false;
+            }
+        });
     });
 </script>
 @endsection

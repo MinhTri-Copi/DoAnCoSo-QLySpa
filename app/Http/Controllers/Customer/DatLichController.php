@@ -184,7 +184,28 @@ class DatLichController extends Controller
         ]);
 
         // Lấy thông tin người dùng hiện tại
-        $user = Auth::user();
+        $account = Auth::user();
+        
+        // Debug log for Auth user
+        \Log::info('Auth user account:', [
+            'MaTK' => $account->MaTK,
+            'Tendangnhap' => $account->Tendangnhap,
+            'RoleID' => $account->RoleID
+        ]);
+        
+        // Get the User record associated with this Account
+        $user = User::where('MaTK', $account->MaTK)->first();
+        
+        if ($user) {
+            \Log::info('Found user:', [
+                'Manguoidung' => $user->Manguoidung,
+                'Hoten' => $user->Hoten,
+                'Email' => $user->Email
+            ]);
+        } else {
+            \Log::error('User not found for MaTK: ' . $account->MaTK);
+            return back()->withInput()->withErrors(['error' => 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.']);
+        }
         
         // Kết hợp ngày và giờ để tạo thời gian đặt lịch
         $bookingDateTime = Carbon::parse($request->booking_date . ' ' . $request->booking_time);
@@ -264,6 +285,10 @@ class DatLichController extends Controller
             $datLich->MaDV = $request->service_id;
             $datLich->Thoigiandatlich = $bookingDateTime;
             $datLich->Trangthai_ = 'Chờ xác nhận';
+            
+            // Debug log to check if user ID is correctly set
+            \Log::info('Creating booking with user ID: ' . $user->Manguoidung);
+            
             $datLich->save();
             
             DB::commit();
