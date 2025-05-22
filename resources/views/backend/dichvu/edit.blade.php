@@ -580,7 +580,7 @@
                     <div class="form-group">
                         <label for="Thoigian" class="required-label">Thời Gian Thực Hiện</label>
                         <div style="position: relative;">
-                            <input id="Thoigian" type="text" class="form-control timepicker @error('Thoigian') is-invalid @enderror" name="Thoigian" value="{{ old('Thoigian', $dichVu->Thoigian ? $dichVu->Thoigian->format('H:i') : '') }}" required placeholder="HH:MM">
+                            <input id="Thoigian" type="text" class="form-control timepicker @error('Thoigian') is-invalid @enderror" name="Thoigian" value="{{ old('Thoigian', $dichVu->Thoigian ? $dichVu->Thoigian . ' phút' : '-') }}" required placeholder="HH:MM">
                             <i class="fas fa-clock time-picker-icon"></i>
                         </div>
                         @error('Thoigian')
