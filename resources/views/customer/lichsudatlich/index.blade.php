@@ -363,13 +363,13 @@
                         <i class="fas fa-eye"></i> Xem chi tiết
                     </a>
                     
-                    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']))
+                    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && !($booking->hoaDon && $booking->hoaDon->count() > 0))
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ $booking->MaDL }}">
                         <i class="fas fa-calendar-alt"></i> Đổi lịch
                     </button>
                     @endif
                     
-                    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']))
+                    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && !($booking->hoaDon && $booking->hoaDon->count() > 0))
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $booking->MaDL }}">
                         <i class="fas fa-times"></i> Hủy lịch
                     </button>
