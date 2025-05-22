@@ -21,47 +21,57 @@ class DatLichController extends Controller
     {
         // Lấy thông tin người dùng hiện tại
         $user = Auth::user();
-        
+    
+        // Xử lý step và service_id từ request
+        $step = $request->input('step', 1); // Mặc định là bước 1
+        $selectedServiceId = $request->input('service_id');
+        $selectedService = null;
+    
+        if ($selectedServiceId) {
+            $selectedService = DichVu::find($selectedServiceId);
+            if (!$selectedService) {
+                return redirect()->route('customer.datlich.create')
+                    ->with('error', 'Dịch vụ không tồn tại.');
+            }
+        }
+    
         // Lấy tất cả các dịch vụ có sẵn
         $query = DichVu::query();
-        
+    
         // Áp dụng bộ lọc nếu có
-        
         if ($request->has('price_min') && $request->price_min != '') {
             $query->where('Gia', '>=', $request->price_min);
         }
-        
+    
         if ($request->has('price_max') && $request->price_max != '') {
             $query->where('Gia', '<=', $request->price_max);
         }
-        
+    
         if ($request->has('search') && $request->search != '') {
             $query->where(function($q) use ($request) {
                 $q->where('Tendichvu', 'like', '%' . $request->search . '%')
                   ->orWhere('MoTa', 'like', '%' . $request->search . '%');
             });
         }
-        
+    
         // Lấy dịch vụ theo thời gian (nếu người dùng đã chọn ngày)
         $selectedDate = $request->date ?? Carbon::now()->format('Y-m-d');
         $dayOfWeek = Carbon::parse($selectedDate)->format('l');
         $dayOfWeekLower = strtolower($dayOfWeek);
-        
-        // Lọc dịch vụ theo ngày trong tuần nếu được chỉ định
+    
         if ($request->has('date')) {
             $query->whereRaw("JSON_CONTAINS(available_days, ?, '$')", ['"' . $dayOfWeekLower . '"']);
         }
-        
+    
         // Lấy các dịch vụ đề xuất (dựa trên lượt đặt nhiều nhất)
         $recommendedServices = DichVu::withCount('datLich')
             ->orderBy('dat_lich_count', 'desc')
             ->limit(4)
             ->get();
-        
+    
         // Lấy các dịch vụ đề xuất dựa trên lịch sử đặt lịch của người dùng
         $userPreferredServices = [];
         if ($user) {
-            // Get the most frequently booked service IDs for this user
             $serviceIds = DB::table('DATLICH')
                 ->where('Manguoidung', $user->Manguoidung)
                 ->select('MaDV', DB::raw('COUNT(*) as booking_count'))
@@ -69,13 +79,12 @@ class DatLichController extends Controller
                 ->orderBy('booking_count', 'desc')
                 ->limit(3)
                 ->pluck('MaDV');
-            
-            // Then fetch the complete service records
+    
             if ($serviceIds->count() > 0) {
                 $userPreferredServices = DichVu::whereIn('MaDV', $serviceIds)->get();
             }
         }
-        
+    
         // Lấy các khung giờ đã đặt trong ngày được chọn
         $bookedTimeSlots = DatLich::whereDate('Thoigiandatlich', $selectedDate)
             ->where('Trangthai_', '!=', 'Đã hủy')
@@ -83,24 +92,21 @@ class DatLichController extends Controller
             ->map(function($booking) {
                 $time = Carbon::parse($booking->Thoigiandatlich);
                 $serviceTime = $booking->dichVu->Thoigian;
-                
-                // Tạo mảng các khung giờ đã đặt, tính cả thời gian kéo dài của dịch vụ
+    
                 $slots = [];
                 $endTime = (clone $time)->addMinutes($serviceTime);
-                
-                // Tạo các slot 30 phút từ thời gian bắt đầu đến kết thúc
                 $currentSlot = clone $time;
                 while ($currentSlot < $endTime) {
                     $slots[] = $currentSlot->format('H:i');
                     $currentSlot->addMinutes(30);
                 }
-                
+    
                 return [
                     'service_id' => $booking->MaDV,
                     'slots' => $slots,
                 ];
             });
-        
+    
         // Sắp xếp dịch vụ
         if ($request->has('sort')) {
             switch ($request->sort) {
@@ -124,30 +130,26 @@ class DatLichController extends Controller
                     break;
             }
         } else {
-            // Mặc định sắp xếp theo tên
             $query->orderBy('Tendichvu', 'asc');
         }
-        
+    
         $dichVus = $query->paginate(9);
-        
-        // Lấy khoảng giá
+    
         $minPrice = DichVu::min('Gia');
         $maxPrice = DichVu::max('Gia');
-        
-        // Lấy ngày có thể đặt lịch (trong 14 ngày tới)
+    
         $availableDates = [];
-        for ($i = 0; $i < 14; $i++) {
-            $date = Carbon::now()->addDays($i);
+        for ($i = 0; $i < 10; $i++) {
+            $date = now()->addDays($i);
             $availableDates[] = [
-                'date' => $date->format('Y-m-d'),
-                'day' => $date->format('d'),
-                'month' => $date->format('m'),
-                'year' => $date->format('Y'),
-                'day_name' => $date->format('l'),
-                'day_short' => $date->format('D'),
+                'date' => $date->toDateString(),
+                'day' => $date->day,
+                'month' => $date->month,
+                'year' => $date->year,
+                'day_short' => $date->locale('vi')->dayName,
             ];
         }
-        
+    
         return view('customer.datlich.create', compact(
             'dichVus',
             'recommendedServices',
@@ -156,7 +158,9 @@ class DatLichController extends Controller
             'maxPrice',
             'availableDates',
             'selectedDate',
-            'bookedTimeSlots'
+            'bookedTimeSlots',
+            'step',
+            'selectedService'
         ));
     }
     
@@ -594,5 +598,40 @@ class DatLichController extends Controller
             'success' => true,
             'recommended_times' => $recommendedTimes
         ]);
+    }
+
+    /**
+     * Get authenticated user information
+     */
+    public function getUserInfo()
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+            
+            // Format phone number and address if they're missing
+            $userData = [
+                'Hoten' => $user->Hoten ?: '',
+                'Email' => $user->Email ?: '',
+                'SDT' => $user->SDT ?: '',
+                'DiaChi' => $user->DiaChi ?: ''
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'user' => $userData
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching user information: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

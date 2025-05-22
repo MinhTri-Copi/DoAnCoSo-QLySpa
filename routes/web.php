@@ -68,7 +68,6 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     Route::get('/dich-vu/api/search', [App\Http\Controllers\Customer\DichVuController::class, 'search'])->name('dichvu.search');
     Route::get('/dich-vu/api/check-availability', [App\Http\Controllers\Customer\DichVuController::class, 'checkAvailability'])->name('dichvu.availability');
 
-    // Bookings
    // Bookings
 Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');
 Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
@@ -76,6 +75,7 @@ Route::get('/dat-lich/check-availability', [App\Http\Controllers\Customer\DatLic
 Route::get('/dat-lich/search-services', [App\Http\Controllers\Customer\DatLichController::class, 'searchServices'])->name('datlich.searchServices');
 Route::get('/dat-lich/calendar-bookings', [App\Http\Controllers\Customer\DatLichController::class, 'getCalendarBookings'])->name('datlich.calendarBookings');
 Route::get('/dat-lich/recommend-times', [App\Http\Controllers\Customer\DatLichController::class, 'recommendTimes'])->name('datlich.recommendTimes');
+Route::get('/get-user-info', [App\Http\Controllers\Customer\DatLichController::class, 'getUserInfo'])->name('getUserInfo');
 
 // Booking History
 Route::get('/lich-su-dat-lich', [App\Http\Controllers\Customer\LichSuDatLichController::class, 'index'])->name('lichsudatlich.index');

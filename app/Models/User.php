@@ -11,7 +11,13 @@ class User extends Model
     public $incrementing = false;
     protected $fillable = ['Manguoidung', 'MaTK', 'Hoten', 'SDT', 'DiaChi', 'Email', 'Ngaysinh', 'Gioitinh'];
     public $timestamps = false;
-
+    
+    protected $casts = [
+        'Email' => 'string',
+        'SDT' => 'string',
+        'DiaChi' => 'string',
+        'Hoten' => 'string',
+    ];
     public function account()
     {
         return $this->belongsTo(Account::class, 'MaTK', 'MaTK');

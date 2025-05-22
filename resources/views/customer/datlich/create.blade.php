@@ -81,6 +81,26 @@
         font-weight: bold;
     }
 
+    /* Customer info styles */
+    .user-info-hoten, .user-info-email, .user-info-sdt, .user-info-diachi {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .user-info-missing {
+        color: #dc3545;
+        font-style: italic;
+        font-weight: 400;
+    }
+    
+    .card-title {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    /* End customer info styles */
+
     .service-card {
         border: 1px solid var(--border-color);
         border-radius: 10px;
@@ -144,6 +164,8 @@
         align-items: center;
         padding-top: 0.5rem;
         border-top: 1px solid var(--border-color);
+        position: relative;
+    z-index: 10; /* Đảm bảo nút nằm trên các phần tử khác */
     }
 
     .service-duration {
@@ -341,18 +363,18 @@
     </div>
 
     <div class="booking-steps mb-4">
-        <div class="step active">
-            <div class="step-number">1</div>
-            <div class="step-label">Chọn dịch vụ</div>
-        </div>
-        <div class="step" id="step2">
-            <div class="step-number">2</div>
-            <div class="step-label">Chọn ngày và giờ</div>
-        </div>
-        <div class="step" id="step3">
-            <div class="step-number">3</div>
-            <div class="step-label">Xác nhận thông tin</div>
-        </div>
+    <div class="step {{ $step == 1 ? 'active' : '' }}">
+    <div class="step-number">1</div>
+    <div class="step-label">Chọn dịch vụ</div>
+</div>
+<div class="step {{ $step == 2 ? 'active' : '' }}" id="step2">
+    <div class="step-number">2</div>
+    <div class="step-label">Chọn ngày và giờ</div>
+</div>
+<div class="step {{ $step == 3 ? 'active' : '' }}" id="step3">
+    <div class="step-number">3</div>
+    <div class="step-label">Xác nhận thông tin</div>
+</div>
     </div>
 
     @if(session('error'))
@@ -374,8 +396,7 @@
     <div class="row">
         <div class="col-lg-8">
             <!-- Step 1: Service Selection -->
-            <div id="service-selection" class="mb-4">
-                @if(count($recommendedServices) > 0)
+            <div id="service-selection" style="{{ $step == 1 ? '' : 'display: none;' }}" class="mb-4">                @if(count($recommendedServices) > 0)
                 <div class="recommended-services mb-4">
                     <h3 class="section-title">Dịch vụ đề xuất</h3>
                     <div class="row">
@@ -393,9 +414,13 @@
                                         <div class="service-duration">
                                             <i class="far fa-clock"></i> {{ $service->Thoigian }} phút
                                         </div>
-                                        <button class="btn btn-sm btn-primary select-service" data-id="{{ $service->MaDV }}" data-name="{{ $service->Tendichvu }}" data-price="{{ $service->getFormattedPriceAttribute() }}" data-time="{{ $service->Thoigian }}">
-                                            Chọn
-                                        </button>
+                                        <form action="{{ route('customer.datlich.create') }}" method="GET">
+                                            <input type="hidden" name="service_id" value="{{ $service->MaDV }}">
+                                            <input type="hidden" name="step" value="2">
+                                            <button type="submit" class="btn btn-sm btn-primary select-service">
+                                                Chọn
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -423,9 +448,13 @@
                                         <div class="service-duration">
                                             <i class="far fa-clock"></i> {{ $service->Thoigian }} phút
                                         </div>
-                                        <button class="btn btn-sm btn-primary select-service" data-id="{{ $service->MaDV }}" data-name="{{ $service->Tendichvu }}" data-price="{{ $service->getFormattedPriceAttribute() }}" data-time="{{ $service->Thoigian }}">
-                                            Chọn
-                                        </button>
+                                        <form action="{{ route('customer.datlich.create') }}" method="GET">
+    <input type="hidden" name="service_id" value="{{ $service->MaDV }}">
+    <input type="hidden" name="step" value="2">
+    <button type="submit" class="btn btn-sm btn-primary select-service">
+        Chọn
+    </button>
+</form>
                                     </div>
                                 </div>
                             </div>
@@ -504,9 +533,13 @@
                                         <div class="service-duration">
                                             <i class="far fa-clock"></i> {{ $dichVu->Thoigian }} phút
                                         </div>
-                                        <button class="btn btn-sm btn-primary select-service" data-id="{{ $dichVu->MaDV }}" data-name="{{ $dichVu->Tendichvu }}" data-price="{{ $dichVu->getFormattedPriceAttribute() }}" data-time="{{ $dichVu->Thoigian }}">
-                                            Chọn
-                                        </button>
+                                        <form action="{{ route('customer.datlich.create') }}" method="GET">
+    <input type="hidden" name="service_id" value="{{ $dichVu->MaDV }}">
+    <input type="hidden" name="step" value="2">
+    <button type="submit" class="btn btn-sm btn-primary select-service">
+        Chọn
+    </button>
+</form>
                                     </div>
                                 </div>
                             </div>
@@ -527,9 +560,11 @@
             </div>
 
             <!-- Step 2: Date & Time Selection -->
-            <div id="datetime-selection" class="mb-4" style="display: none;">
-                <h3 class="section-title">Chọn ngày và giờ</h3>
-                
+            <div id="datetime-selection" style="{{ $step == 2 ? '' : 'display: none;' }}" class="mb-4">                <h3 class="section-title">Chọn ngày và giờ</h3>
+            <input type="hidden" id="booking_date" name="booking_date" value="{{ $selectedDate }}">
+    <div class="mb-3">
+        <strong>Ngày đã chọn:</strong> <span id="summary-date">{{ Carbon\Carbon::parse($selectedDate)->format('l, d/m/Y') }}</span>
+    </div>
                 <div class="date-selector mb-4">
                     @foreach($availableDates as $date)
                     <div class="date-item {{ $date['date'] == $selectedDate ? 'active' : '' }}" data-date="{{ $date['date'] }}">
@@ -563,20 +598,19 @@
             </div>
 
             <!-- Step 3: Confirmation -->
-            <div id="booking-confirmation" style="display: none;">
-                <h3 class="section-title">Xác nhận thông tin đặt lịch</h3>
+            <div id="booking-confirmation" style="{{ $step == 3 ? '' : 'display: none;' }}">                <h3 class="section-title">Xác nhận thông tin đặt lịch</h3>
                 
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Thông tin khách hàng</h5>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Họ tên:</strong> {{ Auth::user()->Hoten }}</p>
-                                <p class="mb-1"><strong>Email:</strong> {{ Auth::user()->Email }}</p>
+                                <p class="mb-1"><strong>Họ tên:</strong> <span class="user-info-hoten">{{ Auth::user()->Hoten ?: 'Chưa cập nhật' }}</span></p>
+                                <p class="mb-1"><strong>Email:</strong> <span class="user-info-email">{{ Auth::user()->Email ?: 'Chưa cập nhật' }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Số điện thoại:</strong> {{ Auth::user()->SDT }}</p>
-                                <p class="mb-1"><strong>Địa chỉ:</strong> {{ Auth::user()->DiaChi }}</p>
+                                <p class="mb-1"><strong>Số điện thoại:</strong> <span class="user-info-sdt">{{ Auth::user()->SDT ?: 'Chưa cập nhật' }}</span></p>
+                                <p class="mb-1"><strong>Địa chỉ:</strong> <span class="user-info-diachi">{{ Auth::user()->DiaChi ?: 'Chưa cập nhật' }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -615,27 +649,27 @@
                     <p>Vui lòng chọn dịch vụ để tiếp tục</p>
                 </div>
                 <div id="booking-summary-content" style="display: none;">
-                    <div class="summary-item">
-                        <div class="summary-label">Dịch vụ</div>
-                        <div class="summary-value" id="summary-service">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Thời gian</div>
-                        <div class="summary-value" id="summary-duration">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Ngày</div>
-                        <div class="summary-value" id="summary-date">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Giờ</div>
-                        <div class="summary-value" id="summary-time">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Giá</div>
-                        <div class="summary-value summary-total" id="summary-price">-</div>
-                    </div>
-                </div>
+            <div class="summary-item">
+                <div class="summary-label">Dịch vụ</div>
+                <div class="summary-value" id="summary-service">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Thời gian</div>
+                <div class="summary-value" id="summary-duration">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Ngày</div>
+                <div class="summary-value" id="summary-date">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Giờ</div>
+                <div class="summary-value" id="summary-time">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Giá</div>
+                <div class="summary-value summary-total" id="summary-price">-</div>
+            </div>
+        </div>
             </div>
         </div>
     </div>
@@ -645,37 +679,31 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        let selectedService = null;
+        let selectedService = @json($selectedService ?? null);
         let selectedDate = "{{ $selectedDate }}";
         let selectedTime = null;
+        let isLoading = false;
 
-        // Step 1: Service Selection
-        $('.select-service').click(function() {
-            selectedService = {
-                id: $(this).data('id'),
-                name: $(this).data('name'),
-                price: $(this).data('price'),
-                time: $(this).data('time')
-            };
+        // Initialize user info on page load for step 3
+        if ("{{ $step }}" == 3) {
+            console.log('Page loaded directly to step 3, loading user info...');
+            loadUserInfo();
+        }
 
-            // Update summary
-            $('#summary-service').text(selectedService.name);
-            $('#summary-duration').text(selectedService.time + ' phút');
-            $('#summary-price').text(selectedService.price);
-            $('#service_id').val(selectedService.id);
-
-            // Show summary
+        // Khởi tạo thông tin tóm tắt nếu đã chọn dịch vụ
+        if (selectedService) {
+            $('#summary-service').text(selectedService.Tendichvu);
+            $('#summary-duration').text(selectedService.Thoigian + ' phút');
+            $('#summary-price').text(selectedService.getFormattedPriceAttribute);
+            $('#service_id').val(selectedService.MaDV);
             $('#empty-summary').hide();
             $('#booking-summary-content').show();
-
-            // Move to step 2
-            $('#service-selection').hide();
-            $('#datetime-selection').show();
-            $('#step2').addClass('active');
-
-            // Load available time slots
+            
+            // Hiển thị ngày được chọn trong phần tóm tắt
+            updateDateDisplay(selectedDate);
+            
             loadTimeSlots();
-        });
+        }
 
         // Step 2: Date & Time Selection
         $('.date-item').click(function() {
@@ -683,31 +711,40 @@
             $(this).addClass('active');
             selectedDate = $(this).data('date');
             $('#booking_date').val(selectedDate);
-            $('#summary-date').text(formatDate(selectedDate));
-            
-            // Reset time selection
+            updateDateDisplay(selectedDate);
             selectedTime = null;
+            $('#booking_time').val('');
             $('#summary-time').text('-');
             $('.continue-to-confirm').prop('disabled', true);
-            
-            // Load time slots for the selected date
             loadTimeSlots();
         });
 
         // Back to service selection
         $('.back-to-services').click(function() {
-            $('#datetime-selection').hide();
-            $('#service-selection').show();
-            $('#step2').removeClass('active');
+            window.location.href = "{{ route('customer.datlich.create') }}";
         });
 
         // Continue to confirmation
         $('.continue-to-confirm').click(function() {
-            if (selectedService && selectedDate && selectedTime) {
-                $('#datetime-selection').hide();
-                $('#booking-confirmation').show();
-                $('#step3').addClass('active');
+            if (!selectedService) {
+                alert('Vui lòng chọn dịch vụ');
+                return;
             }
+            if (!selectedDate) {
+                alert('Vui lòng chọn ngày');
+                return;
+            }
+            if (!selectedTime) {
+                alert('Vui lòng chọn giờ');
+                return;
+            }
+            $('#datetime-selection').hide();
+            $('#booking-confirmation').show();
+            $('#step2').removeClass('active');
+            $('#step3').addClass('active');
+            
+            // Ensure customer info is loaded properly
+            loadUserInfo();
         });
 
         // Back to datetime selection
@@ -715,88 +752,160 @@
             $('#booking-confirmation').hide();
             $('#datetime-selection').show();
             $('#step3').removeClass('active');
+            $('#step2').addClass('active');
         });
 
         // Load time slots
         function loadTimeSlots() {
-            if (!selectedService || !selectedDate) return;
+    if (!selectedService || !selectedDate) {
+        $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
+        return;
+    }
 
-            $('#time-slots-container').html(`
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+    $('#time-slots-container').html(`
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
+        </div>
+    `);
+
+    $.ajax({
+        url: "{{ route('customer.datlich.checkAvailability') }}",
+        type: "GET",
+        data: {
+            service_id: selectedService.MaDV,
+            date: selectedDate
+        },
+        success: function(response) {
+            if (!response.available) {
+                $('#time-slots-container').html(`
+                    <div class="alert alert-warning">
+                        ${response.message}
                     </div>
-                    <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
+                `);
+                return;
+            }
+
+            let html = '';
+            if (response.timeSlots.length === 0) {
+                html = `
+                    <div class="alert alert-info">
+                        Không có khung giờ nào khả dụng cho ngày này.
+                    </div>
+                `;
+            } else {
+                response.timeSlots.forEach(slot => {
+                    html += `
+                        <div class="time-slot ${!slot.available ? 'disabled' : ''}" 
+                            data-time="${slot.time}" 
+                            ${!slot.available ? 'disabled' : ''}>
+                            ${slot.time}
+                        </div>
+                    `;
+                });
+            }
+
+            $('#time-slots-container').html(html);
+
+            $('.time-slot:not(.disabled)').click(function() {
+                $('.time-slot').removeClass('active');
+                $(this).addClass('active');
+                selectedTime = $(this).data('time');
+                $('#booking_time').val(selectedTime);
+                $('#summary-time').text(selectedTime);
+                $('.continue-to-confirm').prop('disabled', false);
+            });
+        },
+        error: function(xhr, status, error) {
+            $('#time-slots-container').html(`
+                <div class="alert alert-danger">
+                    Đã xảy ra lỗi khi tải khung giờ: ${error}. Vui lòng thử lại.
                 </div>
             `);
-
-            $.ajax({
-                url: "{{ route('customer.datlich.checkAvailability') }}",
-                type: "GET",
-                data: {
-                    service_id: selectedService.id,
-                    date: selectedDate
-                },
-                success: function(response) {
-                    if (!response.available) {
-                        $('#time-slots-container').html(`
-                            <div class="alert alert-warning">
-                                ${response.message}
-                            </div>
-                        `);
-                        return;
-                    }
-
-                    let html = '';
-                    if (response.timeSlots.length === 0) {
-                        html = `
-                            <div class="alert alert-info">
-                                Không có khung giờ nào khả dụng cho ngày này.
-                            </div>
-                        `;
-                    } else {
-                        response.timeSlots.forEach(slot => {
-                            html += `
-                                <div class="time-slot ${!slot.available ? 'disabled' : ''}" 
-                                    data-time="${slot.time}" 
-                                    ${!slot.available ? 'disabled' : ''}>
-                                    ${slot.time}
-                                </div>
-                            `;
-                        });
-                    }
-
-                    $('#time-slots-container').html(html);
-
-                    // Time slot selection
-                    $('.time-slot:not(.disabled)').click(function() {
-                        $('.time-slot').removeClass('active');
-                        $(this).addClass('active');
-                        selectedTime = $(this).data('time');
-                        $('#booking_time').val(selectedTime);
-                        $('#summary-time').text(selectedTime);
-                        $('.continue-to-confirm').prop('disabled', false);
-                    });
-                },
-                error: function() {
-                    $('#time-slots-container').html(`
-                        <div class="alert alert-danger">
-                            Đã xảy ra lỗi khi tải khung giờ. Vui lòng thử lại.
-                        </div>
-                    `);
-                }
-            });
+        },
+        complete: function() {
+            isLoading = false;
         }
+    });
+}
 
         // Format date for display
         function formatDate(dateString) {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             return new Date(dateString).toLocaleDateString('vi-VN', options);
         }
+        
+        // Function to update all date displays
+        function updateDateDisplay(date) {
+            if (date) {
+                const formattedDate = formatDate(date);
+                // Update date in the summary section and in the page header
+                $('.summary-value#summary-date').text(formattedDate);
+                $('span#summary-date').text(formattedDate);
+            }
+        }
 
         // Initialize with selected date
         $('#booking_date').val(selectedDate);
-        $('#summary-date').text(formatDate(selectedDate));
+        
+        // Khởi tạo hiển thị thông tin
+        if (selectedDate) {
+            updateDateDisplay(selectedDate);
+        }
+        
+        // Hiển thị giá dịch vụ nếu có
+        if (selectedService && selectedService.Gia) {
+            $('#summary-price').text(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedService.Gia));
+        }
+
+        // Function to load user information
+        function loadUserInfo() {
+            console.log('Loading user information...');
+            // Get user data from server to ensure it's fresh
+            $.ajax({
+                url: "{{ route('customer.getUserInfo') }}",
+                type: "GET",
+                dataType: 'json',
+                success: function(response) {
+                    console.log('User info response:', response);
+                    if (response.success) {
+                        updateUserInfoDisplay(response.user);
+                    } else {
+                        console.error('Error in user info response:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading user information:", error);
+                    console.error("Response:", xhr.responseText);
+                    // Fall back to using the existing DOM content
+                    updateUserInfoDisplay();
+                }
+            });
+        }
+        
+        // Update user info display
+        function updateUserInfoDisplay(user) {
+    console.log('Updating user info display with:', user);
+    
+    // Nếu không có dữ liệu từ API, sử dụng dữ liệu từ Blade
+    if (!user) {
+        user = {
+            Hoten: "{{ Auth::user()->Hoten }}",
+            Email: "{{ Auth::user()->Email }}",
+            SDT: "{{ Auth::user()->SDT }}",
+            DiaChi: "{{ Auth::user()->DiaChi }}"
+        };
+        console.log('Using fallback user data:', user);
+    }
+    
+    // Cập nhật từng trường
+    $('.user-info-hoten').text(user.Hoten && user.Hoten.trim() ? user.Hoten : 'Chưa cập nhật');
+    $('.user-info-email').text(user.Email && user.Email.trim() ? user.Email : 'Chưa cập nhật');
+    $('.user-info-sdt').text(user.SDT && user.SDT.trim() ? user.SDT : 'Chưa cập nhật');
+    $('.user-info-diachi').text(user.DiaChi && user.DiaChi.trim() ? user.DiaChi : 'Chưa cập nhật');
+}
     });
 </script>
 @endsection
