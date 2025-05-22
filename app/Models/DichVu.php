@@ -23,7 +23,6 @@ class DichVu extends Model
     public $timestamps = false;
 
     protected $casts = [
-        'Thoigian' => 'datetime',
         'Gia' => 'decimal:4',
         'featured' => 'boolean',
         'MaDV' => 'integer'
