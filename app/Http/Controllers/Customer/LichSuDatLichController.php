@@ -123,7 +123,12 @@ class LichSuDatLichController extends Controller
         }
         
         // Calculate time left until booking
-        $timeLeftData = [];
+        $timeLeftData = [
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 0
+        ];
+        
         if ($booking->Thoigiandatlich) {
             $now = Carbon::now();
             $bookingTime = Carbon::parse($booking->Thoigiandatlich);
