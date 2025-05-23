@@ -224,7 +224,7 @@ class DichVuController extends Controller
             ->get();
             
         // Generate booking URL for this service
-        $bookingUrl = route('customer.datlich.create', ['service_id' => $service->MaDV]);
+        $bookingUrl = route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2]);
         
         return view('customer.dichvu.show', compact('service', 'relatedServices', 'bookingUrl', 'reviews', 'averageRating', 'ratingCount'));
     }

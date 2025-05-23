@@ -95,7 +95,7 @@
                     </div>
                     <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                         <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV]) }}" class="btn btn-sm btn-primary">Đặt lịch</a>
+                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-sm btn-primary">Đặt lịch</a>
                     </div>
                 </div>
             </div>
