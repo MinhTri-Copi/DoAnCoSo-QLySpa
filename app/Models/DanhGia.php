@@ -16,7 +16,6 @@ class DanhGia extends Model
         'Ngaydanhgia', 
         'Manguoidung', 
         'MaHD',
-        'MaDV',
         'PhanHoi',
         'NgayPhanHoi'
     ];

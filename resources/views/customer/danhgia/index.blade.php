@@ -43,7 +43,6 @@
                                 <th>Điểm đánh giá</th>
                                 <th>Nội dung</th>
                                 <th>Ngày đánh giá</th>
-                                <th>Phản hồi</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
@@ -66,13 +65,7 @@
                                         {{ \Illuminate\Support\Str::limit($review->Nhanxet, 50) }}
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($review->Ngaydanhgia)->format('d/m/Y') }}</td>
-                                    <td>
-                                        @if($review->PhanHoi)
-                                            <span class="badge bg-success">Đã phản hồi</span>
-                                        @else
-                                            <span class="badge bg-secondary">Chưa phản hồi</span>
-                                        @endif
-                                    </td>
+                                   
                                     <td>
                                         <a href="{{ route('customer.danhgia.show', $review->MaDG) }}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> Xem
