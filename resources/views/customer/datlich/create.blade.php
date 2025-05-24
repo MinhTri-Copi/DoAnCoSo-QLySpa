@@ -13,7 +13,7 @@
     }
 
     .booking-container {
-        max-width: 1200px;
+        max-width: 1320px;
         margin: 0 auto;
     }
 
@@ -111,8 +111,8 @@
         flex-direction: column;
         box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
         background: #fff;
-        min-height: 420px;
-        max-width: 420px;
+        min-height: 480px;
+        max-width: 480px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -121,7 +121,7 @@
         transform: translateY(-4px) scale(1.01);
     }
     .service-image {
-        height: 240px;
+        height: 280px;
         overflow: hidden;
         border-radius: 20px 20px 0 0;
         background: #fff0f6;
@@ -491,9 +491,9 @@
             <div id="service-selection" style="{{ $step == 1 ? '' : 'display: none;' }}" class="mb-4">                @if(count($recommendedServices) > 0)
                 <div class="recommended-services mb-4">
                     <h3 class="section-title">Dịch vụ đề xuất</h3>
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                         @foreach($recommendedServices as $service)
-                        <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="col">
                             <div class="service-card">
                                 <div class="service-image">
                                     <img src="{{ $service->Image ? asset($service->Image) : asset('images/default-service.jpg') }}" alt="{{ $service->Tendichvu }}">
@@ -610,9 +610,9 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                         @forelse($dichVus as $dichVu)
-                        <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="col">
                             <div class="service-card">
                                 <div class="service-image">
                                     <img src="{{ $dichVu->Image ? asset($dichVu->Image) : asset('images/default-service.jpg') }}" alt="{{ $dichVu->Tendichvu }}">

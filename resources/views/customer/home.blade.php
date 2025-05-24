@@ -150,17 +150,29 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="h1 mb-4">{{ $promotionAds[0]->Tieude ?? 'Ưu đãi đặc biệt' }}</h2>
-                <p class="lead mb-4">{{ $promotionAds[0]->Noidung ?? 'Hãy khám phá các ưu đãi độc quyền của chúng tôi dành cho bạn.' }}</p>
-                @if(isset($promotionAds[0]))
-                <a href="{{ route('customer.quangcao.show', $promotionAds[0]->MaQC) }}" class="btn btn-primary btn-lg">Khám phá ngay</a>
-                @endif
+                <h2 class="h1 mb-4">Phun xăm thẩm mỹ giảm giá sốc</h2>
+                <ul class="promo-sticker-list mb-4">
+                    <li>✨ <b>PHUN XĂM THẨM MỸ – GIẢM GIÁ 15%</b></li>
+                    <li>💖 Đẹp tự nhiên – Không đau – An toàn tuyệt đối</li>
+                    <li>🎯 Kỹ thuật chuẩn y khoa – Mực hữu cơ nhập khẩu 🦉</li>
+                    <li>👁️ Dáng mày hài hòa, sắc nét, khắc phục khuyết điểm</li>
+                    <li>📍 Chuyên viên tay nghề cao – Trang thiết bị vô trùng 🎁</li>
+                    <li>Đặt lịch ngay – Ưu đãi chỉ áp dụng trong tuần này!</li>
+                </ul>
+                <a href="#" class="btn btn-pink btn-lg">Khám phá ngay</a>
             </div>
             <div class="col-lg-6 text-center">
                 @if(isset($promotionAds[0]) && $promotionAds[0]->Image)
-                <img src="{{ asset($promotionAds[0]->Image) }}" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="{{ asset($promotionAds[0]->Image) }}"
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Promotion';"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @else
-                <img src="https://placehold.co/600x400?text=Ưu+đãi+đặc+biệt" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="https://placehold.co/600x400?text=Promotion"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @endif
             </div>
         </div>
@@ -799,6 +811,46 @@
         background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
         color: #fff;
         transform: translateY(-2px) scale(1.04);
+    }
+    .promo-sticker-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 1.5rem;
+    }
+    .promo-sticker-list li {
+        font-size: 1.18rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5em;
+        line-height: 1.6;
+    }
+    .promo-sticker-list li b {
+        color: #d72660;
+        font-weight: 700;
+    }
+    .btn-pink {
+        background: #ff6b9d;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.7rem 2.2rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+        box-shadow: 0 4px 16px rgba(255,107,157,0.10);
+        transition: background 0.2s;
+    }
+    .btn-pink:hover {
+        background: #ff4785;
+        color: #fff;
+    }
+    .promo-banner-img {
+        max-width: 100% !important;
+        max-height: 520px !important;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.13);
+        object-fit: cover;
+        object-position: center;
     }
 </style>
 @endsection
