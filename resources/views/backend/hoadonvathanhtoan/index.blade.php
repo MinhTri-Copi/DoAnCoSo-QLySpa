@@ -536,6 +536,49 @@
             flex-direction: column;
         }
     }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .pulse-badge {
+        animation: pulse 2s infinite;
+        font-weight: bold;
+        padding: 8px 12px;
+        border-radius: 15px;
+        box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+        position: relative;
+        display: inline-block;
+        background-color: #ffc107 !important;
+        color: #000 !important;
+        border: 2px solid #e0a800;
+        font-size: 12px;
+        line-height: 1.2;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .pulse-badge::after {
+        content: "";
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: 50%;
+        border: 1px solid white;
+    }
+
+    tr.pending-payment {
+        background-color: rgba(255, 243, 205, 0.4) !important;
+    }
+
+    tr.pending-payment:hover {
+        background-color: rgba(255, 243, 205, 0.7) !important;
+    }
 </style>
 
 <div class="header-container">
@@ -727,7 +770,7 @@
             </thead>
             <tbody>
                 @forelse($hoaDons as $hoaDon)
-                <tr>
+                <tr class="{{ $hoaDon->Matrangthai == 6 ? 'pending-payment' : '' }}">
                     <td>{{ $hoaDon->MaHD }}</td>
                     <td>
                         @if($hoaDon->user)
@@ -777,7 +820,11 @@
                     </td>
                     <td>
                         @if($hoaDon->trangThai)
-                            <span>{{ $hoaDon->trangThai->Tentrangthai }}</span>
+                            @if($hoaDon->Matrangthai == 6)
+                                <span class="pulse-badge">{{ $hoaDon->trangThai->Tentrangthai }}</span>
+                            @else
+                                <span>{{ $hoaDon->trangThai->Tentrangthai }}</span>
+                            @endif
                         @else
                             <span class="text-muted">N/A</span>
                         @endif
@@ -787,9 +834,11 @@
                             <a href="{{ route('admin.hoadonvathanhtoan.show', $hoaDon->MaHD) }}" class="btn-action btn-view" title="Xem chi tiết">
                                 <i class="fas fa-eye"></i>
                             </a>
+                            @if($hoaDon->Matrangthai != 4) {{-- Ẩn nút chỉnh sửa nếu hóa đơn đã thanh toán (Matrangthai = 4) --}}
                             <a href="{{ route('admin.hoadonvathanhtoan.edit', $hoaDon->MaHD) }}" class="btn-action btn-edit" title="Chỉnh sửa">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            @endif
                             <a href="{{ route('admin.hoadonvathanhtoan.confirmDestroy', $hoaDon->MaHD) }}" class="btn-action btn-delete" title="Xóa">
                                 <i class="fas fa-trash"></i>
                             </a>

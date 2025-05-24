@@ -58,12 +58,19 @@ class HoaDonVaThanhToanController extends Controller
             $query->where('Tongtien', '<=', $request->amount_to);
         }
         
-        // Sắp xếp
-        $sortField = $request->get('sort', 'Ngaythanhtoan');
-        $sortDirection = $request->get('direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
-        
-        $hoaDons = $query->paginate(10);
+        // Ưu tiên hiển thị hóa đơn có trạng thái "Chờ thanh toán" (Matrangthai = 6)
+        if (!$request->has('sort')) {
+            // Nếu người dùng không chỉ định cách sắp xếp, ưu tiên theo trạng thái "Chờ thanh toán"
+            $hoaDons = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])
+                ->orderByRaw("CASE WHEN Matrangthai = 6 THEN 0 ELSE 1 END")
+                ->orderBy('Ngaythanhtoan', 'desc')
+                ->paginate(10);
+        } else {
+            // Sắp xếp theo yêu cầu của người dùng
+            $sortField = $request->get('sort', 'Ngaythanhtoan');
+            $sortDirection = $request->get('direction', 'desc');
+            $hoaDons = $query->orderBy($sortField, $sortDirection)->paginate(10);
+        }
         
         // Lấy danh sách người dùng, phương thức thanh toán và trạng thái cho bộ lọc
         $users = User::all();
@@ -99,7 +106,15 @@ class HoaDonVaThanhToanController extends Controller
 
     public function create()
     {
-        $datLichs = DatLich::all();
+        // Chỉ lấy các lịch đặt có trạng thái "Đã xác nhận" và chưa có hóa đơn hoặc có hóa đơn với trạng thái "Chờ thanh toán"
+        $datLichs = DatLich::where('Trangthai_', 'Đã xác nhận')
+            ->whereNotIn('MaDL', function($query) {
+                $query->select('MaDL')
+                    ->from('HOADON_VA_THANHTOAN')
+                    ->whereNotIn('Matrangthai', [6]); // Chỉ lấy những lịch đặt không có trong hóa đơn đã thanh toán
+            })
+            ->get();
+            
         $users = User::all();
         $phongs = Phong::all();
         $phuongThucs = PhuongThuc::all();
@@ -118,8 +133,7 @@ class HoaDonVaThanhToanController extends Controller
             'MaDL' => 'required|exists:DATLICH,MaDL',
             'Manguoidung' => 'required|exists:USER,Manguoidung',
             'Maphong' => 'required|exists:PHONG,Maphong',
-            'MaPT' => 'required|exists:PHUONGTHUC,MaPT',
-            'Matrangthai' => 'required|exists:TRANGTHAI,Matrangthai',
+            'MaPT' => 'nullable|exists:PHUONGTHUC,MaPT',
         ], [
             'Ngaythanhtoan.required' => 'Ngày thanh toán không được để trống.',
             'Ngaythanhtoan.date' => 'Ngày thanh toán không hợp lệ.',
@@ -132,10 +146,7 @@ class HoaDonVaThanhToanController extends Controller
             'Manguoidung.exists' => 'Người dùng không tồn tại.',
             'Maphong.required' => 'Phòng không được để trống.',
             'Maphong.exists' => 'Phòng không tồn tại.',
-            'MaPT.required' => 'Phương thức không được để trống.',
             'MaPT.exists' => 'Phương thức không tồn tại.',
-            'Matrangthai.required' => 'Trạng thái không được để trống.',
-            'Matrangthai.exists' => 'Trạng thái không tồn tại.',
         ]);
 
         try {
@@ -148,6 +159,9 @@ class HoaDonVaThanhToanController extends Controller
             $datLich = DatLich::with('dichVu')->findOrFail($request->MaDL);
             $tongtien = $datLich->dichVu->Gia; // Set total amount from service price
 
+            // Nếu không chọn trạng thái, mặc định là "Chờ thanh toán" (Matrangthai = 6)
+            $matrangThai = $request->Matrangthai ?? 6;
+
             $hoaDon = HoaDonVaThanhToan::create([
                 'MaHD' => $newMaHD,
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
@@ -156,7 +170,7 @@ class HoaDonVaThanhToanController extends Controller
                 'Manguoidung' => $request->Manguoidung,
                 'Maphong' => $request->Maphong,
                 'MaPT' => $request->MaPT,
-                'Matrangthai' => $request->Matrangthai,
+                'Matrangthai' => $matrangThai,
             ]);
 
             // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền
@@ -202,6 +216,13 @@ class HoaDonVaThanhToanController extends Controller
     public function edit($id)
     {
         $hoaDon = HoaDonVaThanhToan::findOrFail($id);
+        
+        // Kiểm tra nếu hóa đơn đã thanh toán (Matrangthai = 4) thì không cho phép chỉnh sửa
+        if ($hoaDon->Matrangthai == 4) {
+            return redirect()->route('admin.hoadonvathanhtoan.show', $hoaDon->MaHD)
+                ->with('error', 'Không thể chỉnh sửa hóa đơn đã thanh toán!');
+        }
+        
         $datLichs = DatLich::all();
         $users = User::all();
         $phongs = Phong::all();
@@ -221,8 +242,7 @@ class HoaDonVaThanhToanController extends Controller
             'MaDL' => 'required|exists:DATLICH,MaDL',
             'Manguoidung' => 'required|exists:USER,Manguoidung',
             'Maphong' => 'required|exists:PHONG,Maphong',
-            'MaPT' => 'required|exists:PHUONGTHUC,MaPT',
-            'Matrangthai' => 'required|exists:TRANGTHAI,Matrangthai',
+            'MaPT' => 'nullable|exists:PHUONGTHUC,MaPT',
         ], [
             'Ngaythanhtoan.required' => 'Ngày thanh toán không được để trống.',
             'Ngaythanhtoan.date' => 'Ngày thanh toán không hợp lệ.',
@@ -235,10 +255,7 @@ class HoaDonVaThanhToanController extends Controller
             'Manguoidung.exists' => 'Người dùng không tồn tại.',
             'Maphong.required' => 'Phòng không được để trống.',
             'Maphong.exists' => 'Phòng không tồn tại.',
-            'MaPT.required' => 'Phương thức không được để trống.',
             'MaPT.exists' => 'Phương thức không tồn tại.',
-            'Matrangthai.required' => 'Trạng thái không được để trống.',
-            'Matrangthai.exists' => 'Trạng thái không tồn tại.',
         ]);
 
         try {
@@ -248,6 +265,9 @@ class HoaDonVaThanhToanController extends Controller
             $datLich = DatLich::with('dichVu')->findOrFail($request->MaDL);
             $tongtien = $datLich->dichVu->Gia; // Set total amount from service price
             
+            // Nếu không chọn trạng thái, mặc định là "Chờ thanh toán" (Matrangthai = 6)
+            $matrangThai = $request->Matrangthai ?? 6;
+            
             $hoaDon->update([
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
                 'Tongtien' => $tongtien, // Use the calculated total amount
@@ -255,7 +275,7 @@ class HoaDonVaThanhToanController extends Controller
                 'Manguoidung' => $request->Manguoidung,
                 'Maphong' => $request->Maphong,
                 'MaPT' => $request->MaPT,
-                'Matrangthai' => $request->Matrangthai,
+                'Matrangthai' => $matrangThai,
             ]);
 
             // Cập nhật lịch sử điểm thưởng dựa trên tổng tiền

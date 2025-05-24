@@ -112,8 +112,8 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     Route::get('/quang-cao/{id}', [App\Http\Controllers\Customer\QuangCaoController::class, 'show'])->name('quangcao.show');
     Route::get('/quang-cao-noi-bat', [App\Http\Controllers\Customer\QuangCaoController::class, 'getFeaturedAds'])->name('quangcao.featured');
     Route::get('/khuyen-mai', [App\Http\Controllers\Customer\QuangCaoController::class, 'getPromotionAds'])->name('quangcao.promotions');
-    Route::get('/dich-vu-moi', [App\Http\Controllers\Customer\QuangCaoController::class, 'getNewServiceAds'])->name('quangcao.newservices');
     Route::get('/su-kien', [App\Http\Controllers\Customer\QuangCaoController::class, 'getEventAds'])->name('quangcao.events');
+    Route::get('/thong-bao', [App\Http\Controllers\Customer\QuangCaoController::class, 'getNotificationAds'])->name('quangcao.notifications');
     Route::get('/lien-he', [App\Http\Controllers\Customer\LienHeController::class, 'index'])->name('lienhe');
 
     // Phiếu hỗ trợ
