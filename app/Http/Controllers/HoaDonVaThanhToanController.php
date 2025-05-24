@@ -20,6 +20,15 @@ class HoaDonVaThanhToanController extends Controller
     {
         $query = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai']);
         
+        // Tìm kiếm theo tên khách hàng hoặc số điện thoại
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('Hoten', 'like', '%' . $search . '%')
+                  ->orWhere('SDT', 'like', '%' . $search . '%');
+            });
+        }
+        
         // Tìm kiếm theo mã hóa đơn
         if ($request->has('maHD') && $request->maHD) {
             $query->where('MaHD', 'like', '%' . $request->maHD . '%');
@@ -60,11 +69,21 @@ class HoaDonVaThanhToanController extends Controller
         
         // Ưu tiên hiển thị hóa đơn có trạng thái "Chờ thanh toán" (Matrangthai = 6)
         if (!$request->has('sort')) {
-            // Nếu người dùng không chỉ định cách sắp xếp, ưu tiên theo trạng thái "Chờ thanh toán"
-            $hoaDons = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])
-                ->orderByRaw("CASE WHEN Matrangthai = 6 THEN 0 ELSE 1 END")
-                ->orderBy('Ngaythanhtoan', 'desc')
-                ->paginate(10);
+            // Nếu có tìm kiếm, sử dụng query đã xây dựng, nếu không thì dùng query mới
+            if ($request->has('search') || $request->has('maHD') || $request->has('user_id') || 
+                $request->has('payment_method') || $request->has('status') || 
+                $request->has('date_from') || $request->has('date_to') || 
+                $request->has('amount_from') || $request->has('amount_to')) {
+                $hoaDons = $query->orderByRaw("CASE WHEN Matrangthai = 6 THEN 0 ELSE 1 END")
+                    ->orderBy('Ngaythanhtoan', 'desc')
+                    ->paginate(10);
+            } else {
+                // Nếu không có tìm kiếm, sử dụng query mặc định
+                $hoaDons = HoaDonVaThanhToan::with(['datLich', 'user', 'phong', 'phuongThuc', 'trangThai'])
+                    ->orderByRaw("CASE WHEN Matrangthai = 6 THEN 0 ELSE 1 END")
+                    ->orderBy('Ngaythanhtoan', 'desc')
+                    ->paginate(10);
+            }
         } else {
             // Sắp xếp theo yêu cầu của người dùng
             $sortField = $request->get('sort', 'Ngaythanhtoan');
@@ -104,7 +123,7 @@ class HoaDonVaThanhToanController extends Controller
         ));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         // Chỉ lấy các lịch đặt có trạng thái "Đã xác nhận" và chưa có hóa đơn hoặc có hóa đơn với trạng thái "Chờ thanh toán"
         $datLichs = DatLich::where('Trangthai_', 'Đã xác nhận')
@@ -121,8 +140,31 @@ class HoaDonVaThanhToanController extends Controller
         $trangThais = TrangThai::all();
         $maxMaHD = HoaDonVaThanhToan::max('MaHD') ?? 0;
         $suggestedMaHD = $maxMaHD + 1;
+        
+        // Kiểm tra nếu có booking_id được truyền từ trang datlich
+        $selectedBookingId = $request->booking_id ?? null;
+        $selectedBooking = null;
+        
+        if ($selectedBookingId) {
+            $selectedBooking = DatLich::with(['user', 'dichVu'])->find($selectedBookingId);
+            
+            // Nếu booking tồn tại và có trạng thái "Đã xác nhận"
+            if ($selectedBooking && $selectedBooking->Trangthai_ == 'Đã xác nhận') {
+                // Pre-fill user
+                $selectedUserId = $selectedBooking->Manguoidung;
+            }
+        }
 
-        return view('backend.hoadonvathanhtoan.create', compact('datLichs', 'users', 'phongs', 'phuongThucs', 'trangThais', 'suggestedMaHD'));
+        return view('backend.hoadonvathanhtoan.create', compact(
+            'datLichs', 
+            'users', 
+            'phongs', 
+            'phuongThucs', 
+            'trangThais', 
+            'suggestedMaHD',
+            'selectedBookingId',
+            'selectedBooking'
+        ));
     }
 
     public function store(Request $request)

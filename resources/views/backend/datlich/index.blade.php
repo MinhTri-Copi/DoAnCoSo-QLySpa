@@ -706,6 +706,76 @@
             flex-direction: column;
         }
     }
+
+    .btn-action.btn-delete:hover {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .btn-action.btn-invoice {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+    
+    .btn-action.btn-invoice:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    /* Highlighting for pending bookings */
+    tr.pending-booking {
+        background-color: rgba(255, 235, 200, 0.5) !important;
+    }
+    
+    tr.pending-booking:hover {
+        background-color: rgba(255, 235, 200, 0.8) !important;
+    }
+    
+    .pending-status-badge {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .pending-status-badge::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #ffc107;
+        animation: pulse-pending 1.5s infinite;
+    }
+    
+    @keyframes pulse-pending {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        }
+        
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 6px rgba(255, 193, 7, 0);
+        }
+        
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+        }
+    }
 </style>
 
 <div class="spa-dashboard-header animate__animated animate__fadeIn">
@@ -811,7 +881,7 @@
     <form action="{{ route('admin.datlich.index') }}" method="GET" id="filterForm">
         <div class="search-filter-container" id="filterContainer">
             <div class="search-box mb-3 w-100">
-                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên người dùng, dịch vụ, mã đặt lịch..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên người dùng, số điện thoại, dịch vụ, mã đặt lịch..." value="{{ request('search') }}">
                 <i class="fas fa-search"></i>
             </div>
             
@@ -897,41 +967,41 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Mã Đặt Lịch</th>
-                    <th>Người Dùng</th>
-                    <th>Dịch Vụ</th>
-                    <th>Thời Gian</th>
-                    <th>Trạng Thái</th>
-                    <th class="text-end">Thao Tác</th>
+                    <th>Mã</th>
+                    <th>Khách hàng</th>
+                    <th>Dịch vụ</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($datLichs as $datLich)
-                <tr>
+                <tr class="booking-row {{ $datLich->Trangthai_ == 'Chờ xác nhận' ? 'pending-booking' : '' }}" data-url="{{ route('admin.datlich.show', $datLich->MaDL) }}" style="cursor: pointer;">
                     <td>{{ $datLich->MaDL }}</td>
                     <td>
                         @if($datLich->user)
-                            <div class="d-flex align-items-center">
-                                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary-color); font-weight: bold; margin-right: 10px;">
-                                    {{ substr($datLich->user->Hoten, 0, 1) }}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 500;">{{ $datLich->user->Hoten }}</div>
-                                    <div style="font-size: 12px; color: #6c757d;">{{ $datLich->user->SDT ?? 'N/A' }}</div>
-                                </div>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-2">
+                                {{ substr($datLich->user->Hoten, 0, 1) }}
                             </div>
+                            <div>
+                                <div style="font-weight: 500;">{{ $datLich->user->Hoten }}</div>
+                                <div style="font-size: 12px; color: #6c757d;">{{ $datLich->user->SDT ?? 'N/A' }}</div>
+                            </div>
+                        </div>
                         @else
-                            <span class="text-muted">N/A</span>
+                        <span class="text-muted">N/A</span>
                         @endif
                     </td>
                     <td>
                         @if($datLich->dichVu)
-                            <div>
-                                <div style="font-weight: 500;">{{ $datLich->dichVu->Tendichvu }}</div>
-                                <div style="font-size: 12px; color: #6c757d;">{{ number_format($datLich->dichVu->Gia, 0, ',', '.') }} VNĐ</div>
-                            </div>
+                        <div>
+                            <div style="font-weight: 500;">{{ $datLich->dichVu->Tendichvu }}</div>
+                            <div style="font-size: 12px; color: #6c757d;">{{ number_format($datLich->dichVu->Gia, 0, ',', '.') }} VNĐ</div>
+                        </div>
                         @else
-                            <span class="text-muted">N/A</span>
+                        <span class="text-muted">N/A</span>
                         @endif
                     </td>
                     <td>
@@ -941,22 +1011,25 @@
                         </div>
                     </td>
                     <td>
-                       
-                            <div>
-                                <div style="font-weight: 500;">{{ $datLich->Trangthai_ }}</div>
-                            </div>
-                       
+                        <div>
+                            @if($datLich->Trangthai_ == 'Chờ xác nhận')
+                            <div class="pending-status-badge" style="font-weight: 500;">{{ $datLich->Trangthai_ }}</div>
+                            @else
+                            <div style="font-weight: 500;">{{ $datLich->Trangthai_ }}</div>
+                            @endif
+                        </div>
                     </td>
-                   
                     <td class="text-end">
                         <div class="action-buttons">
-                            <a href="{{ route('admin.datlich.show', $datLich->MaDL) }}" class="btn-action btn-view">
-                                <i class="fas fa-eye"></i>
+                            @if($datLich->Trangthai_ == 'Đã xác nhận')
+                            <a href="{{ route('admin.hoadonvathanhtoan.create', ['booking_id' => $datLich->MaDL]) }}" class="btn-action btn-invoice" title="Lập hóa đơn">
+                                <i class="fas fa-file-invoice"></i>
                             </a>
-                            <a href="{{ route('admin.datlich.edit', $datLich->MaDL) }}" class="btn-action btn-edit">
+                            @endif
+                            <a href="{{ route('admin.datlich.edit', $datLich->MaDL) }}" class="btn-action btn-edit" onclick="event.stopPropagation();" title="Chỉnh sửa">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{{ route('admin.datlich.confirmDestroy', $datLich->MaDL) }}" class="btn-action btn-delete">
+                            <a href="{{ route('admin.datlich.confirmDestroy', $datLich->MaDL) }}" class="btn-action btn-delete" onclick="event.stopPropagation();" title="Xóa">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -1142,6 +1215,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
+
+    // Make booking rows clickable to view details
+    document.querySelectorAll('.booking-row').forEach(row => {
+        row.addEventListener('click', function() {
+            window.location.href = this.dataset.url;
+        });
+    });
 });
 </script>
 @endsection

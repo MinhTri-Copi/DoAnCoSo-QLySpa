@@ -271,13 +271,14 @@
             <select class="form-select @error('MaDL') is-invalid @enderror" id="MaDL" name="MaDL" required>
                 <option value="">-- Chọn lịch đặt --</option>
                 @foreach($datLichs as $datLich)
-                    <option value="{{ $datLich->MaDL }}" data-user="{{ $datLich->Manguoidung }}" {{ old('MaDL') == $datLich->MaDL ? 'selected' : '' }}>
-                        {{ $datLich->MaDL }} - {{ optional($datLich->dichVu)->Tendichvu ?? 'N/A' }} ({{ \Carbon\Carbon::parse($datLich->Thoigiandatlich)->format('d/m/Y H:i') }})
-                    </option>
+                <option value="{{ $datLich->MaDL }}" data-user="{{ $datLich->Manguoidung }}" 
+                    {{ old('MaDL') == $datLich->MaDL ? 'selected' : ($selectedBookingId == $datLich->MaDL ? 'selected' : '') }}>
+                    {{ $datLich->MaDL }} - {{ optional($datLich->dichVu)->Tendichvu ?? 'N/A' }} ({{ \Carbon\Carbon::parse($datLich->Thoigiandatlich)->format('d/m/Y H:i') }})
+                </option>
                 @endforeach
             </select>
             @error('MaDL')
-                <div class="invalid-feedback">{{ $message }}</div>
+            <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
         
@@ -470,10 +471,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Khởi tạo giá trị ban đầu nếu đã có
+    // Automatically trigger the change event if a booking is pre-selected
     if (datLichSelect.value) {
         datLichSelect.dispatchEvent(new Event('change'));
     }
+    
+    // If there's a pre-selected booking, auto-populate booking details
+    @if($selectedBookingId)
+    setTimeout(() => {
+        datLichSelect.dispatchEvent(new Event('change'));
+    }, 500);
+    @endif
     
     // Cập nhật người dùng khi chọn đặt lịch
     datLichSelect.addEventListener('change', function() {

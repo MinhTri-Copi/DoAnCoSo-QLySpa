@@ -1007,6 +1007,10 @@
             <a href="{{ route('admin.dichvu.analytics') }}" class="btn btn-action btn-outline">
                 <i class="fas fa-chart-line"></i> Thống kê
             </a>
+            
+            <a href="{{ route('admin.dichvu.auto-featured') }}" class="btn btn-action btn-outline-warning">
+                <i class="fas fa-star"></i> Tự động nổi bật
+            </a>
         </div>
     </div>
 
