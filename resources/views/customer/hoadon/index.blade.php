@@ -261,18 +261,19 @@
         border-radius: 6px;
     }
 
-    /* Đã thanh toán - Soft green */
+    /* Đã thanh toán - Pink */
     .bg-success {
-        background-color: #E7F4E8 !important;
-        color: #2D862F !important;
-        border: 1px solid #A5D6A7;
+        background-color: #ff69b4 !important;
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 2px 4px rgba(255, 105, 180, 0.2);
     }
 
-    /* Hoàn tất - Soft blue */
+    /* Hoàn tất - Silver */
     .bg-completed {
-        background-color: #E3F2FD !important;
-        color: #1565C0 !important;
-        border: 1px solid #90CAF9;
+        background-color: #f5f5f5 !important;
+        color: #666666 !important;
+        border: 1px solid #dddddd;
     }
 
     /* Chờ thanh toán - Soft yellow */
