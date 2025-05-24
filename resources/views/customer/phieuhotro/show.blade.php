@@ -3,126 +3,139 @@
 @section('title', 'Chi tiết phiếu hỗ trợ')
 
 @section('content')
+<style>
+    .rosa-card {
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px 0 rgba(251,113,133,0.10);
+        border: none;
+        background: #fff;
+        margin-bottom: 2rem;
+    }
+    .rosa-badge {
+        font-size: 1rem;
+        padding: 0.5em 1.2em;
+        border-radius: 1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+    .rosa-badge-warning { background: linear-gradient(90deg, #fb7185 0%, #f472b6 100%); color: #fff; }
+    .rosa-badge-success { background: #f9a8d4; color: #047857; }
+    .rosa-badge-danger { background: #fb7185; color: #fff; }
+    .rosa-badge-secondary { background: #f3f4f6; color: #6b7280; }
+    .rosa-btn {
+        border-radius: 2rem;
+        font-weight: 600;
+        padding: 0.5em 1.5em;
+        font-size: 1.1rem;
+        transition: background 0.2s, color 0.2s;
+        min-width: 140px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+    }
+    .rosa-btn-primary {
+        background: linear-gradient(90deg, #fb7185 0%, #f472b6 100%);
+        color: #fff;
+        border: none;
+    }
+    .rosa-btn-primary:hover { background: #f472b6; color: #fff; }
+    .rosa-btn-outline {
+        border: 2px solid #fb7185;
+        color: #fb7185;
+        background: #fff;
+    }
+    .rosa-btn-outline:hover {
+        background: #fb7185;
+        color: #fff;
+    }
+    .rosa-icon {
+        font-size: 1.5rem;
+        vertical-align: middle;
+    }
+    .rosa-label {
+        color: #fb7185;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .rosa-content-box {
+        background: #fff0f6;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1.5px solid #f9a8d4;
+        min-height: 120px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .rosa-header-flex {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem 0 1rem 0;
+    }
+    .rosa-action-row {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+</style>
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="mb-0">Chi tiết phiếu hỗ trợ</h1>
-                <a href="{{ route('customer.phieuhotro.index') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-2"></i>Quay lại
-                </a>
-            </div>
-
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            @endif
-
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            @endif
-
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-0">{{ $phieuHoTro->Tieude }}</h5>
-                            <span class="text-muted small">Mã phiếu: {{ $phieuHoTro->MaPhieu }}</span>
-                        </div>
-                        <div>
-                            @if($phieuHoTro->Trangthai == 'Đang xử lý')
-                                <span class="badge bg-warning">Đang xử lý</span>
-                            @elseif($phieuHoTro->Trangthai == 'Đã hoàn thành')
-                                <span class="badge bg-success">Đã hoàn thành</span>
-                            @elseif($phieuHoTro->Trangthai == 'Đã hủy')
-                                <span class="badge bg-danger">Đã hủy</span>
-                            @else
-                                <span class="badge bg-secondary">{{ $phieuHoTro->Trangthai }}</span>
-                            @endif
-                        </div>
+        <div class="col-md-8">
+            <div class="card rosa-card">
+                <div class="rosa-header-flex">
+                    <h2 class="mb-2" style="color:#fb7185;font-weight:700;">Phiếu hỗ trợ #{{ $phieuHoTro->MaphieuHT }}</h2>
+                    <div class="mb-2">
+                        @if($phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
+                            <span class="rosa-badge rosa-badge-warning"><i class="fas fa-spinner rosa-icon"></i>Đang xử lý</span>
+                        @elseif($phieuHoTro->trangThai->Tentrangthai == 'Đã hoàn thành')
+                            <span class="rosa-badge rosa-badge-success"><i class="fas fa-check-circle rosa-icon"></i>Đã hoàn thành</span>
+                        @elseif($phieuHoTro->trangThai->Tentrangthai == 'Đã hủy')
+                            <span class="rosa-badge rosa-badge-danger"><i class="fas fa-times-circle rosa-icon"></i>Đã hủy</span>
+                        @else
+                            <span class="rosa-badge rosa-badge-secondary">{{ $phieuHoTro->trangThai->Tentrangthai }}</span>
+                        @endif
+                    </div>
+                    <div class="mb-2">
+                        <span class="rosa-label">Phương thức hỗ trợ:</span>
+                        <span style="font-weight:600; color:#fb7185;">{{ $phieuHoTro->ptHoTro->TenPT ?? 'Không xác định' }}</span>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <p class="mb-1 text-muted">Ngày gửi:</p>
-                            <p class="mb-0 fw-medium">{{ \Carbon\Carbon::parse($phieuHoTro->Ngaygui)->format('d/m/Y H:i') }}</p>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2 justify-content-center">
+                            <i class="fas fa-align-left rosa-icon text-pink-400 me-2"></i>
+                            <span class="rosa-label">Nội dung yêu cầu</span>
                         </div>
-                        <div class="col-md-6">
-                            <p class="mb-1 text-muted">Phương thức hỗ trợ:</p>
-                            <p class="mb-0 fw-medium">{{ $phieuHoTro->phuongThucHoTro->Ten ?? 'Không xác định' }}</p>
+                        <div class="rosa-content-box">
+                            {{ $phieuHoTro->Noidungyeucau }}
                         </div>
                     </div>
-
-                    <h6 class="mb-3">Nội dung:</h6>
-                    <div class="bg-light p-3 rounded mb-4" style="white-space: pre-wrap;">{{ $phieuHoTro->Noidung }}</div>
-
-                    @if($phieuHoTro->Trangthai != 'Đã hủy' && !in_array($phieuHoTro->Trangthai, ['Đã hoàn thành', 'Đã hủy']))
-                        <div class="d-flex justify-content-end mt-3 gap-2">
-                            @if($phieuHoTro->Trangthai == 'Đang xử lý')
-                                <a href="{{ route('customer.phieuhotro.edit', $phieuHoTro->MaPhieu) }}" class="btn btn-outline-primary">
-                                    <i class="fas fa-edit me-2"></i>Chỉnh sửa
-                                </a>
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                                    <i class="fas fa-times me-2"></i>Hủy phiếu
-                                </button>
-                            @endif
-                        </div>
-                    @endif
+                    <div class="rosa-action-row">
+                        @if($phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
+                            <a href="{{ route('customer.phieuhotro.edit', $phieuHoTro->MaphieuHT) }}" class="rosa-btn rosa-btn-outline">
+                                <i class="fas fa-edit rosa-icon"></i>Chỉnh sửa
+                            </a>
+                            <a href="{{ route('customer.phieuhotro.confirm-destroy', $phieuHoTro->MaphieuHT) }}" class="rosa-btn rosa-btn-outline">
+                                <i class="fas fa-trash rosa-icon"></i>Xoá phiếu
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
-
-            @if($phieuHoTro->Trangthai != 'Đã hủy')
-                <!-- Form gửi phản hồi bổ sung -->
-                @if(!in_array($phieuHoTro->Trangthai, ['Đã hoàn thành', 'Đã hủy']))
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Gửi thêm phản hồi</h5>
-                            <form action="{{ route('customer.phieuhotro.feedback', $phieuHoTro->MaPhieu) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <textarea class="form-control @error('feedback') is-invalid @enderror" id="feedback" name="feedback" rows="4" placeholder="Nhập phản hồi của bạn..." required>{{ old('feedback') }}</textarea>
-                                    @error('feedback')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane me-2"></i>Gửi phản hồi
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                @endif
-            @endif
-        </div>
-    </div>
-</div>
-
-<!-- Modal xác nhận hủy -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Xác nhận hủy phiếu hỗ trợ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn hủy phiếu hỗ trợ này không?</p>
-                <p class="text-muted">Lưu ý: Bạn sẽ không thể khôi phục lại phiếu hỗ trợ sau khi đã hủy.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <form action="{{ route('customer.phieuhotro.cancel', $phieuHoTro->MaPhieu) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
-                </form>
+            <div class="d-flex justify-content-center">
+                <a href="{{ route('customer.phieuhotro.index') }}" class="rosa-btn rosa-btn-primary">
+                    <i class="fas fa-arrow-left rosa-icon me-2"></i>Quay lại danh sách
+                </a>
             </div>
         </div>
     </div>

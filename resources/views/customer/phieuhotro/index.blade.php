@@ -33,9 +33,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Mã phiếu</th>
-                                <th>Tiêu đề</th>
                                 <th>Phương thức hỗ trợ</th>
-                                <th>Ngày gửi</th>
                                 <th>Trạng thái</th>
                                 <th>Thao tác</th>
                             </tr>
@@ -43,54 +41,32 @@
                         <tbody>
                             @foreach($phieuHoTro as $phieu)
                                 <tr>
-                                    <td>{{ $phieu->MaPhieu }}</td>
-                                    <td>{{ $phieu->Tieude }}</td>
-                                    <td>{{ $phieu->phuongThucHoTro->Ten ?? 'Không xác định' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($phieu->Ngaygui)->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $phieu->MaphieuHT }}</td>
+                                    <td>{{ $phieu->ptHoTro->TenPT ?? 'Không xác định' }}</td>
                                     <td>
-                                        @if($phieu->Trangthai == 'Đang xử lý')
+                                        @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
                                             <span class="badge bg-warning">Đang xử lý</span>
-                                        @elseif($phieu->Trangthai == 'Đã hoàn thành')
+                                        @elseif($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đã hoàn thành')
                                             <span class="badge bg-success">Đã hoàn thành</span>
-                                        @elseif($phieu->Trangthai == 'Đã hủy')
+                                        @elseif($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đã hủy')
                                             <span class="badge bg-danger">Đã hủy</span>
                                         @else
-                                            <span class="badge bg-secondary">{{ $phieu->Trangthai }}</span>
+                                            <span class="badge bg-secondary">{{ $phieu->trangThai->Tentrangthai ?? '' }}</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('customer.phieuhotro.show', $phieu->MaPhieu) }}" class="btn btn-sm btn-primary me-1" title="Xem chi tiết">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        @if($phieu->Trangthai == 'Đang xử lý')
-                                            <a href="{{ route('customer.phieuhotro.edit', $phieu->MaPhieu) }}" class="btn btn-sm btn-info me-1" title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
+                                        @if($phieu->MaphieuHT)
+                                            <a href="{{ route('customer.phieuhotro.show', $phieu->MaphieuHT) }}" class="btn btn-sm btn-primary me-1" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $phieu->MaPhieu }}" title="Hủy phiếu">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-
-                                            <!-- Modal xác nhận hủy -->
-                                            <div class="modal fade" id="cancelModal{{ $phieu->MaPhieu }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ $phieu->MaPhieu }}" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="cancelModalLabel{{ $phieu->MaPhieu }}">Xác nhận hủy phiếu hỗ trợ</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            Bạn có chắc chắn muốn hủy phiếu hỗ trợ này không?
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                                            <form action="{{ route('customer.phieuhotro.cancel', $phieu->MaPhieu) }}" method="POST">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-danger">Hủy phiếu</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
+                                                <a href="{{ route('customer.phieuhotro.edit', $phieu->MaphieuHT) }}" class="btn btn-sm btn-info me-1" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{{ route('customer.phieuhotro.confirm-destroy', $phieu->MaphieuHT) }}" class="btn btn-sm btn-danger" title="Xoá phiếu">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>

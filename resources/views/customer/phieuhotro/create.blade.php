@@ -26,14 +26,6 @@
                         @csrf
                         
                         <div class="mb-3">
-                            <label for="Tieude" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('Tieude') is-invalid @enderror" id="Tieude" name="Tieude" value="{{ old('Tieude') }}" required>
-                            @error('Tieude')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
                             <label for="MaPTHT" class="form-label">Phương thức hỗ trợ <span class="text-danger">*</span></label>
                             <select class="form-select @error('MaPTHT') is-invalid @enderror" id="MaPTHT" name="MaPTHT" required>
                                 <option value="">-- Chọn phương thức hỗ trợ --</option>
@@ -47,9 +39,9 @@
                         </div>
                         
                         <div class="mb-4">
-                            <label for="Noidung" class="form-label">Nội dung <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('Noidung') is-invalid @enderror" id="Noidung" name="Noidung" rows="6" required>{{ old('Noidung') }}</textarea>
-                            @error('Noidung')
+                            <label for="Noidungyeucau" class="form-label">Nội dung yêu cầu <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('Noidungyeucau') is-invalid @enderror" id="Noidungyeucau" name="Noidungyeucau" rows="6" required>{{ old('Noidungyeucau') }}</textarea>
+                            @error('Noidungyeucau')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">Vui lòng mô tả chi tiết vấn đề của bạn để chúng tôi có thể hỗ trợ tốt nhất.</div>

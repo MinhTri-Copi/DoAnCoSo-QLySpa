@@ -125,6 +125,8 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     Route::put('/phieu-ho-tro/{id}', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'update'])->name('phieuhotro.update');
     Route::post('/phieu-ho-tro/{id}/cancel', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'cancel'])->name('phieuhotro.cancel');
     Route::post('/phieu-ho-tro/{id}/feedback', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'sendFeedback'])->name('phieuhotro.feedback');
+    Route::delete('/phieu-ho-tro/{id}', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'destroy'])->name('phieuhotro.destroy');
+    Route::get('/phieu-ho-tro/{id}/confirm-destroy', [App\Http\Controllers\Customer\PhieuHoTroController::class, 'confirmDestroy'])->name('phieuhotro.confirm-destroy');
 });
 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
