@@ -311,21 +311,21 @@
             </div>
             <h1 class="page-title">Tạo phiếu hỗ trợ mới</h1>
             <p class="page-subtitle">Mô tả chi tiết vấn đề của bạn để chúng tôi có thể hỗ trợ tốt nhất</p>
-        </div>
+            </div>
 
         <!-- Alerts -->
-        @if(session('error'))
+                    @if(session('error'))
         <div class="alert alert-danger">
             <i class="fas fa-exclamation-circle"></i>
-            {{ session('error') }}
-        </div>
-        @endif
+                        {{ session('error') }}
+                    </div>
+                    @endif
 
         <!-- Form -->
         <div class="form-container">
             <form action="{{ route('customer.phieuhotro.store') }}" method="POST" id="createForm">
-                @csrf
-                
+                        @csrf
+                        
                 <!-- Support Method -->
                 <div class="form-group">
                     <label for="MaPTHT" class="form-label">
@@ -333,21 +333,21 @@
                         Phương thức hỗ trợ 
                         <span class="required">*</span>
                     </label>
-                    <select class="form-select @error('MaPTHT') is-invalid @enderror" id="MaPTHT" name="MaPTHT" required>
-                        <option value="">-- Chọn phương thức hỗ trợ --</option>
-                        @foreach($phuongThucHoTro as $pt)
+                            <select class="form-select @error('MaPTHT') is-invalid @enderror" id="MaPTHT" name="MaPTHT" required>
+                                <option value="">-- Chọn phương thức hỗ trợ --</option>
+                                @foreach($phuongThucHoTro as $pt)
                             <option value="{{ $pt->MaPTHT }}" {{ old('MaPTHT') == $pt->MaPTHT ? 'selected' : '' }}>
                                 {{ $pt->TenPT }}
                             </option>
-                        @endforeach
-                    </select>
-                    @error('MaPTHT')
+                                @endforeach
+                            </select>
+                            @error('MaPTHT')
                         <div class="invalid-feedback">
                             <i class="fas fa-exclamation-triangle"></i>{{ $message }}
                         </div>
                     @enderror
-                </div>
-                
+                        </div>
+                        
                 <!-- Content -->
                 <div class="form-group">
                     <label for="Noidungyeucau" class="form-label">
@@ -387,8 +387,8 @@
                     Gửi phiếu hỗ trợ
                 </button>
             </form>
-        </div>
-        
+            </div>
+            
         <!-- Info Card -->
         <div class="info-card">
             <div class="info-title">
@@ -419,4 +419,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
+@endsection 

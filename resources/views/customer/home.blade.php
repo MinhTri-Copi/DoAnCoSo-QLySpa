@@ -35,19 +35,15 @@
         <div class="row">
             @foreach($featuredAds as $ad)
             <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="position-relative">
-                        @if($ad->Image)
-                        <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}" style="height: 200px; object-fit: cover;">
-                        @else
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="fas fa-image fa-3x"></i>
-                        </div>
-                        @endif
-                        <div class="position-absolute top-0 end-0 bg-primary text-white px-2 py-1 m-2 rounded-pill">
-                            Nổi bật
-                        </div>
+                <div class="card h-100 border-0 shadow-sm position-relative">
+                    @if($ad->Image)
+                    <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}">
+                    @else
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x"></i>
                     </div>
+                    @endif
+                    <div class="badge-featured">Nổi bật</div>
                     <div class="card-body">
                         <h5 class="card-title">{{ $ad->Tieude }}</h5>
                         <p class="card-text text-muted small">
@@ -57,12 +53,15 @@
                         </p>
                         <p class="card-text">{{ \Illuminate\Support\Str::limit($ad->Noidung, 100) }}</p>
                     </div>
-                    <div class="card-footer bg-white border-0 pt-0">
-                        <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                    <div class="card-footer">
+                        <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn btn-outline-primary">Chi tiết</a>
                     </div>
                 </div>
             </div>
             @endforeach
+        </div>
+        <div class="text-center">
+            <a href="{{ route('customer.quangcao.index') }}" class="see-all-btn">Xem tất cả ưu đãi</a>
         </div>
     </div>
 </section>
@@ -76,33 +75,29 @@
         <div class="row">
             @foreach($featuredServices as $service)
             <div class="col-md-3 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="position-relative">
-                        @if($service->Image)
-                        <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}" style="height: 200px; object-fit: cover;">
-                        @else
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="fas fa-spa fa-3x"></i>
-                        </div>
-                        @endif
-                        <div class="position-absolute bottom-0 start-0 bg-primary text-white px-2 py-1 m-2">
-                            {{ number_format($service->Gia, 0, ',', '.') }} VND
-                        </div>
+                <div class="card h-100 border-0 shadow-sm position-relative">
+                    @if($service->Image)
+                    <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}">
+                    @else
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-spa fa-3x"></i>
                     </div>
+                    @endif
+                    <div class="price-badge">{{ number_format($service->Gia, 0, ',', '.') }} VND</div>
                     <div class="card-body">
                         <h5 class="card-title">{{ $service->Tendichvu }}</h5>
                         <p class="card-text">{{ \Illuminate\Support\Str::limit($service->MoTa ?? 'Không có mô tả', 80) }}</p>
                     </div>
-                    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
-                        <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-sm btn-primary">Đặt lịch</a>
+                    <div class="card-footer">
+                        <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">Chi tiết</a>
+                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-primary">Đặt lịch</a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
         <div class="text-center mt-4">
-            <a href="{{ route('customer.dichvu.index') }}" class="btn btn-outline-primary">Xem tất cả dịch vụ</a>
+            <a href="{{ route('customer.dichvu.index') }}" class="see-all-btn">Xem tất cả dịch vụ</a>
         </div>
     </div>
 </section>
@@ -155,17 +150,29 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="h1 mb-4">{{ $promotionAds[0]->Tieude ?? 'Ưu đãi đặc biệt' }}</h2>
-                <p class="lead mb-4">{{ $promotionAds[0]->Noidung ?? 'Hãy khám phá các ưu đãi độc quyền của chúng tôi dành cho bạn.' }}</p>
-                @if(isset($promotionAds[0]))
-                <a href="{{ route('customer.quangcao.show', $promotionAds[0]->MaQC) }}" class="btn btn-primary btn-lg">Khám phá ngay</a>
-                @endif
+                <h2 class="h1 mb-4">Phun xăm thẩm mỹ giảm giá sốc</h2>
+                <ul class="promo-sticker-list mb-4">
+                    <li>✨ <b>PHUN XĂM THẨM MỸ – GIẢM GIÁ 15%</b></li>
+                    <li>💖 Đẹp tự nhiên – Không đau – An toàn tuyệt đối</li>
+                    <li>🎯 Kỹ thuật chuẩn y khoa – Mực hữu cơ nhập khẩu 🦉</li>
+                    <li>👁️ Dáng mày hài hòa, sắc nét, khắc phục khuyết điểm</li>
+                    <li>📍 Chuyên viên tay nghề cao – Trang thiết bị vô trùng 🎁</li>
+                    <li>Đặt lịch ngay – Ưu đãi chỉ áp dụng trong tuần này!</li>
+                </ul>
+                <a href="#" class="btn btn-pink btn-lg">Khám phá ngay</a>
             </div>
             <div class="col-lg-6 text-center">
                 @if(isset($promotionAds[0]) && $promotionAds[0]->Image)
-                <img src="{{ asset($promotionAds[0]->Image) }}" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="{{ asset($promotionAds[0]->Image) }}"
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Promotion';"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @else
-                <img src="https://placehold.co/600x400?text=Ưu+đãi+đặc+biệt" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="https://placehold.co/600x400?text=Promotion"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @endif
             </div>
         </div>
@@ -572,6 +579,278 @@
         to {
             transform: scale3d(1, 1, 1);
         }
+    }
+
+    .featured-services .card {
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
+        border: 2px solid #ffe3ea;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(.4,2,.3,1);
+        background: #fff;
+    }
+    .featured-services .card:hover {
+        box-shadow: 0 16px 48px 0 rgba(255,107,157,0.18);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .featured-services .card-img-top {
+        border-radius: 20px 20px 0 0;
+        height: 210px;
+        object-fit: cover;
+    }
+    .featured-services .price-badge {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        background: linear-gradient(90deg,#3b82f6 0%,#60a5fa 100%);
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.08rem;
+        border-radius: 10px;
+        padding: 0.4rem 1.1rem;
+        box-shadow: 0 2px 8px #b3d4fc;
+        z-index: 2;
+    }
+    .featured-services .card-title {
+        font-size: 1.18rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 0.3rem;
+    }
+    .featured-services .card-text {
+        color: #888;
+        font-size: 0.98rem;
+        min-height: 38px;
+    }
+    .featured-services .card-footer {
+        background: #fff;
+        border-top: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.2rem 1rem 1.2rem;
+    }
+    .featured-services .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.02rem;
+        padding: 0.6rem 1.3rem;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px #ffe3ea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .featured-services .btn-primary {
+        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
+        color: #fff;
+        border: none;
+    }
+    .featured-services .btn-primary:hover {
+        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
+        color: #fff;
+        transform: translateY(-2px) scale(1.04);
+    }
+    .featured-services .btn-outline-primary {
+        color: #ff6b9d;
+        border: 2px solid #ff6b9d;
+        background: #fff;
+    }
+    .featured-services .btn-outline-primary:hover {
+        background: #ff6b9d;
+        color: #fff;
+        border: 2px solid #ff6b9d;
+    }
+    @media (max-width: 900px) {
+        .featured-services .card-img-top {
+            height: 150px;
+        }
+    }
+    @media (max-width: 600px) {
+        .featured-services .card {
+            border-radius: 12px;
+        }
+        .featured-services .card-img-top {
+            border-radius: 12px 12px 0 0;
+            height: 110px;
+        }
+        .featured-services .card-title {
+            font-size: 1rem;
+        }
+        .featured-services .btn {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+
+    .featured-ads .card {
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
+        border: 2px solid #ffe3ea;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(.4,2,.3,1);
+        background: #fff;
+    }
+    .featured-ads .card:hover {
+        box-shadow: 0 16px 48px 0 rgba(255,107,157,0.18);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .featured-ads .card-img-top {
+        border-radius: 20px 20px 0 0;
+        height: 210px;
+        object-fit: cover;
+    }
+    .featured-ads .badge-featured {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: linear-gradient(90deg,#3b82f6 0%,#60a5fa 100%);
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.08rem;
+        border-radius: 10px;
+        padding: 0.4rem 1.1rem;
+        box-shadow: 0 2px 8px #b3d4fc;
+        z-index: 2;
+    }
+    .featured-ads .card-title {
+        font-size: 1.18rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 0.3rem;
+    }
+    .featured-ads .card-text {
+        color: #888;
+        font-size: 0.98rem;
+        min-height: 38px;
+    }
+    .featured-ads .card-footer {
+        background: #fff;
+        border-top: none;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.2rem 1rem 1.2rem;
+    }
+    .featured-ads .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.02rem;
+        padding: 0.6rem 1.3rem;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px #ffe3ea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .featured-ads .btn-outline-primary {
+        color: #ff6b9d;
+        border: 2px solid #ff6b9d;
+        background: #fff;
+    }
+    .featured-ads .btn-outline-primary:hover {
+        background: #ff6b9d;
+        color: #fff;
+        border: 2px solid #ff6b9d;
+    }
+    .featured-ads .see-all-btn {
+        margin-top: 24px;
+        border-radius: 12px;
+        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.08rem;
+        padding: 0.7rem 2.2rem;
+        border: none;
+        box-shadow: 0 2px 8px #ffe3ea;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+    .featured-ads .see-all-btn:hover {
+        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
+        color: #fff;
+        transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 900px) {
+        .featured-ads .card-img-top {
+            height: 150px;
+        }
+    }
+    @media (max-width: 600px) {
+        .featured-ads .card {
+            border-radius: 12px;
+        }
+        .featured-ads .card-img-top {
+            border-radius: 12px 12px 0 0;
+            height: 110px;
+        }
+        .featured-ads .card-title {
+            font-size: 1rem;
+        }
+        .featured-ads .btn {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+    .see-all-btn {
+        margin-top: 24px;
+        border-radius: 12px;
+        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.08rem;
+        padding: 0.7rem 2.2rem;
+        border: none;
+        box-shadow: 0 2px 8px #ffe3ea;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+    .see-all-btn:hover {
+        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
+        color: #fff;
+        transform: translateY(-2px) scale(1.04);
+    }
+    .promo-sticker-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 1.5rem;
+    }
+    .promo-sticker-list li {
+        font-size: 1.18rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5em;
+        line-height: 1.6;
+    }
+    .promo-sticker-list li b {
+        color: #d72660;
+        font-weight: 700;
+    }
+    .btn-pink {
+        background: #ff6b9d;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.7rem 2.2rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+        box-shadow: 0 4px 16px rgba(255,107,157,0.10);
+        transition: background 0.2s;
+    }
+    .btn-pink:hover {
+        background: #ff4785;
+        color: #fff;
+    }
+    .promo-banner-img {
+        max-width: 100% !important;
+        max-height: 520px !important;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.13);
+        object-fit: cover;
+        object-position: center;
     }
 </style>
 @endsection

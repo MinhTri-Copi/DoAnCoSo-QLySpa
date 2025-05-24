@@ -355,8 +355,8 @@
             <a href="{{ route('customer.phieuhotro.index') }}">
                 <i class="fas fa-arrow-left"></i>
                 Quay lại danh sách phiếu hỗ trợ
-            </a>
-        </div>
+                </a>
+            </div>
 
         <!-- Ticket Header Card -->
         <div class="ticket-header-card">
@@ -364,13 +364,13 @@
                 <div class="ticket-id-section">
                     <div class="ticket-icon">
                         <i class="fas fa-headset"></i>
-                    </div>
-                    <div>
+                        </div>
+                        <div>
                         <h1 class="ticket-id">#{{ $phieuHoTro->MaphieuHT }}</h1>
                         <p class="ticket-method">{{ $phieuHoTro->ptHoTro->TenPT ?? 'Không xác định' }}</p>
+                        </div>
                     </div>
-                </div>
-                
+
                 <div>
                     @if($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
                         <span class="status-badge status-processing">
@@ -395,12 +395,12 @@
                 <div class="info-item">
                     <span class="info-label">Ngày tạo</span>
                     <span class="info-value">{{ $phieuHoTro->created_at ? $phieuHoTro->created_at->format('d/m/Y H:i') : 'N/A' }}</span>
-                </div>
+                                </div>
                 <div class="info-item">
                     <span class="info-label">Cập nhật lần cuối</span>
                     <span class="info-value">{{ $phieuHoTro->updated_at ? $phieuHoTro->updated_at->format('d/m/Y H:i') : 'N/A' }}</span>
-                </div>
-            </div>
+                        </div>
+                    </div>
         </div>
 
         <!-- Content Section -->
@@ -410,9 +410,9 @@
                 <div class="content-header">
                     <div class="content-icon">
                         <i class="fas fa-file-alt"></i>
-                    </div>
+    </div>
                     <h2 class="content-title">Nội dung yêu cầu hỗ trợ</h2>
-                </div>
+</div>
                 <div class="content-text">{{ $phieuHoTro->Noidungyeucau }}</div>
             </div>
 
@@ -449,9 +449,9 @@
                         <i class="fas fa-phone"></i>
                         Liên hệ hotline
                     </a>
-                </div>
+            </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
+@endsection 
