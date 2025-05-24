@@ -373,8 +373,8 @@
         </div>
         
         <div class="form-group">
-            <label for="MaPT" class="form-label">Phương Thức Thanh Toán <span class="text-danger">*</span></label>
-            <select class="form-select @error('MaPT') is-invalid @enderror" id="MaPT" name="MaPT" required>
+            <label for="MaPT" class="form-label">Phương Thức Thanh Toán</label>
+            <select id="MaPT" name="MaPT" class="form-select @error('MaPT') is-invalid @enderror">
                 <option value="">-- Chọn phương thức thanh toán --</option>
                 @foreach($phuongThucs as $phuongThuc)
                     <option value="{{ $phuongThuc->MaPT }}" {{ old('MaPT', $hoaDon->MaPT) == $phuongThuc->MaPT ? 'selected' : '' }}>
@@ -389,10 +389,10 @@
         
         <div class="form-group">
             <label for="Matrangthai" class="form-label">Trạng Thái <span class="text-danger">*</span></label>
-            <select class="form-select @error('Matrangthai') is-invalid @enderror" id="Matrangthai" name="Matrangthai" required>
+            <select id="Matrangthai" name="Matrangthai" class="form-select @error('Matrangthai') is-invalid @enderror" required>
                 <option value="">-- Chọn trạng thái --</option>
                 @foreach($trangThais as $trangThai)
-                    <option value="{{ $trangThai->Matrangthai }}" {{ old('Matrangthai', $hoaDon->Matrangthai) == $trangThai->Matrangthai ? 'selected' : '' }}>
+                    <option value="{{ $trangThai->Matrangthai }}" {{ ($hoaDon->Matrangthai == $trangThai->Matrangthai) || (empty($hoaDon->Matrangthai) && $trangThai->Matrangthai == 6) ? 'selected' : '' }}>
                         {{ $trangThai->Tentrangthai }}
                     </option>
                 @endforeach

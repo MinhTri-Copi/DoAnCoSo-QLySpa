@@ -941,18 +941,13 @@
                         </div>
                     </td>
                     <td>
-                        @php
-                            $statusClass = 'badge-pending';
-                            if($datLich->Trangthai_ == 'Đã xác nhận') {
-                                $statusClass = 'badge-confirmed';
-                            } elseif($datLich->Trangthai_ == 'Đã hủy') {
-                                $statusClass = 'badge-cancelled';
-                            } elseif($datLich->Trangthai_ == 'Hoàn thành') {
-                                $statusClass = 'badge-completed';
-                            }
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ $datLich->Trangthai_ }}</span>
+                       
+                            <div>
+                                <div style="font-weight: 500;">{{ $datLich->Trangthai_ }}</div>
+                            </div>
+                       
                     </td>
+                   
                     <td class="text-end">
                         <div class="action-buttons">
                             <a href="{{ route('admin.datlich.show', $datLich->MaDL) }}" class="btn-action btn-view">

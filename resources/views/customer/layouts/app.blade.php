@@ -571,8 +571,8 @@
                                 <li><a class="dropdown-item" href="{{ route('customer.quangcao.events') }}">
                                     <i class="fas fa-calendar-alt"></i> Sự kiện
                                 </a></li>
-                                <li><a class="dropdown-item" href="{{ route('customer.quangcao.newservices') }}">
-                                    <i class="fas fa-star"></i> Dịch vụ mới
+                                <li><a class="dropdown-item" href="{{ route('customer.quangcao.notifications') }}">
+                                    <i class="fas fa-bell"></i> Thông báo
                                 </a></li>
                             </ul>
                         </li>

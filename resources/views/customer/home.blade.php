@@ -37,8 +37,8 @@
             <div class="col-md-4 mb-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="position-relative">
-                        @if($ad->Hinhanh)
-                        <img src="{{ asset($ad->Hinhanh) }}" class="card-img-top" alt="{{ $ad->Tieude }}" style="height: 200px; object-fit: cover;">
+                        @if($ad->Image)
+                        <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}" style="height: 200px; object-fit: cover;">
                         @else
                         <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
                             <i class="fas fa-image fa-3x"></i>
@@ -162,10 +162,10 @@
                 @endif
             </div>
             <div class="col-lg-6 text-center">
-                @if(isset($promotionAds[0]) && $promotionAds[0]->Hinhanh)
-                <img src="{{ asset($promotionAds[0]->Hinhanh) }}" class="img-fluid rounded-3 shadow" alt="Promotion">
+                @if(isset($promotionAds[0]) && $promotionAds[0]->Image)
+                <img src="{{ asset($promotionAds[0]->Image) }}" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
                 @else
-                <img src="https://placehold.co/600x400?text=Ưu+đãi+đặc+biệt" class="img-fluid rounded-3 shadow" alt="Promotion">
+                <img src="https://placehold.co/600x400?text=Ưu+đãi+đặc+biệt" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
                 @endif
             </div>
         </div>
