@@ -92,10 +92,15 @@ class HomeController extends Controller
         // Get advertisement data from QuangCaoController
         try {
             $quangCaoController = new QuangCaoController();
-            $featuredAds = $quangCaoController->getFeaturedAds(3);
-            $promotionAds = $quangCaoController->getPromotionAds(2);
-            $eventAds = $quangCaoController->getEventAds(1);
+            $featuredAds = $quangCaoController->getFeaturedAdsData(3);
+            
+            // Create a getPromotionAdsData method similar to getFeaturedAdsData
+            $promotionAds = $quangCaoController->getPromotionAdsData();
+            $eventAds = $quangCaoController->getEventAdsData();
         } catch (\Exception $e) {
+            // Log lỗi để debug
+            \Log::error('Error loading advertisements: ' . $e->getMessage());
+            
             // If advertisements can't be loaded, use empty collections
             $featuredAds = collect();
             $promotionAds = collect();

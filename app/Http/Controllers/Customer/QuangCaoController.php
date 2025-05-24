@@ -178,4 +178,30 @@ class QuangCaoController extends Controller
                 ->get();
         });
     }
+    
+    /**
+     * Get promotion advertisements data for API/AJAX calls.
+     */
+    public function getPromotionAdsData($limit = 3)
+    {
+        return Cache::remember('promotion_ads_' . $limit, 30, function () use ($limit) {
+            return QuangCao::where('Loaiquangcao', 'Khuyến mãi')
+                ->orderBy('Ngaybatdau', 'desc')
+                ->limit($limit)
+                ->get();
+        });
+    }
+    
+    /**
+     * Get event advertisements data for API/AJAX calls.
+     */
+    public function getEventAdsData($limit = 3)
+    {
+        return Cache::remember('event_ads_' . $limit, 30, function () use ($limit) {
+            return QuangCao::where('Loaiquangcao', 'Sự kiện')
+                ->orderBy('Ngaybatdau', 'desc')
+                ->limit($limit)
+                ->get();
+        });
+    }
 }
