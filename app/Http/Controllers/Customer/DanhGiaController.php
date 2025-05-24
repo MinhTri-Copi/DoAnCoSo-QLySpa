@@ -174,17 +174,10 @@ class DanhGiaController extends Controller
         $lastReview = DanhGia::orderBy('MaDG', 'desc')->first();
         $newReviewId = $lastReview ? $lastReview->MaDG + 1 : 1;
         
-        // Lấy MaDV từ đặt lịch
-        $maDV = null;
-        if ($hoaDon->datLich && $hoaDon->datLich->MaDV) {
-            $maDV = $hoaDon->datLich->MaDV;
-        }
-        
-        // Create the review
+        // Create the review - remove MaDV field since it doesn't exist in the database
         $danhGia = DanhGia::create([
             'MaDG' => $newReviewId,
             'Manguoidung' => $user->Manguoidung,
-            'MaDV' => $maDV,
             'MaHD' => $hoaDon->MaHD,
             'Danhgiasao' => $request->Diemdanhgia,
             'Nhanxet' => $request->Noidungdanhgia,

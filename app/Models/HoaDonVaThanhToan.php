@@ -61,6 +61,12 @@ class HoaDonVaThanhToan extends Model
             $query->where('Manguoidung', $userID);
         }
         
-        return $query->exists();
+        // Check if any rating exists
+        $exists = $query->exists();
+        
+        // Log for debugging
+        \Log::info('Checking if invoice #' . $this->MaHD . ' has been rated by user #' . $userID . ': ' . ($exists ? 'Yes' : 'No'));
+        
+        return $exists;
     }
 }

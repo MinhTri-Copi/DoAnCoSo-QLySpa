@@ -56,7 +56,7 @@
                         <div class="col-md-6 mb-3">
                             <div class="info-item d-flex align-items-center">
                                 <i class="fas fa-clock me-2"></i>
-                                <span>Thời gian: {{ $service->Thoigian ? $service->Thoigian->format('H:i') : 'Liên hệ để biết thêm' }}</span>
+                                <span>Thời gian: {{ $service->thoigian ? (is_string($service->thoigian) ? $service->thoigian : $service->thoigian->format('H:i d/m/Y')) : '' }}</span>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">

@@ -106,6 +106,7 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     Route::get('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'showPayment'])->name('hoadon.showPayment');
     Route::post('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'processPayment'])->name('hoadon.processPayment');
     Route::get('/hoa-don/tao-moi/tu-lich-hen', [App\Http\Controllers\Customer\HoaDonController::class, 'createInvoice'])->name('hoadon.createFromBookings');
+    Route::get('/hoa-don/{id}/check-rating', [App\Http\Controllers\Customer\HoaDonController::class, 'checkRatingStatus'])->name('hoadon.checkRating');
     
     // Advertisements
     Route::get('/quang-cao', [App\Http\Controllers\Customer\QuangCaoController::class, 'index'])->name('quangcao.index');

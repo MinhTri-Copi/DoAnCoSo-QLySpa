@@ -358,4 +358,70 @@ class HoaDonController extends Controller
                 ->with('info', 'Không có lịch hẹn hoàn thành nào cần tạo hóa đơn.');
         }
     }
+    
+    /**
+     * Diagnostic function to check invoice rating status
+     * 
+     * @param int $id Invoice ID to check
+     * @return \Illuminate\Http\Response
+     */
+    public function checkRatingStatus($id)
+    {
+        $user = Auth::user();
+        $customer = User::where('MaTK', $user->MaTK)->first();
+        
+        if (!$customer) {
+            return response()->json([
+                'error' => 'Customer not found'
+            ]);
+        }
+        
+        $invoice = HoaDonVaThanhToan::with(['datLich.dichVu', 'trangThai', 'danhGia'])
+            ->find($id);
+            
+        if (!$invoice) {
+            return response()->json([
+                'error' => 'Invoice not found'
+            ]);
+        }
+        
+        // Check if user has permission to view this invoice
+        $isOwner = false;
+        if ($invoice->datLich && $invoice->datLich->Manguoidung == $customer->Manguoidung) {
+            $isOwner = true;
+        }
+        if ($invoice->Manguoidung == $customer->Manguoidung) {
+            $isOwner = true;
+        }
+        
+        if (!$isOwner) {
+            return response()->json([
+                'error' => 'Not authorized to view this invoice'
+            ]);
+        }
+        
+        // Direct check if ratings exist
+        $ratings = \App\Models\DanhGia::where('MaHD', $invoice->MaHD)
+            ->where('Manguoidung', $customer->Manguoidung)
+            ->get();
+            
+        // Use the model method
+        $hasRating = $invoice->daDanhGia($customer->Manguoidung);
+        
+        return response()->json([
+            'invoice_id' => $invoice->MaHD,
+            'status_code' => $invoice->Matrangthai,
+            'status_name' => $invoice->trangThai ? $invoice->trangThai->Tentrangthai : 'Unknown',
+            'ratings_direct_check' => $ratings->count() > 0,
+            'ratings_direct_count' => $ratings->count(),
+            'ratings_model_check' => $hasRating,
+            'ratings' => $ratings->map(function($rating) {
+                return [
+                    'id' => $rating->MaDG,
+                    'stars' => $rating->Danhgiasao,
+                    'comment' => $rating->Nhanxet
+                ];
+            })
+        ]);
+    }
 } 

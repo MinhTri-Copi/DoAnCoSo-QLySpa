@@ -171,17 +171,31 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
+                                        @php
+                                            // Determine if the invoice has been paid by checking badge text
+                                            $isPaid = false;
+                                            if ($invoice->Matrangthai == 4) {
+                                                $isPaid = true;
+                                            } elseif ($invoice->trangThai && $invoice->trangThai->Tentrangthai == 'Đã thanh toán') {
+                                                $isPaid = true;
+                                            }
+                                            // Check if already rated
+                                            $hasRating = \App\Models\DanhGia::where('MaHD', $invoice->MaHD)
+                                                ->where('Manguoidung', $customer->Manguoidung)
+                                                ->exists();
+                                        @endphp
+                                        
                                         @if($invoice->Matrangthai == 2)
                                             <a href="{{ route('customer.hoadon.showPayment', $invoice->MaHD) }}" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-credit-card me-1"></i>Thanh toán
                                             </a>
                                         @else
                                             <div class="btn-group">
-                                                @if($invoice->Matrangthai == 1 && !$invoice->daDanhGia($customer->Manguoidung))
-                                                <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-sm btn-success" onclick="redirectToDanhGia(event, {{ $invoice->MaHD }})">
+                                                @if($isPaid && !$hasRating)
+                                                <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-sm btn-success">
                                                     <i class="fas fa-star me-1"></i>Đánh giá ngay
                                                 </a>
-                                                @elseif($invoice->Matrangthai == 1 && $invoice->daDanhGia($customer->Manguoidung))
+                                                @elseif($isPaid && $hasRating)
                                                 <button class="btn btn-sm btn-secondary" disabled>
                                                     <i class="fas fa-check me-1"></i>Đã đánh giá
                                                 </button>
