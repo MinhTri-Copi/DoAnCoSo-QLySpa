@@ -434,4 +434,111 @@ class DichVuController extends Controller
             'total' => $dichVus->count()
         ]);
     }
+
+    /**
+     * Automatically update featured services based on booking frequency and ratings
+     * Maximum 10 featured services total
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function updateFeaturedServices()
+    {
+        // Get current manually featured services (we'll preserve these)
+        $currentFeaturedServices = DichVu::where('featured', true)
+            ->pluck('MaDV')
+            ->toArray();
+        
+        // Get the most booked confirmed services
+        $mostBookedServices = DatLich::where('Trangthai_', 2) // "Đã xác nhận"
+            ->select('MaDV', DB::raw('COUNT(*) as booking_count'))
+            ->groupBy('MaDV')
+            ->orderBy('booking_count', 'desc')
+            ->limit(20) // Get more than we need for scoring
+            ->get();
+        
+        // Get highest rated services
+        $highestRatedServices = DB::table('DANHGIA')
+            ->join('HOADON_VA_THANHTOAN', 'DANHGIA.MaHD', '=', 'HOADON_VA_THANHTOAN.MaHD')
+            ->join('DATLICH', 'HOADON_VA_THANHTOAN.MaDL', '=', 'DATLICH.MaDL')
+            ->select('DATLICH.MaDV', DB::raw('AVG(DANHGIA.Danhgiasao) as avg_rating, COUNT(DANHGIA.MaDG) as rating_count'))
+            ->groupBy('DATLICH.MaDV')
+            ->having('rating_count', '>=', 3) // At least 3 ratings
+            ->orderBy('avg_rating', 'desc')
+            ->limit(20) // Get more than we need for scoring
+            ->get();
+        
+        // Create a scoring system that combines booking frequency and ratings
+        $serviceScores = [];
+        
+        // Score based on booking frequency (0-50 points)
+        $maxBookings = $mostBookedServices->max('booking_count') ?: 1;
+        foreach ($mostBookedServices as $service) {
+            $bookingScore = ($service->booking_count / $maxBookings) * 50;
+            $serviceScores[$service->MaDV] = [
+                'id' => $service->MaDV,
+                'booking_score' => $bookingScore,
+                'rating_score' => 0,
+                'total_score' => $bookingScore
+            ];
+        }
+        
+        // Score based on ratings (0-50 points)
+        $maxRating = 5; // Assuming 5-star rating system
+        foreach ($highestRatedServices as $service) {
+            $ratingScore = ($service->avg_rating / $maxRating) * 50;
+            
+            if (isset($serviceScores[$service->MaDV])) {
+                $serviceScores[$service->MaDV]['rating_score'] = $ratingScore;
+                $serviceScores[$service->MaDV]['total_score'] += $ratingScore;
+            } else {
+                $serviceScores[$service->MaDV] = [
+                    'id' => $service->MaDV,
+                    'booking_score' => 0,
+                    'rating_score' => $ratingScore,
+                    'total_score' => $ratingScore
+                ];
+            }
+        }
+        
+        // Sort by total score
+        uasort($serviceScores, function($a, $b) {
+            return $b['total_score'] <=> $a['total_score'];
+        });
+        
+        // Get the top services up to max 10 total
+        $featuredServices = [];
+        $maxFeatured = 10;
+        
+        // First, preserve the existing featured services 
+        foreach ($currentFeaturedServices as $serviceId) {
+            $featuredServices[] = $serviceId;
+            if (count($featuredServices) >= $maxFeatured) {
+                break;
+            }
+        }
+        
+        // Then add top rated/booked services until we reach the maximum
+        if (count($featuredServices) < $maxFeatured) {
+            foreach ($serviceScores as $serviceId => $score) {
+                if (!in_array($serviceId, $featuredServices)) {
+                    $featuredServices[] = $serviceId;
+                    if (count($featuredServices) >= $maxFeatured) {
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Reset all featured status
+        DichVu::query()->update(['featured' => false]);
+        
+        // Set featured status for top services
+        if (!empty($featuredServices)) {
+            DichVu::whereIn('MaDV', $featuredServices)
+                ->update(['featured' => true]);
+        }
+        
+        return redirect()->route('admin.dichvu.index')
+            ->with('success', 'Cập nhật dịch vụ nổi bật thành công! Hiện có ' . count($featuredServices) . ' dịch vụ nổi bật.');
+    }
 }

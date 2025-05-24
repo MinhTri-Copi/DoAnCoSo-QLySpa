@@ -660,21 +660,17 @@
     
     <form action="{{ route('admin.hoadonvathanhtoan.index') }}" method="GET" id="filterForm">
         <div class="search-filter-container" id="filterContainer">
-            <div class="search-box">
+            <div class="search-box mb-3 w-100">
                 <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên khách hàng, số điện thoại..." value="{{ request('search') }}" id="searchInput">
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-file-invoice"></i>
                 <input type="text" name="maHD" placeholder="Tìm kiếm theo mã hóa đơn..." value="{{ request('maHD') }}">
             </div>
             
             <div class="filter-box">
-                <select name="user_id" class="filter-select">
-                    <option value="">-- Tất cả người dùng --</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->Manguoidung }}" {{ request('user_id') == $user->Manguoidung ? 'selected' : '' }}>
-                            {{ $user->Hoten }}
-                        </option>
-                    @endforeach
-                </select>
-                
                 <select name="payment_method" class="filter-select">
                     <option value="">-- Tất cả phương thức --</option>
                     @foreach($phuongThucs as $phuongThuc)
@@ -809,7 +805,7 @@
                     </td>
                     <td>
                         <div style="font-weight: 500; color: var(--primary-color);">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
-                        <div style="font-size: 12px; color: #6c757d;">Đã bao gồm VAT (10%)</div>
+                        <div style="font-size: 12px; color: #6c757d;">Chưa bao gồm VAT</div>
                     </td>
                     <td>
                         @if($hoaDon->phuongThuc)
@@ -886,6 +882,25 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleFilters.addEventListener('click', function() {
         filterContainer.style.display = filterContainer.style.display === 'none' ? 'flex' : 'none';
     });
+    
+    // Handle search inputs submission on Enter key
+    const searchInputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
+    searchInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('filterForm').submit();
+            }
+        });
+    });
+    
+    // Add focus to the search input when page loads
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        if (!searchInput.value) {
+            searchInput.focus();
+        }
+    }
     
     // Initialize tooltips if using Bootstrap
     if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {

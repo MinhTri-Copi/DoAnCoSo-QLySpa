@@ -182,6 +182,7 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
    Route::get('dichvu/analytics/data', [DichVuController::class, 'analytics'])->name('admin.dichvu.analytics');
    Route::get('dichvu/export/csv', [DichVuController::class, 'export'])->name('admin.dichvu.export');
    Route::post('dichvu/{id}/toggle-featured', [DichVuController::class, 'toggleFeatured'])->name('admin.dichvu.toggle-featured');
+   Route::get('dichvu/auto-featured/update', [DichVuController::class, 'updateFeaturedServices'])->name('admin.dichvu.auto-featured');
    Route::get('api/services', [DichVuController::class, 'apiServices'])->name('api.services');
 
    // Route cho quản lý đặt lịch (DATLICH)
