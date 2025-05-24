@@ -352,6 +352,50 @@
             margin-bottom: 0;
         }
     }
+
+    /* Simple Pagination Styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .pagination .page-item {
+        margin: 0 5px;
+    }
+    
+    .pagination .page-link {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: #333;
+        font-weight: 500;
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        text-decoration: none;
+    }
+    
+    .pagination .active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    
+    .pagination .disabled .page-link {
+        color: #aaa;
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    
+    .pagination .page-link:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        color: #0056b3;
+        z-index: 1;
+    }
 </style>
 @endsection
 
@@ -554,7 +598,42 @@
                     </div>
 
                     <div class="d-flex justify-content-center">
-                        {{ $dichVus->appends(request()->query())->links() }}
+                        <nav aria-label="Phân trang">
+                            <ul class="pagination">
+                                {{-- Previous Page Link --}}
+                                @if ($dichVus->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->previousPageUrl() }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @foreach ($dichVus->getUrlRange(1, $dichVus->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $page == $dichVus->currentPage() ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($dichVus->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->nextPageUrl() }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
