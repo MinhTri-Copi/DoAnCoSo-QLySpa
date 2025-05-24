@@ -44,36 +44,40 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Họ và tên</label>
-                                        <input type="text" class="form-control" name="name" value="{{ auth()->user()->Hoten }}" required>
+                                        <input type="text" class="form-control" name="name" value="{{ $user ? $user->Hoten : '' }}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" value="{{ auth()->user()->Email }}" disabled>
+                                        <input type="email" class="form-control" value="{{ $user ? $user->Email : '' }}" disabled>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Số điện thoại</label>
-                                        <input type="tel" class="form-control" name="phone" value="{{ auth()->user()->SDT }}">
+                                        <input type="tel" class="form-control" name="phone" value="{{ $user ? $user->SDT : '' }}">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Ngày sinh</label>
-                                        <input type="date" class="form-control" name="birthday" value="{{ auth()->user()->Ngaysinh }}">
+                                        <input type="date" class="form-control" name="birthday" value="{{ $user ? $user->Ngaysinh : '' }}">
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Địa chỉ</label>
-                                    <textarea class="form-control" name="address" rows="2">{{ auth()->user()->DiaChi }}</textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Giới tính</label>
-                                    <div>
-                                        <label class="me-3"><input type="radio" name="gender" value="1" {{ auth()->user()->Gioitinh == 1 ? 'checked' : '' }}> Nam</label>
-                                        <label><input type="radio" name="gender" value="0" {{ auth()->user()->Gioitinh == 0 ? 'checked' : '' }}> Nữ</label>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Địa chỉ</label>
+                                        <input type="text" class="form-control" name="address" value="{{ $user ? $user->DiaChi : '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Giới tính</label>
+                                        <select class="form-select" name="gender">
+                                            <option value="1" {{ $user && $user->Gioitinh == 1 ? 'selected' : '' }}>Nam</option>
+                                            <option value="0" {{ $user && $user->Gioitinh == 0 ? 'selected' : '' }}>Nữ</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-primary px-4">Cập nhật</button>
+                                    <button type="submit" class="btn btn-primary" style="background-color: var(--accent-color); border-color: var(--accent-color);">
+                                        <i class="fas fa-save me-2"></i>Cập nhật thông tin
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -91,7 +95,7 @@
                                     <tbody>
                                         @forelse(($user ? $user->lsDiemThuong()->orderByDesc('Thoigian')->get() : []) as $ls)
                                             <tr>
-                                                <td>{{ \Carbon\Carbon::parse($ls->Thoigian)->format('d/m/Y H:i') }}</td>
+                                                <td>{{ $ls->Thoigian ? \Carbon\Carbon::parse($ls->Thoigian)->format('d/m/Y H:i') : '' }}</td>
                                                 <td style="color: {{ $ls->Sodiem > 0 ? 'var(--accent-color)' : '#888' }}; font-weight: 600;">{{ $ls->Sodiem > 0 ? '+' : '' }}{{ $ls->Sodiem }}</td>
                                                 <td>{{ $ls->MaHD ? 'HD-' . $ls->MaHD : '' }}</td>
                                             </tr>
