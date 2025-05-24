@@ -25,7 +25,7 @@
                 <i class="fas fa-download me-2"></i>Tải hóa đơn PDF
             </a>
             @if (!$hasReview)
-                <a href="{{ route('customer.danhgia.create', ['invoice_id' => $invoice->MaHD]) }}" class="btn btn-outline-primary">
+                <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-outline-primary" onclick="redirectToDanhGia(event, {{ $invoice->MaHD }})">
                     <i class="fas fa-star me-2"></i>Viết đánh giá
                 </a>
             @endif
@@ -412,4 +412,21 @@
         }
     }
 </style>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+    function redirectToDanhGia(event, invoiceId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('Redirecting to review page for invoice: ' + invoiceId);
+        
+        // Tạo URL đánh giá
+        var reviewUrl = "{{ url('/customer/danh-gia/create') }}/" + invoiceId;
+        
+        // Chuyển hướng đến trang đánh giá
+        window.location.href = reviewUrl;
+    }
+</script>
+@endpush 

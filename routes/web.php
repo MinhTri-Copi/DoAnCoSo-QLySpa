@@ -86,6 +86,7 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     // Reviews
     Route::get('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'index'])->name('danhgia.index');
     Route::get('/danh-gia/create', [App\Http\Controllers\Customer\DanhGiaController::class, 'create'])->name('danhgia.create');
+    Route::get('/danh-gia/create/{invoice_id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'create'])->name('danhgia.create.with_id');
     Route::post('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'store'])->name('danhgia.store');
     Route::get('/danh-gia/{id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'show'])->name('danhgia.show');
     Route::get('/danh-gia/{id}/edit', [App\Http\Controllers\Customer\DanhGiaController::class, 'edit'])->name('danhgia.edit');

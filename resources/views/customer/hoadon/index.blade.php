@@ -143,24 +143,24 @@
                     </thead>
                     <tbody>
                         @forelse($invoices as $invoice)
-                            <tr style="cursor: pointer;" onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
-                                <td>
+                            <tr style="cursor: pointer;">
+                                <td onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
                                     <span class="fw-bold">#{{ $invoice->MaHD }}</span>
                                 </td>
-                                <td>
+                                <td onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
                                     {{ $invoice->datLich->dichVu->Tendichvu ?? 'N/A' }}
                                 </td>
-                                <td>
+                                <td onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
                                     @if($invoice->Ngaythanhtoan)
                                         {{ \Carbon\Carbon::parse($invoice->Ngaythanhtoan)->format('d/m/Y H:i') }}
                                     @else
                                         <span class="text-muted">Chưa thanh toán</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
                                     <span class="text-primary fw-bold">{{ number_format($invoice->Tongtien, 0, ',', '.') }} VNĐ</span>
                                 </td>
-                                <td>
+                                <td onclick="window.location='{{ route('customer.hoadon.show', $invoice->MaHD) }}'">
                                     @if($invoice->Matrangthai == 1)
                                         <span class="badge bg-success">Đã thanh toán</span>
                                     @elseif($invoice->Matrangthai == 2)
@@ -169,7 +169,7 @@
                                         <span class="badge bg-secondary">{{ $invoice->trangThai->Tentrangthai ?? 'N/A' }}</span>
                                     @endif
                                 </td>
-                                <td onclick="event.stopPropagation();">
+                                <td>
                                     <div class="btn-group">
                                         @if($invoice->Matrangthai == 2)
                                             <a href="{{ route('customer.hoadon.showPayment', $invoice->MaHD) }}" class="btn btn-sm btn-primary">
@@ -177,7 +177,7 @@
                                             </a>
                                         @else
                                             <div class="btn-group">
-                                                <a href="{{ route('customer.danhgia.create') }}?invoice_id={{ $invoice->MaHD }}" class="btn btn-sm btn-success">
+                                                <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-sm btn-success" onclick="redirectToDanhGia(event, {{ $invoice->MaHD }})">
                                                     <i class="fas fa-star me-1"></i>Đánh giá ngay
                                                 </a>
                                                 <a href="{{ route('customer.hoadon.pdf', $invoice->MaHD) }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -231,4 +231,22 @@
         margin-bottom: 0;
     }
 </style>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+    function redirectToDanhGia(event, invoiceId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('Redirecting to review page for invoice: ' + invoiceId);
+        
+        // Tạo URL đánh giá
+        var reviewUrl = "{{ url('/customer/danh-gia/create') }}/" + invoiceId;
+        
+        // Chuyển hướng đến trang đánh giá
+        window.location.href = reviewUrl;
+    }
+</script>
+@endpush
+

@@ -28,7 +28,7 @@
                         
                         <div class="mb-4">
                             <h6 class="fw-bold">Dịch vụ</h6>
-                            <p>{{ $review->dichVu ? $review->dichVu->Tendichvu : 'Không có thông tin' }}</p>
+                            <p>{{ $review->getTenDichVu() }}</p>
                         </div>
                         
                         <div class="mb-4">
@@ -36,7 +36,7 @@
                             <div class="star-rating mb-2">
                                 @for($i = 5; $i >= 1; $i--)
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="Diemdanhgia" id="star{{ $i }}" value="{{ $i }}" {{ old('Diemdanhgia', $review->Diemdanhgia) == $i ? 'checked' : '' }} required>
+                                        <input class="form-check-input" type="radio" name="Diemdanhgia" id="star{{ $i }}" value="{{ $i }}" {{ old('Diemdanhgia', $review->Danhgiasao) == $i ? 'checked' : '' }} required>
                                         <label class="form-check-label" for="star{{ $i }}">
                                             @for($j = 1; $j <= 5; $j++)
                                                 @if($j <= $i)
@@ -58,41 +58,10 @@
                         
                         <div class="mb-4">
                             <label for="Noidungdanhgia" class="form-label">Nội dung đánh giá <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('Noidungdanhgia') is-invalid @enderror" id="Noidungdanhgia" name="Noidungdanhgia" rows="5" required>{{ old('Noidungdanhgia', $review->Noidungdanhgia) }}</textarea>
+                            <textarea class="form-control @error('Noidungdanhgia') is-invalid @enderror" id="Noidungdanhgia" name="Noidungdanhgia" rows="5" required>{{ old('Noidungdanhgia', $review->Nhanxet) }}</textarea>
                             @error('Noidungdanhgia')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
-                        
-                        @if(isset($photos) && count($photos) > 0)
-                        <div class="mb-4">
-                            <label class="form-label">Hình ảnh hiện tại</label>
-                            <div class="row g-2">
-                                @foreach($photos as $index => $photo)
-                                <div class="col-4">
-                                    <div class="position-relative">
-                                        <img src="{{ asset('storage/' . $photo) }}" class="img-thumbnail" alt="Hình ảnh đánh giá">
-                                        <div class="form-check position-absolute top-0 end-0 m-2">
-                                            <input class="form-check-input" type="checkbox" name="delete_photos[]" id="delete_photo{{ $index }}" value="{{ $photo }}">
-                                            <label class="form-check-label" for="delete_photo{{ $index }}">
-                                                <span class="badge bg-danger"><i class="fas fa-trash"></i></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                            <small class="form-text text-muted">Đánh dấu vào hình ảnh nếu bạn muốn xóa.</small>
-                        </div>
-                        @endif
-                        
-                        <div class="mb-4">
-                            <label for="photos" class="form-label">Thêm hình ảnh mới</label>
-                            <input type="file" class="form-control @error('photos.*') is-invalid @enderror" id="photos" name="photos[]" multiple accept="image/*">
-                            @error('photos.*')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="form-text text-muted">Có thể chọn nhiều hình ảnh. Kích thước tối đa: 2MB/hình.</small>
                         </div>
                         
                         <div class="d-flex justify-content-between">
