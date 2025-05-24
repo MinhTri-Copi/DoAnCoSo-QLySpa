@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use PDF;
+use Illuminate\Support\Str;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class HoaDonController extends Controller
 {
@@ -23,13 +26,26 @@ class HoaDonController extends Controller
     {
         $user = Auth::user();
         
-        $query = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-            $query->where('Manguoidung', $user->id);
+        // Đảm bảo tìm đúng user trong bảng USER dựa trên tài khoản đăng nhập
+        $customer = User::where('MaTK', $user->MaTK)->first();
+        
+        if (!$customer) {
+            return view('customer.hoadon.index', [
+                'invoices' => collect(),
+                'paymentMethods' => PhuongThuc::all(),
+                'totalSpent' => 0,
+                'totalInvoices' => 0,
+                'unpaidInvoices' => 0,
+            ])->with('error', 'Không tìm thấy thông tin khách hàng');
+        }
+        
+        $query = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($customer) {
+            $query->where('Manguoidung', $customer->Manguoidung);
         })->with(['datLich.dichVu', 'phuongThuc']);
         
         // Filter by payment status
         if ($request->has('payment_status') && $request->payment_status != '') {
-            $query->where('TrangthaiTT', $request->payment_status);
+            $query->where('Matrangthai', $request->payment_status);
         }
         
         // Filter by date range
@@ -75,22 +91,47 @@ class HoaDonController extends Controller
         // Get payment methods for filter
         $paymentMethods = PhuongThuc::all();
         
-        // Calculate statistics
-        $totalSpent = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
-            })
-            ->where('TrangthaiTT', 'completed') // Assuming 'completed' is the status for completed payments
+        // Debug: Log customer info
+        \Log::info('Customer info:', [
+            'MaTK' => $user->MaTK,
+            'Customer ID' => $customer->Manguoidung,
+            'Customer Name' => $customer->Hoten
+        ]);
+        
+        // Calculate statistics - Thử truy vấn trực tiếp
+        $invoiceIds = DB::table('DATLICH')
+            ->where('DATLICH.Manguoidung', $customer->Manguoidung)
+            ->join('HOADON_VA_THANHTOAN', 'DATLICH.MaDL', '=', 'HOADON_VA_THANHTOAN.MaDL')
+            ->pluck('HOADON_VA_THANHTOAN.MaHD');
+            
+        // Debug: Log invoice IDs found
+        \Log::info('Invoices found for user '.$customer->Manguoidung.': ', [
+            'count' => count($invoiceIds),
+            'ids' => $invoiceIds
+        ]);
+        
+        $totalSpent = DB::table('HOADON_VA_THANHTOAN')
+            ->whereIn('MaHD', $invoiceIds)
             ->sum('Tongtien');
             
-        $totalInvoices = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
-            })->count();
-            
-        $unpaidInvoices = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
-            })
-            ->where('TrangthaiTT', 'pending') // Assuming 'pending' is the status for pending payments
+        // Debug: Log total spent calculated
+        \Log::info('Total spent calculated: '.$totalSpent);
+        
+        // Calculate total invoices count
+        $totalInvoices = count($invoiceIds);
+        
+        // Calculate unpaid invoices
+        $unpaidInvoices = DB::table('HOADON_VA_THANHTOAN')
+            ->whereIn('MaHD', $invoiceIds)
+            ->where('Matrangthai', 2) // 2 represents 'pending' status
             ->count();
+        
+        // Debug: Log statistics
+        \Log::info('Invoice statistics:', [
+            'totalSpent' => $totalSpent,
+            'totalInvoices' => $totalInvoices,
+            'unpaidInvoices' => $unpaidInvoices
+        ]);
         
         return view('customer.hoadon.index', compact(
             'invoices',
@@ -110,9 +151,15 @@ class HoaDonController extends Controller
     public function show($id)
     {
         $user = Auth::user();
+        $customer = User::where('MaTK', $user->MaTK)->first();
         
-        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
+        if (!$customer) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin khách hàng');
+        }
+        
+        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($customer) {
+                $query->where('Manguoidung', $customer->Manguoidung);
             })
             ->with(['datLich.dichVu', 'phuongThuc', 'datLich.user'])
             ->where('MaHD', $id)
@@ -133,9 +180,15 @@ class HoaDonController extends Controller
     public function downloadPdf($id)
     {
         $user = Auth::user();
+        $customer = User::where('MaTK', $user->MaTK)->first();
         
-        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
+        if (!$customer) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin khách hàng');
+        }
+        
+        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($customer) {
+                $query->where('Manguoidung', $customer->Manguoidung);
             })
             ->with(['datLich.dichVu', 'phuongThuc', 'datLich.user'])
             ->where('MaHD', $id)
@@ -156,13 +209,19 @@ class HoaDonController extends Controller
     public function showPayment($id)
     {
         $user = Auth::user();
+        $customer = User::where('MaTK', $user->MaTK)->first();
         
-        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
+        if (!$customer) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin khách hàng');
+        }
+        
+        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($customer) {
+                $query->where('Manguoidung', $customer->Manguoidung);
             })
             ->with(['datLich.dichVu'])
             ->where('MaHD', $id)
-            ->where('TrangthaiTT', 'pending') // Only allow payment for pending invoices
+            ->where('Matrangthai', 2) // 2 is 'pending' status
             ->firstOrFail();
         
         // Get available payment methods
@@ -186,25 +245,31 @@ class HoaDonController extends Controller
         ]);
         
         $user = Auth::user();
+        $customer = User::where('MaTK', $user->MaTK)->first();
         
-        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
+        if (!$customer) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin khách hàng');
+        }
+        
+        $invoice = HoaDonVaThanhToan::whereHas('datLich', function ($query) use ($customer) {
+                $query->where('Manguoidung', $customer->Manguoidung);
             })
             ->where('MaHD', $id)
-            ->where('TrangthaiTT', 'pending')
+            ->where('Matrangthai', 2) // 2 is 'pending' status
             ->firstOrFail();
         
         // Update invoice with payment details
         $invoice->update([
             'MaPT' => $request->payment_method,
             'Ngaythanhtoan' => Carbon::now(),
-            'TrangthaiTT' => 'completed',
+            'Matrangthai' => 1, // 1 is 'completed' status
         ]);
         
         // Update booking status if needed
-        if ($invoice->datLich && $invoice->datLich->Trangthai_ == 2) { // Assuming 2 is "confirmed" status
+        if ($invoice->datLich && $invoice->datLich->Trangthai_ == 'Đã xác nhận') {
             $invoice->datLich->update([
-                'Trangthai_' => 3 // Assuming 3 is "in progress" status
+                'Trangthai_' => 'Hoàn thành'
             ]);
         }
         
@@ -246,6 +311,47 @@ class HoaDonController extends Controller
                 'Trangthai' => 'active',
                 'Thoigianhethan' => Carbon::now()->addYear(), // Points expire after 1 year
             ]);
+        }
+    }
+    
+    /**
+     * Generate invoices for completed appointments without invoices
+     */
+    public function createInvoice()
+    {
+        $user = Auth::user();
+        
+        // Find completed appointments without invoices
+        $completedBookings = DatLich::where('Manguoidung', $user->Manguoidung)
+            ->where('Trangthai_', 'Hoàn thành') // Assuming 'Hoàn thành' is the completed status
+            ->whereDoesntHave('hoaDon')
+            ->with('dichVu')
+            ->get();
+            
+        $created = 0;
+        
+        foreach ($completedBookings as $booking) {
+            // Create an invoice for this booking
+            $invoiceId = 'HD' . Str::random(8);
+            
+            HoaDonVaThanhToan::create([
+                'MaHD' => $invoiceId,
+                'MaDL' => $booking->MaDL,
+                'Manguoidung' => $booking->Manguoidung,
+                'Tongtien' => $booking->dichVu->Gia,
+                'Ngaythanhtoan' => Carbon::now(),
+                'Matrangthai' => 2, // Pending payment
+            ]);
+            
+            $created++;
+        }
+        
+        if ($created > 0) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('success', "Đã tạo {$created} hóa đơn mới từ các lịch hẹn đã hoàn thành.");
+        } else {
+            return redirect()->route('customer.hoadon.index')
+                ->with('info', 'Không có lịch hẹn hoàn thành nào cần tạo hóa đơn.');
         }
     }
 } 
