@@ -86,6 +86,7 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     // Reviews
     Route::get('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'index'])->name('danhgia.index');
     Route::get('/danh-gia/create', [App\Http\Controllers\Customer\DanhGiaController::class, 'create'])->name('danhgia.create');
+    Route::get('/danh-gia/create/{invoice_id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'create'])->name('danhgia.create.with_id');
     Route::post('/danh-gia', [App\Http\Controllers\Customer\DanhGiaController::class, 'store'])->name('danhgia.store');
     Route::get('/danh-gia/{id}', [App\Http\Controllers\Customer\DanhGiaController::class, 'show'])->name('danhgia.show');
     Route::get('/danh-gia/{id}/edit', [App\Http\Controllers\Customer\DanhGiaController::class, 'edit'])->name('danhgia.edit');
@@ -104,6 +105,7 @@ Route::post('/lich-su-dat-lich/{id}/reschedule', [App\Http\Controllers\Customer\
     Route::get('/hoa-don/{id}/pdf', [App\Http\Controllers\Customer\HoaDonController::class, 'downloadPdf'])->name('hoadon.pdf');
     Route::get('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'showPayment'])->name('hoadon.showPayment');
     Route::post('/hoa-don/{id}/thanh-toan', [App\Http\Controllers\Customer\HoaDonController::class, 'processPayment'])->name('hoadon.processPayment');
+    Route::get('/hoa-don/tao-moi/tu-lich-hen', [App\Http\Controllers\Customer\HoaDonController::class, 'createInvoice'])->name('hoadon.createFromBookings');
     
     // Advertisements
     Route::get('/quang-cao', [App\Http\Controllers\Customer\QuangCaoController::class, 'index'])->name('quangcao.index');

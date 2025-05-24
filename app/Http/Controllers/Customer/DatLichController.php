@@ -252,10 +252,10 @@ class DatLichController extends Controller
             })
             ->count();
         
-        // Nếu đã có đủ lịch đặt cùng lúc (giả sử tối đa 2 lịch cùng dịch vụ, cùng thời điểm)
+        // Nếu đã có đủ lịch đặt cùng lúc (tối đa 2 lịch cùng dịch vụ, cùng thời điểm)
         $maxConcurrentBookings = 2;
         if ($overlappingBookings >= $maxConcurrentBookings) {
-            return back()->withInput()->withErrors(['booking_time' => 'Khung giờ này đã đủ lịch đặt, vui lòng chọn khung giờ khác']);
+            return back()->withInput()->withErrors(['booking_time' => 'Khung giờ này đã đạt giới hạn tối đa ' . $maxConcurrentBookings . ' lịch đặt cùng dịch vụ. Vui lòng chọn khung giờ khác']);
         }
         
         try {

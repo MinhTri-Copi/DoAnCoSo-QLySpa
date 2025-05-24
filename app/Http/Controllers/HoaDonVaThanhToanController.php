@@ -144,10 +144,14 @@ class HoaDonVaThanhToanController extends Controller
             $maxMaHD = HoaDonVaThanhToan::max('MaHD') ?? 0;
             $newMaHD = $maxMaHD + 1;
 
+            // Get the DatLich record to access the service price
+            $datLich = DatLich::with('dichVu')->findOrFail($request->MaDL);
+            $tongtien = $datLich->dichVu->Gia; // Set total amount from service price
+
             $hoaDon = HoaDonVaThanhToan::create([
                 'MaHD' => $newMaHD,
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
-                'Tongtien' => $request->Tongtien,
+                'Tongtien' => $tongtien, // Use the calculated total amount
                 'MaDL' => $request->MaDL,
                 'Manguoidung' => $request->Manguoidung,
                 'Maphong' => $request->Maphong,
@@ -156,8 +160,7 @@ class HoaDonVaThanhToanController extends Controller
             ]);
 
             // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền
-            $tongTien = $request->Tongtien;
-            $soDiem = $this->calculateRewardPoints($tongTien);
+            $soDiem = $this->calculateRewardPoints($tongtien);
 
             if ($soDiem > 0) {
                 $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
@@ -241,9 +244,13 @@ class HoaDonVaThanhToanController extends Controller
         try {
             DB::beginTransaction();
             
+            // Get the booking to access the service price
+            $datLich = DatLich::with('dichVu')->findOrFail($request->MaDL);
+            $tongtien = $datLich->dichVu->Gia; // Set total amount from service price
+            
             $hoaDon->update([
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
-                'Tongtien' => $request->Tongtien,
+                'Tongtien' => $tongtien, // Use the calculated total amount
                 'MaDL' => $request->MaDL,
                 'Manguoidung' => $request->Manguoidung,
                 'Maphong' => $request->Maphong,
@@ -253,8 +260,7 @@ class HoaDonVaThanhToanController extends Controller
 
             // Cập nhật lịch sử điểm thưởng dựa trên tổng tiền
             $existingLSDT = LSDiemThuong::where('MaHD', $hoaDon->MaHD)->first();
-            $tongTien = $request->Tongtien;
-            $soDiem = $this->calculateRewardPoints($tongTien);
+            $soDiem = $this->calculateRewardPoints($tongtien);
 
             if ($soDiem > 0) {
                 if ($existingLSDT) {

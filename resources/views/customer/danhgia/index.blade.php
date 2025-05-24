@@ -51,15 +51,11 @@
                             @foreach($reviews as $review)
                                 <tr>
                                     <td>
-                                        @if($review->dichVu)
-                                            {{ $review->dichVu->Tendichvu }}
-                                        @else
-                                            <span class="text-muted fst-italic">Không có thông tin</span>
-                                        @endif
+                                        {{ $review->getTenDichVu() }}
                                     </td>
                                     <td>
                                         @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= $review->Diemdanhgia)
+                                            @if($i <= $review->Danhgiasao)
                                                 <i class="fas fa-star text-warning"></i>
                                             @else
                                                 <i class="far fa-star text-warning"></i>
@@ -67,7 +63,7 @@
                                         @endfor
                                     </td>
                                     <td>
-                                        {{ \Illuminate\Support\Str::limit($review->Noidungdanhgia, 50) }}
+                                        {{ \Illuminate\Support\Str::limit($review->Nhanxet, 50) }}
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($review->Ngaydanhgia)->format('d/m/Y') }}</td>
                                     <td>

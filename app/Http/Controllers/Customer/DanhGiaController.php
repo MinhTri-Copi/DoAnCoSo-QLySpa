@@ -18,10 +18,17 @@ class DanhGiaController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        $reviews = DanhGia::where('Manguoidung', $user->id)
+        $accountUser = Auth::user();
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.home')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
+        $reviews = DanhGia::where('Manguoidung', $user->Manguoidung)
             ->with(['dichVu', 'hoaDon'])
-            ->latest()
+            ->orderBy('Ngaydanhgia', 'desc')
             ->paginate(10);
             
         return view('customer.danhgia.index', compact('reviews'));
@@ -33,32 +40,70 @@ class DanhGiaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(Request $request, $invoice_id = null)
     {
-        // Validate invoice ID
-        $request->validate([
-            'invoice_id' => 'required|exists:HOADON_VA_THANHTOAN,MaHD'
-        ]);
+        // Ưu tiên route param, sau đó đến query param
+        $invoiceId = $invoice_id ?? $request->invoice_id;
         
-        $user = Auth::user();
+        // Validate invoice ID
+        if (!$invoiceId || !is_numeric($invoiceId)) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'ID hóa đơn không hợp lệ.');
+        }
+        
+        // Lấy thông tin tài khoản đăng nhập
+        $accountUser = Auth::user();
+        
+        // Lấy thông tin người dùng từ bảng USER dựa trên MaTK
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
+        // Try to find the invoice with more flexible query
         $hoaDon = HoaDonVaThanhToan::with(['datLich.dichVu'])
-            ->whereHas('datLich', function($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
-            })
-            ->where('MaHD', $request->invoice_id)
-            ->firstOrFail();
+            ->where('MaHD', $invoiceId)
+            ->first();
+            
+        if (!$hoaDon) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy hóa đơn này. Vui lòng thử lại.');
+        }
+        
+        // Kiểm tra xem datLich có tồn tại không
+        if (!$hoaDon->datLich) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin đặt lịch cho hóa đơn này.');
+        }
+        
+        // Verify ownership - kiểm tra cả hai cách
+        $isOwner = false;
+        
+        // Cách 1: Kiểm tra qua datLich
+        if ($hoaDon->datLich->Manguoidung == $user->Manguoidung) {
+            $isOwner = true;
+        }
+        
+        // Cách 2: Kiểm tra qua hóa đơn
+        if ($hoaDon->Manguoidung == $user->Manguoidung) {
+            $isOwner = true;
+        }
+        
+        if (!$isOwner) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Bạn không có quyền đánh giá hóa đơn này.');
+        }
             
         // Check if user already reviewed this invoice
-        $existingReview = DanhGia::where('MaHD', $hoaDon->MaHD)->exists();
+        $existingReview = DanhGia::where('MaHD', $hoaDon->MaHD)
+            ->where('Manguoidung', $user->Manguoidung)
+            ->exists();
+            
         if ($existingReview) {
             return redirect()->route('customer.danhgia.index')
                 ->with('error', 'Bạn đã đánh giá dịch vụ này rồi.');
-        }
-        
-        // Check if service is completed
-        if ($hoaDon->datLich->Trangthai_ != 5) { // Assuming 5 is completed status
-            return redirect()->route('customer.lichsudatlich.index')
-                ->with('error', 'Chỉ có thể đánh giá dịch vụ đã hoàn thành.');
         }
         
         return view('customer.danhgia.create', compact('hoaDon'));
@@ -73,53 +118,77 @@ class DanhGiaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice_id' => 'required|exists:HOADON_VA_THANHTOAN,MaHD',
+            'invoice_id' => 'required|numeric',
             'Diemdanhgia' => 'required|integer|min:1|max:5',
             'Noidungdanhgia' => 'required|string|max:500',
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ], [
             'Diemdanhgia.required' => 'Vui lòng chọn số sao đánh giá.',
             'Diemdanhgia.min' => 'Vui lòng chọn ít nhất 1 sao.',
             'Diemdanhgia.max' => 'Đánh giá tối đa 5 sao.',
             'Noidungdanhgia.required' => 'Vui lòng nhập nội dung đánh giá.',
             'Noidungdanhgia.max' => 'Nội dung đánh giá không quá 500 ký tự.',
-            'photos.*.image' => 'File phải là hình ảnh.',
-            'photos.*.mimes' => 'Định dạng hình ảnh phải là: jpeg, png, jpg, gif.',
-            'photos.*.max' => 'Kích thước hình ảnh không quá 2MB.'
         ]);
         
-        $user = Auth::user();
+        // Lấy thông tin tài khoản đăng nhập
+        $accountUser = Auth::user();
+        
+        // Lấy thông tin người dùng từ bảng USER dựa trên MaTK
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
+        $invoiceId = $request->invoice_id;
+        
+        // Find the invoice
         $hoaDon = HoaDonVaThanhToan::with('datLich')
-            ->whereHas('datLich', function($query) use ($user) {
-                $query->where('Manguoidung', $user->id);
-            })
-            ->where('MaHD', $request->invoice_id)
-            ->firstOrFail();
+            ->where('MaHD', $invoiceId)
+            ->first();
+            
+        if (!$hoaDon) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Không tìm thấy hóa đơn này.');
+        }
+        
+        // Verify ownership - kiểm tra cả hai cách
+        $isOwner = false;
+        
+        // Cách 1: Kiểm tra qua datLich
+        if ($hoaDon->datLich && $hoaDon->datLich->Manguoidung == $user->Manguoidung) {
+            $isOwner = true;
+        }
+        
+        // Cách 2: Kiểm tra qua hóa đơn
+        if ($hoaDon->Manguoidung == $user->Manguoidung) {
+            $isOwner = true;
+        }
+        
+        if (!$isOwner) {
+            return redirect()->route('customer.hoadon.index')
+                ->with('error', 'Bạn không có quyền đánh giá hóa đơn này.');
+        }
         
         // Generate a unique review ID
         $lastReview = DanhGia::orderBy('MaDG', 'desc')->first();
         $newReviewId = $lastReview ? $lastReview->MaDG + 1 : 1;
         
-        // Handle photo uploads
-        $photos = [];
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $filename = 'review-' . time() . '-' . rand(1000, 9999) . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('images/reviews'), $filename);
-                $photos[] = 'images/reviews/' . $filename;
-            }
+        // Lấy MaDV từ đặt lịch
+        $maDV = null;
+        if ($hoaDon->datLich && $hoaDon->datLich->MaDV) {
+            $maDV = $hoaDon->datLich->MaDV;
         }
         
         // Create the review
         $danhGia = DanhGia::create([
             'MaDG' => $newReviewId,
-            'Manguoidung' => $user->id,
-            'MaDV' => $hoaDon->datLich->MaDV,
+            'Manguoidung' => $user->Manguoidung,
+            'MaDV' => $maDV,
             'MaHD' => $hoaDon->MaHD,
-            'Diemdanhgia' => $request->Diemdanhgia,
-            'Noidungdanhgia' => $request->Noidungdanhgia,
+            'Danhgiasao' => $request->Diemdanhgia,
+            'Nhanxet' => $request->Noidungdanhgia,
             'Ngaydanhgia' => Carbon::now(),
-            'Hinhanh' => !empty($photos) ? json_encode($photos) : null
         ]);
         
         return redirect()->route('customer.danhgia.show', $danhGia->MaDG)
@@ -134,19 +203,20 @@ class DanhGiaController extends Controller
      */
     public function show($id)
     {
-        $user = Auth::user();
+        $accountUser = Auth::user();
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.home')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
         $review = DanhGia::with(['dichVu', 'hoaDon', 'user'])
-            ->where('Manguoidung', $user->id)
+            ->where('Manguoidung', $user->Manguoidung)
             ->where('MaDG', $id)
             ->firstOrFail();
             
-        // Parse photo JSON
-        $photos = [];
-        if ($review->Hinhanh) {
-            $photos = json_decode($review->Hinhanh, true) ?? [];
-        }
-        
-        return view('customer.danhgia.show', compact('review', 'photos'));
+        return view('customer.danhgia.show', compact('review'));
     }
     
     /**
@@ -157,9 +227,16 @@ class DanhGiaController extends Controller
      */
     public function edit($id)
     {
-        $user = Auth::user();
+        $accountUser = Auth::user();
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.home')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
         $review = DanhGia::with(['dichVu', 'hoaDon'])
-            ->where('Manguoidung', $user->id)
+            ->where('Manguoidung', $user->Manguoidung)
             ->where('MaDG', $id)
             ->firstOrFail();
             
@@ -170,13 +247,7 @@ class DanhGiaController extends Controller
                 ->with('error', 'Không thể chỉnh sửa đánh giá sau 48 giờ.');
         }
         
-        // Parse photo JSON
-        $photos = [];
-        if ($review->Hinhanh) {
-            $photos = json_decode($review->Hinhanh, true) ?? [];
-        }
-        
-        return view('customer.danhgia.edit', compact('review', 'photos'));
+        return view('customer.danhgia.edit', compact('review'));
     }
     
     /**
@@ -191,12 +262,17 @@ class DanhGiaController extends Controller
         $request->validate([
             'Diemdanhgia' => 'required|integer|min:1|max:5',
             'Noidungdanhgia' => 'required|string|max:500',
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'delete_photos' => 'nullable|array',
         ]);
         
-        $user = Auth::user();
-        $review = DanhGia::where('Manguoidung', $user->id)
+        $accountUser = Auth::user();
+        $user = \App\Models\User::where('MaTK', $accountUser->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->route('customer.home')
+                ->with('error', 'Không tìm thấy thông tin người dùng.');
+        }
+        
+        $review = DanhGia::where('Manguoidung', $user->Manguoidung)
             ->where('MaDG', $id)
             ->firstOrFail();
             
@@ -207,42 +283,10 @@ class DanhGiaController extends Controller
                 ->with('error', 'Không thể chỉnh sửa đánh giá sau 48 giờ.');
         }
         
-        // Handle existing photos
-        $photos = [];
-        if ($review->Hinhanh) {
-            $photos = json_decode($review->Hinhanh, true) ?? [];
-        }
-        
-        // Remove selected photos
-        if ($request->has('delete_photos')) {
-            foreach ($request->delete_photos as $photoPath) {
-                $index = array_search($photoPath, $photos);
-                if ($index !== false) {
-                    // Delete file if exists
-                    if (file_exists(public_path($photoPath))) {
-                        unlink(public_path($photoPath));
-                    }
-                    unset($photos[$index]);
-                }
-            }
-            $photos = array_values($photos); // Re-index array
-        }
-        
-        // Add new photos
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $filename = 'review-' . time() . '-' . rand(1000, 9999) . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('images/reviews'), $filename);
-                $photos[] = 'images/reviews/' . $filename;
-            }
-        }
-        
         // Update the review
         $review->update([
-            'Diemdanhgia' => $request->Diemdanhgia,
-            'Noidungdanhgia' => $request->Noidungdanhgia,
-            'Hinhanh' => !empty($photos) ? json_encode($photos) : null,
-            'Ngaysuadanhgia' => Carbon::now()
+            'Danhgiasao' => $request->Diemdanhgia,
+            'Nhanxet' => $request->Noidungdanhgia,
         ]);
         
         return redirect()->route('customer.danhgia.show', $id)

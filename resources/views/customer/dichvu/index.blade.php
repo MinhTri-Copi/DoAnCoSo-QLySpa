@@ -237,7 +237,7 @@
                                 <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">
                                     <i class="fas fa-eye me-1"></i>Chi tiết
                                 </a>
-                                <a href="{{ $bookingRoute }}?service_id={{ $service->MaDV }}" class="btn btn-primary">
+                                <a href="{{ $bookingRoute }}?service_id={{ $service->MaDV }}&step=2" class="btn btn-primary">
                                     <i class="fas fa-calendar-check me-1"></i>Đặt lịch
                                 </a>
                             </div>
@@ -309,7 +309,7 @@
                             <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">
                                 <i class="fas fa-eye me-1"></i>Chi tiết
                             </a>
-                            <a href="{{ $bookingRoute }}?service_id={{ $service->MaDV }}" class="btn btn-primary">
+                            <a href="{{ $bookingRoute }}?service_id={{ $service->MaDV }}&step=2" class="btn btn-primary">
                                 <i class="fas fa-calendar-check me-1"></i>Đặt lịch
                             </a>
                         </div>

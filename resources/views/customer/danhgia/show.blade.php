@@ -33,46 +33,27 @@
                     
                     <div class="mb-4">
                         <h6 class="fw-bold">Dịch vụ</h6>
-                        @if($review->dichVu)
-                            <p>{{ $review->dichVu->Tendichvu }}</p>
-                        @else
-                            <p class="text-muted fst-italic">Không có thông tin</p>
-                        @endif
+                        <p>{{ $review->getTenDichVu() }}</p>
                     </div>
                     
                     <div class="mb-4">
                         <h6 class="fw-bold">Điểm đánh giá</h6>
                         <div>
                             @for($i = 1; $i <= 5; $i++)
-                                @if($i <= $review->Diemdanhgia)
+                                @if($i <= $review->Danhgiasao)
                                     <i class="fas fa-star text-warning"></i>
                                 @else
                                     <i class="far fa-star text-warning"></i>
                                 @endif
                             @endfor
-                            <span class="ms-2">{{ $review->Diemdanhgia }}/5 sao</span>
+                            <span class="ms-2">{{ $review->Danhgiasao }}/5 sao</span>
                         </div>
                     </div>
                     
                     <div class="mb-4">
                         <h6 class="fw-bold">Nội dung đánh giá</h6>
-                        <p>{{ $review->Noidungdanhgia }}</p>
+                        <p>{{ $review->Nhanxet }}</p>
                     </div>
-                    
-                    @if($photos && count($photos) > 0)
-                        <div class="mb-4">
-                            <h6 class="fw-bold">Hình ảnh đính kèm</h6>
-                            <div class="row g-2">
-                                @foreach($photos as $photo)
-                                    <div class="col-4">
-                                        <a href="{{ asset('storage/' . $photo) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $photo) }}" class="img-thumbnail" alt="Hình ảnh đánh giá">
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
                     
                     <div>
                         <h6 class="fw-bold">Thời gian đánh giá</h6>

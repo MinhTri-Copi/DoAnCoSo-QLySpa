@@ -46,4 +46,21 @@ class HoaDonVaThanhToan extends Model
     {
         return $this->hasMany(LSDiemThuong::class, 'MaHD', 'MaHD');
     }
+    
+    /**
+     * Kiểm tra xem hóa đơn đã được đánh giá chưa
+     *
+     * @param int|null $userID ID của người dùng (nếu null, kiểm tra bất kỳ đánh giá nào)
+     * @return bool
+     */
+    public function daDanhGia($userID = null)
+    {
+        $query = $this->danhGia();
+        
+        if ($userID) {
+            $query->where('Manguoidung', $userID);
+        }
+        
+        return $query->exists();
+    }
 }

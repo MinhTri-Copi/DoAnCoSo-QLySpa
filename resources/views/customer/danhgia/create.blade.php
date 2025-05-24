@@ -83,14 +83,7 @@
                             @enderror
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="photos" class="form-label">Hình ảnh (tùy chọn)</label>
-                            <input type="file" class="form-control @error('photos.*') is-invalid @enderror" id="photos" name="photos[]" multiple accept="image/*">
-                            @error('photos.*')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="form-text text-muted">Có thể chọn nhiều hình ảnh. Kích thước tối đa: 2MB/hình.</small>
-                        </div>
+                       
                         
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary py-2">

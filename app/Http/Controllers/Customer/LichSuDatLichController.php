@@ -21,7 +21,16 @@ class LichSuDatLichController extends Controller
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
+        // Get authenticated account
+        $account = Auth::user();
+        
+        // Get the User record associated with this Account
+        $user = \App\Models\User::where('MaTK', $account->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        }
+        
         $query = DatLich::where('Manguoidung', $user->Manguoidung)
             ->with(['dichVu', 'hoaDon']);
             
@@ -87,7 +96,16 @@ class LichSuDatLichController extends Controller
      */
     public function show($id)
     {
-        $user = Auth::user();
+        // Get authenticated account
+        $account = Auth::user();
+        
+        // Get the User record associated with this Account
+        $user = \App\Models\User::where('MaTK', $account->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        }
+        
         $booking = DatLich::with(['dichVu', 'hoaDon.phuongThuc', 'user'])
             ->where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
@@ -105,7 +123,12 @@ class LichSuDatLichController extends Controller
         }
         
         // Calculate time left until booking
-        $timeLeftData = [];
+        $timeLeftData = [
+            'days' => 0,
+            'hours' => 0,
+            'minutes' => 0
+        ];
+        
         if ($booking->Thoigiandatlich) {
             $now = Carbon::now();
             $bookingTime = Carbon::parse($booking->Thoigiandatlich);
@@ -124,11 +147,21 @@ class LichSuDatLichController extends Controller
         $qrCodeData = route('customer.lichsudatlich.show', $id);
         
         // Get booking status history (if available)
-        $statusHistory = DB::table('LICHSU_TRANGTHAI')
-            ->where('MaDL', $id)
-            ->orderBy('ThoigianCapNhat', 'desc')
-            ->get();
-            
+        $statusHistory = collect([]);
+        
+        // Check if the table exists before querying it
+        try {
+            // First check if we can get a single row to verify table exists
+            if (DB::select("SHOW TABLES LIKE 'LICHSU_TRANGTHAI'")) {
+                $statusHistory = DB::table('LICHSU_TRANGTHAI')
+                    ->where('MaDL', $id)
+                    ->orderBy('ThoigianCapNhat', 'desc')
+                    ->get();
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist or other DB error, just continue without status history
+        }
+        
         return view('customer.lichsudatlich.show', compact(
             'booking', 
             'hasReview', 
@@ -146,7 +179,16 @@ class LichSuDatLichController extends Controller
      */
     public function cancel($id)
     {
-        $user = Auth::user();
+        // Get authenticated account
+        $account = Auth::user();
+        
+        // Get the User record associated with this Account
+        $user = \App\Models\User::where('MaTK', $account->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        }
+        
         $booking = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
             ->firstOrFail();
@@ -170,16 +212,20 @@ class LichSuDatLichController extends Controller
         $booking->Trangthai_ = 'Đã hủy';
         $booking->save();
         
-        // Log status change if you have a status history table
-        if (class_exists('App\Models\LichSuTrangThai')) {
-            DB::table('LICHSU_TRANGTHAI')->insert([
-                'MaDL' => $id,
-                'TrangthaiCu' => $booking->getOriginal('Trangthai_'),
-                'TrangthaiMoi' => 'Đã hủy',
-                'ThoigianCapNhat' => now(),
-                'NguoiCapNhat' => $user->Manguoidung,
-                'GhiChu' => 'Khách hàng tự hủy lịch'
-            ]);
+        // Log status change if the table exists
+        try {
+            if (DB::select("SHOW TABLES LIKE 'LICHSU_TRANGTHAI'")) {
+                DB::table('LICHSU_TRANGTHAI')->insert([
+                    'MaDL' => $id,
+                    'TrangthaiCu' => $booking->getOriginal('Trangthai_'),
+                    'TrangthaiMoi' => 'Đã hủy',
+                    'ThoigianCapNhat' => now(),
+                    'NguoiCapNhat' => $user->Manguoidung,
+                    'GhiChu' => 'Khách hàng tự hủy lịch'
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist or other DB error, just continue without logging
         }
         
         return redirect()->route('customer.lichsudatlich.index')
@@ -201,7 +247,16 @@ class LichSuDatLichController extends Controller
             'reason' => 'required|string|max:255'
         ]);
         
-        $user = Auth::user();
+        // Get authenticated account
+        $account = Auth::user();
+        
+        // Get the User record associated with this Account
+        $user = \App\Models\User::where('MaTK', $account->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        }
+        
         $booking = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('MaDL', $id)
             ->firstOrFail();
@@ -256,16 +311,20 @@ class LichSuDatLichController extends Controller
         $booking->Thoigiandatlich = $newDateTime;
         $booking->save();
         
-        // Log reschedule request
-        if (class_exists('App\Models\LichSuTrangThai')) {
-            DB::table('LICHSU_TRANGTHAI')->insert([
-                'MaDL' => $id,
-                'TrangthaiCu' => $booking->Trangthai_,
-                'TrangthaiMoi' => $booking->Trangthai_,
-                'ThoigianCapNhat' => now(),
-                'NguoiCapNhat' => $user->Manguoidung,
-                'GhiChu' => 'Đổi lịch từ ' . $oldDateTime . ' sang ' . $newDateTime . '. Lý do: ' . $request->reason
-            ]);
+        // Log reschedule request if the table exists
+        try {
+            if (DB::select("SHOW TABLES LIKE 'LICHSU_TRANGTHAI'")) {
+                DB::table('LICHSU_TRANGTHAI')->insert([
+                    'MaDL' => $id,
+                    'TrangthaiCu' => $booking->Trangthai_,
+                    'TrangthaiMoi' => $booking->Trangthai_,
+                    'ThoigianCapNhat' => now(),
+                    'NguoiCapNhat' => $user->Manguoidung,
+                    'GhiChu' => 'Đổi lịch từ ' . $oldDateTime . ' sang ' . $newDateTime . '. Lý do: ' . $request->reason
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist or other DB error, just continue without logging
         }
         
         return redirect()->route('customer.lichsudatlich.show', $id)

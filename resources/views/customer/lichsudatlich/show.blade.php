@@ -288,18 +288,21 @@
         border-radius: 10px;
         padding: 1rem;
         min-width: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .countdown-value {
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: bold;
         color: var(--primary-color);
-        margin-bottom: 0.5rem;
     }
 
     .countdown-label {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         color: #666;
+        margin-bottom: 0.5rem;
     }
 
     .timeline {
@@ -424,21 +427,21 @@
     </div>
     @endif
 
-    @if(!empty($timeLeftData) && in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']))
+    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && \Carbon\Carbon::parse($booking->Thoigiandatlich) > \Carbon\Carbon::now())
     <div class="countdown-container">
         <h4 class="countdown-title">Thời gian còn lại đến lịch hẹn</h4>
         <div class="countdown">
             <div class="countdown-item">
-                <div class="countdown-value">{{ $timeLeftData['days'] }}</div>
                 <div class="countdown-label">Ngày</div>
+                <div class="countdown-value">{{ isset($timeLeftData['days']) ? $timeLeftData['days'] : '0' }}</div>
             </div>
             <div class="countdown-item">
-                <div class="countdown-value">{{ $timeLeftData['hours'] }}</div>
                 <div class="countdown-label">Giờ</div>
+                <div class="countdown-value">{{ isset($timeLeftData['hours']) ? $timeLeftData['hours'] : '0' }}</div>
             </div>
             <div class="countdown-item">
-                <div class="countdown-value">{{ $timeLeftData['minutes'] }}</div>
                 <div class="countdown-label">Phút</div>
+                <div class="countdown-value">{{ isset($timeLeftData['minutes']) ? $timeLeftData['minutes'] : '0' }}</div>
             </div>
         </div>
     </div>
