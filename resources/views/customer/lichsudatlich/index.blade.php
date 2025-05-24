@@ -78,13 +78,13 @@
 
     /* Header Banner Styling */
     .booking-history-header {
-        background: var(--primary-color);
+        background: #ffb6c1;
         border-radius: 15px;
         padding: 2.5rem;
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(255, 107, 157, 0.2);
+        box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
     }
 
     .booking-history-header h1 {
@@ -98,20 +98,15 @@
     }
 
     .booking-history-header p {
-        color: rgba(255, 255, 255, 0.9);
+        color: #fff;
         margin: 0;
         font-size: 1.1rem;
+        opacity: 0.95;
     }
 
-    .booking-history-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-        pointer-events: none;
+    .booking-history-header i {
+        font-size: 2rem;
+        color: #fff;
     }
 
     /* Filter Section Styling */
