@@ -117,45 +117,7 @@
                         
                         <div class="col-md-6">
                             <!-- Bộ lọc theo loại dịch vụ -->
-                            <label class="form-label fw-bold">Loại dịch vụ</label>
-                            <div class="card shadow-sm mb-3">
-                                <div class="card-body p-3">
-                                    <h6 class="mb-3 d-flex align-items-center">
-                                        <i class="fas fa-list-alt text-primary me-2"></i>
-                                        Chọn loại dịch vụ
-                                    </h6>
-                                    
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="featured" id="filter_featured" value="1" {{ request('featured') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="filter_featured">
-                                            <span class="badge bg-danger px-2 me-1">
-                                                <i class="fas fa-star me-1"></i>Nổi bật
-                                            </span>
-                                            Chỉ hiển thị dịch vụ nổi bật
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="has_promotion" id="filter_promotion" value="1" {{ request('has_promotion') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="filter_promotion">
-                                            <span class="badge bg-success px-2 me-1">
-                                                <i class="fas fa-percent me-1"></i>Khuyến mãi
-                                            </span>
-                                            Có khuyến mãi
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="is_new" id="filter_new" value="1" {{ request('is_new') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="filter_new">
-                                            <span class="badge bg-info px-2 me-1">
-                                                <i class="fas fa-fire me-1"></i>Mới
-                                            </span>
-                                            Dịch vụ mới
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Đã xoá block chọn loại dịch vụ theo yêu cầu -->
                         </div>
                     </div>
                 </div>

@@ -34,37 +34,45 @@
     }
 
     .booking-card {
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
+        border: 2px solid #ffe3ea;
+        border-radius: 20px;
         overflow: hidden;
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
+        transition: all 0.3s cubic-bezier(.4,2,.3,1);
+        margin-bottom: 2.5rem;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
+        background: #fff;
     }
 
     .booking-card:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
+        box-shadow: 0 12px 40px 0 rgba(255,107,157,0.18);
+        transform: translateY(-4px) scale(1.01);
     }
 
     .booking-header {
-        padding: 1rem;
-        border-bottom: 1px solid var(--border-color);
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid #ffe3ea;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #f8f9fa;
+        background: #fafafd;
+        border-radius: 20px 20px 0 0;
+        font-size: 1.08rem;
+        font-weight: 600;
+        color: #ff6b9d;
     }
 
     .booking-id {
-        font-weight: bold;
-        color: var(--text-color);
+        font-weight: 700;
+        color: #22223b;
+        font-size: 1.08rem;
     }
 
     .booking-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: bold;
+        font-size: 1rem;
+        font-weight: 600;
+        background: none;
+        border: none;
+        color: #888;
     }
 
     .status-pending {
@@ -93,20 +101,26 @@
     }
 
     .booking-body {
-        padding: 1.5rem;
+        padding: 2rem 2.5rem 2rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
     .booking-service {
         display: flex;
-        margin-bottom: 1rem;
+        align-items: center;
+        gap: 1.5rem;
     }
 
     .service-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 10px;
+        width: 90px;
+        height: 90px;
+        border-radius: 14px;
         overflow: hidden;
-        margin-right: 1rem;
+        box-shadow: 0 2px 12px #ffe3ea;
+        border: 2px solid #ffe3ea;
+        background: #fff0f6;
     }
 
     .service-image img {
@@ -117,78 +131,130 @@
 
     .service-details {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
     }
 
     .service-name {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #22223b;
+        margin-bottom: 0.2rem;
     }
 
     .service-price {
-        color: var(--primary-color);
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        color: #ff6b9d;
+        font-weight: 700;
+        font-size: 1.08rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .service-duration {
+        color: #888;
+        font-size: 0.98rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
     .booking-details {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 1rem;
+        gap: 2.5rem;
+        margin-bottom: 0.5rem;
+        justify-content: flex-start;
     }
 
     .booking-detail-item {
-        flex: 1;
-        min-width: 200px;
-        margin-bottom: 0.5rem;
+        min-width: 160px;
     }
 
     .detail-label {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 0.25rem;
+        font-size: 0.97rem;
+        color: #b0b0b0;
+        margin-bottom: 0.1rem;
     }
 
     .detail-value {
-        font-weight: bold;
-        color: var(--text-color);
-    }
-
-    .booking-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        margin-top: 1rem;
-        border-top: 1px solid var(--border-color);
-        padding-top: 1rem;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-
-    .btn-outline-primary {
-        color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--primary-color);
-        color: white;
+        font-weight: 700;
+        color: #22223b;
+        font-size: 1.08rem;
     }
 
     .status-badge {
         display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: bold;
+        padding: 0.4rem 1.1rem;
+        border-radius: 12px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        background: #fff7e6;
+        color: #b68900;
+        border: 1.5px solid #ffe3ea;
+        box-shadow: 0 1px 4px #ffe3ea;
+    }
+
+    .status-badge.status-completed {
+        background: linear-gradient(90deg,#d1fae5 0%,#a7f3d0 100%);
+        color: #065f46;
+        border: 1.5px solid #b7f7d8;
+    }
+
+    .booking-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1.2rem;
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .btn-primary, .btn-outline-primary, .btn-outline-danger {
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.02rem;
+        padding: 0.7rem 1.5rem;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px #ffe3ea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
+        color: #fff;
+        transform: translateY(-2px) scale(1.04);
+    }
+
+    .btn-outline-primary {
+        color: #ff6b9d;
+        border: 2px solid #ff6b9d;
+        background: #fff;
+    }
+
+    .btn-outline-primary:hover {
+        background: #ff6b9d;
+        color: #fff;
+        border: 2px solid #ff6b9d;
+    }
+
+    .btn-outline-danger {
+        color: #ff6b9d;
+        border: 2px solid #ff6b9d;
+        background: #fff;
+    }
+
+    .btn-outline-danger:hover {
+        background: #ffb3d1;
+        color: #fff;
+        border: 2px solid #ff6b9d;
     }
 
     .empty-state {
@@ -210,32 +276,49 @@
         margin-bottom: 1.5rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+        .booking-body {
+            padding: 1.2rem 1rem 1.2rem 1rem;
+        }
         .booking-header {
-            flex-direction: column;
-            align-items: flex-start;
+            padding: 1rem 1rem;
         }
-
-        .booking-status {
-            margin-top: 0.5rem;
+        .booking-details {
+            gap: 1.2rem;
         }
+    }
 
-        .booking-service {
-            flex-direction: column;
+    @media (max-width: 600px) {
+        .booking-card {
+            border-radius: 12px;
         }
-
+        .booking-header {
+            border-radius: 12px 12px 0 0;
+            font-size: 0.98rem;
+        }
+        .booking-body {
+            padding: 1rem 0.5rem 1rem 0.5rem;
+        }
         .service-image {
-            margin-right: 0;
-            margin-bottom: 1rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
         }
-
-        .booking-actions {
-            flex-direction: column;
+        .service-name {
+            font-size: 1rem;
         }
-
-        .booking-actions .btn {
-            width: 100%;
-            margin-bottom: 0.5rem;
+        .service-price {
+            font-size: 0.98rem;
+        }
+        .booking-details {
+            gap: 0.7rem;
+        }
+        .booking-detail-item {
+            min-width: 120px;
+        }
+        .btn-primary, .btn-outline-primary, .btn-outline-danger {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
         }
     }
 </style>

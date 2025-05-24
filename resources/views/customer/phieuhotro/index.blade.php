@@ -366,23 +366,23 @@
             <a href="{{ route('customer.phieuhotro.create') }}" class="btn-primary">
                 <i class="fas fa-plus"></i>
                 Tạo phiếu mới
-            </a>
-        </div>
+        </a>
+    </div>
 
         <!-- Alerts -->
-        @if(session('success'))
+    @if(session('success'))
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
-            {{ session('success') }}
-        </div>
-        @endif
+        {{ session('success') }}
+    </div>
+    @endif
 
-        @if(session('error'))
+    @if(session('error'))
         <div class="alert alert-danger">
             <i class="fas fa-exclamation-circle"></i>
-            {{ session('error') }}
-        </div>
-        @endif
+        {{ session('error') }}
+    </div>
+    @endif
 
         <!-- Search Section -->
         <div class="search-section">
@@ -393,9 +393,9 @@
         </div>
 
         <!-- Tickets Grid -->
-        @if(count($phieuHoTro) > 0)
+            @if(count($phieuHoTro) > 0)
             <div class="tickets-grid">
-                @foreach($phieuHoTro as $phieu)
+                            @foreach($phieuHoTro as $phieu)
                     <div class="ticket-card">
                         <div class="ticket-header">
                             <div class="ticket-id">
@@ -421,7 +421,7 @@
                                     <span class="status-badge status-cancelled">
                                         <i class="fas fa-times-circle"></i>Đã hủy
                                     </span>
-                                @endif
+                                        @endif
                             </div>
                         </div>
 
@@ -439,9 +439,9 @@
                                 <button class="action-btn action-view" 
                                         onclick="window.location.href='{{ route('customer.phieuhotro.show', $phieu->MaphieuHT) }}'"
                                         title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                
+                                            <i class="fas fa-eye"></i>
+                                            </button>
+
                                 @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
                                     <button class="action-btn action-edit" 
                                             onclick="window.location.href='{{ route('customer.phieuhotro.edit', $phieu->MaphieuHT) }}'"
@@ -454,17 +454,17 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 @endif
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
+                                                    </div>
+                                                </div>
+                                            </div>
+                            @endforeach
+                </div>
+                
             <!-- Pagination -->
-            <div class="d-flex justify-content-center mt-4">
-                {{ $phieuHoTro->links() }}
-            </div>
-        @else
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $phieuHoTro->links() }}
+                </div>
+            @else
             <div class="empty-state">
                 <div class="empty-icon">
                     <i class="fas fa-clipboard-list"></i>
@@ -479,8 +479,8 @@
                     <i class="fas fa-plus"></i>
                     Tạo phiếu mới
                 </a>
-            </div>
-        @endif
+                </div>
+            @endif
     </div>
 </div>
-@endsection
+@endsection 

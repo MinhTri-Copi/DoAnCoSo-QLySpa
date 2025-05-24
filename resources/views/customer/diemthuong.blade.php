@@ -513,10 +513,10 @@
                             <th>Số điểm</th>
                             <!-- <th>Mã người dùng</th> -->
                             <th>Mã hóa đơn</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($lsDiemThuong as $ls)
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($lsDiemThuong as $ls)
                             <tr>
                                 <td>
                                     <span class="record-id">#{{ $ls->MaLSDT }}</span>
@@ -530,8 +530,8 @@
                                     <span class="points-badge {{ $ls->Sodiem > 0 ? 'positive' : 'negative' }}">
                                         <i class="fas fa-{{ $ls->Sodiem > 0 ? 'plus' : 'minus' }}"></i>
                                         {{ $ls->Sodiem > 0 ? '+' : '' }}{{ number_format($ls->Sodiem) }}
-                                    </span>
-                                </td>
+                                            </span>
+                                        </td>
                                 <!-- <td>
                                     <span class="user-id">{{ $ls->Manguoidung }}</span>
                                 </td> -->
@@ -542,8 +542,8 @@
                                         <span style="color: #9ca3af;">-</span>
                                     @endif
                                 </td>
-                            </tr>
-                        @empty
+                                    </tr>
+                                @empty
                             <tr>
                                 <td colspan="4">
                                     <div class="empty-state">
@@ -555,9 +555,9 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                @endforelse
+                            </tbody>
+                        </table>
             </div>
         </div>
     </div>
