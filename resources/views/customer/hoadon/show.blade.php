@@ -24,10 +24,14 @@
             <a href="{{ route('customer.hoadon.pdf', $invoice->MaHD) }}" class="btn btn-primary">
                 <i class="fas fa-download me-2"></i>Tải hóa đơn PDF
             </a>
-            @if (!$hasReview)
+            @if($invoice->Matrangthai == 1 && !$hasReview)
                 <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-outline-primary" onclick="redirectToDanhGia(event, {{ $invoice->MaHD }})">
                     <i class="fas fa-star me-2"></i>Viết đánh giá
                 </a>
+            @elseif($invoice->Matrangthai == 1 && $hasReview)
+                <button class="btn btn-outline-secondary" disabled>
+                    <i class="fas fa-check me-2"></i>Đã đánh giá
+                </button>
             @endif
         @endif
     </div>

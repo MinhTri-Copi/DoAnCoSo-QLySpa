@@ -36,6 +36,8 @@ class HoaDonController extends Controller
                 'totalSpent' => 0,
                 'totalInvoices' => 0,
                 'unpaidInvoices' => 0,
+                'loggedInUser' => $user,
+                'customer' => null
             ])->with('error', 'Không tìm thấy thông tin khách hàng');
         }
         
@@ -138,7 +140,9 @@ class HoaDonController extends Controller
             'paymentMethods',
             'totalSpent',
             'totalInvoices',
-            'unpaidInvoices'
+            'unpaidInvoices',
+            'user',
+            'customer'
         ));
     }
     
@@ -168,7 +172,7 @@ class HoaDonController extends Controller
         // Check if the invoice has been reviewed
         $hasReview = $invoice->danhGia()->exists();
         
-        return view('customer.hoadon.show', compact('invoice', 'hasReview'));
+        return view('customer.hoadon.show', compact('invoice', 'hasReview', 'user', 'customer'));
     }
     
     /**

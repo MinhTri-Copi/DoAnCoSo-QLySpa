@@ -177,9 +177,15 @@
                                             </a>
                                         @else
                                             <div class="btn-group">
+                                                @if($invoice->Matrangthai == 1 && !$invoice->daDanhGia($customer->Manguoidung))
                                                 <a href="{{ route('customer.danhgia.create.with_id', $invoice->MaHD) }}" class="btn btn-sm btn-success" onclick="redirectToDanhGia(event, {{ $invoice->MaHD }})">
                                                     <i class="fas fa-star me-1"></i>Đánh giá ngay
                                                 </a>
+                                                @elseif($invoice->Matrangthai == 1 && $invoice->daDanhGia($customer->Manguoidung))
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="fas fa-check me-1"></i>Đã đánh giá
+                                                </button>
+                                                @endif
                                                 <a href="{{ route('customer.hoadon.pdf', $invoice->MaHD) }}" class="btn btn-sm btn-outline-secondary ms-1">
                                                     <i class="fas fa-download me-1"></i>Tải PDF
                                                 </a>
