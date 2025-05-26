@@ -34,9 +34,14 @@ class AuthController extends Controller
         if ($account && Hash::check($credentials['Matkhau'], $account->Matkhau)) {
             Auth::login($account);
 
+            // Log successful login
+            Log::info('User logged in successfully: ' . $account->Tendangnhap . ' with RoleID: ' . $account->RoleID);
+
             if ($account->RoleID == 1) {
-                return redirect()->route('dashboard');
+                // Admin - Chuyển hướng đến dashboard
+                return redirect('/admin/dashboard');
             } else {
+                // Khách hàng - Chuyển hướng đến trang chủ khách hàng
                 return redirect()->route('customer.home');
             }
         }
@@ -206,7 +211,12 @@ class AuthController extends Controller
 
     public function logout()
     {
+        // Store the user's role before logging out
+        $wasAdmin = Auth::user() && Auth::user()->RoleID == 1;
+        
         Auth::logout();
-        return redirect()->route('login');
+        
+        // Redirect all users to the welcome page, with a session message
+        return redirect()->route('welcome')->with('success', 'Đã đăng xuất thành công!');
     }
 }
