@@ -13,7 +13,7 @@
     }
 
     .booking-container {
-        max-width: 1200px;
+        max-width: 1320px;
         margin: 0 auto;
     }
 
@@ -102,75 +102,123 @@
     /* End customer info styles */
 
     .service-card {
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
+        border: 2px solid #ffe3ea;
+        border-radius: 20px;
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(.4,2,.3,1);
         height: 100%;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
+        background: #fff;
+        min-height: 480px;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
     }
-
     .service-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 16px 48px 0 rgba(255,107,157,0.18);
+        transform: translateY(-4px) scale(1.01);
     }
-
     .service-image {
-        height: 200px;
+        height: 280px;
         overflow: hidden;
+        border-radius: 20px 20px 0 0;
+        background: #fff0f6;
+        border-bottom: 2px solid #ffe3ea;
     }
-
     .service-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
-
     .service-card:hover .service-image img {
         transform: scale(1.05);
     }
-
     .service-info {
-        padding: 1rem;
+        padding: 1.3rem 1.2rem 1.2rem 1.2rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+        gap: 0.5rem;
     }
-
     .service-title {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
+        font-weight: 700;
+        font-size: 1.18rem;
+        margin-bottom: 0.3rem;
+        color: #22223b;
     }
-
     .service-price {
-        color: var(--primary-color);
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        color: #ff6b9d;
+        font-weight: 700;
+        font-size: 1.08rem;
+        margin-bottom: 0.2rem;
     }
-
     .service-description {
-        color: #666;
-        font-size: 0.9rem;
+        color: #888;
+        font-size: 0.98rem;
         margin-bottom: 1rem;
         flex-grow: 1;
     }
-
     .service-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: 0.5rem;
-        border-top: 1px solid var(--border-color);
+        padding-top: 0.7rem;
+        border-top: 1.5px solid #ffe3ea;
         position: relative;
-    z-index: 10; /* Đảm bảo nút nằm trên các phần tử khác */
+        z-index: 10;
+        gap: 1rem;
     }
-
     .service-duration {
-        font-size: 0.8rem;
+        font-size: 1.02rem;
         color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    .select-service {
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.02rem;
+        padding: 0.6rem 1.3rem;
+        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 2px 8px #ffe3ea;
+        transition: all 0.2s;
+    }
+    .select-service:hover {
+        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
+        color: #fff;
+        transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 900px) {
+        .service-card {
+            min-height: 340px;
+            max-width: 100%;
+        }
+        .service-image {
+            height: 160px;
+        }
+    }
+    @media (max-width: 600px) {
+        .service-card {
+            border-radius: 12px;
+            min-height: 220px;
+        }
+        .service-image {
+            border-radius: 12px 12px 0 0;
+            height: 90px;
+        }
+        .service-title {
+            font-size: 1rem;
+        }
+        .select-service {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+        }
     }
 
     .btn-primary {
@@ -352,6 +400,50 @@
             margin-bottom: 0;
         }
     }
+
+    /* Simple Pagination Styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .pagination .page-item {
+        margin: 0 5px;
+    }
+    
+    .pagination .page-link {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: #333;
+        font-weight: 500;
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        text-decoration: none;
+    }
+    
+    .pagination .active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    
+    .pagination .disabled .page-link {
+        color: #aaa;
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    
+    .pagination .page-link:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        color: #0056b3;
+        z-index: 1;
+    }
 </style>
 @endsection
 
@@ -399,9 +491,9 @@
             <div id="service-selection" style="{{ $step == 1 ? '' : 'display: none;' }}" class="mb-4">                @if(count($recommendedServices) > 0)
                 <div class="recommended-services mb-4">
                     <h3 class="section-title">Dịch vụ đề xuất</h3>
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                         @foreach($recommendedServices as $service)
-                        <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="col">
                             <div class="service-card">
                                 <div class="service-image">
                                     <img src="{{ $service->Image ? asset($service->Image) : asset('images/default-service.jpg') }}" alt="{{ $service->Tendichvu }}">
@@ -518,9 +610,9 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                         @forelse($dichVus as $dichVu)
-                        <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="col">
                             <div class="service-card">
                                 <div class="service-image">
                                     <img src="{{ $dichVu->Image ? asset($dichVu->Image) : asset('images/default-service.jpg') }}" alt="{{ $dichVu->Tendichvu }}">
@@ -554,7 +646,42 @@
                     </div>
 
                     <div class="d-flex justify-content-center">
-                        {{ $dichVus->appends(request()->query())->links() }}
+                        <nav aria-label="Phân trang">
+                            <ul class="pagination">
+                                {{-- Previous Page Link --}}
+                                @if ($dichVus->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->previousPageUrl() }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @foreach ($dichVus->getUrlRange(1, $dichVus->lastPage()) as $page => $url)
+                                    <li class="page-item {{ $page == $dichVus->currentPage() ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($dichVus->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $dichVus->appends(request()->query())->nextPageUrl() }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>

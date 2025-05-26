@@ -582,10 +582,6 @@
     </div>
 
     <div class="receipt-actions no-print">
-        <button class="btn btn-primary" onclick="window.print()">
-            <i class="fas fa-print"></i> In phiếu đặt lịch
-        </button>
-        
         <a href="{{ route('customer.lichsudatlich.index') }}" class="btn btn-outline-primary">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </a>

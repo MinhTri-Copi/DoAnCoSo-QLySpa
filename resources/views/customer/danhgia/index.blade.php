@@ -2,10 +2,77 @@
 
 @section('title', 'Đánh giá của tôi')
 
+@section('styles')
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #ff6b9d 0%, #ff8db3 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-banner h1 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+    }
+    
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .shine-line {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 200%;
+        }
+    }
+    
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .clickable-row:hover {
+        background-color: rgba(255, 107, 157, 0.05);
+    }
+    
+    .clickable-row td:first-child {
+        color: #ff6b9d;
+        font-weight: 500;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Đánh giá của tôi</h1>
+    <!-- Welcome banner -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-star"></i> Đánh giá của tôi</h1>
+        <p>Chia sẻ trải nghiệm của bạn và giúp chúng tôi cải thiện dịch vụ</p>
+        <div class="shine-line"></div>
     </div>
     
     @if(session('success'))
@@ -43,12 +110,11 @@
                                 <th>Điểm đánh giá</th>
                                 <th>Nội dung</th>
                                 <th>Ngày đánh giá</th>
-                                <th>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($reviews as $review)
-                                <tr>
+                                <tr class="clickable-row" data-href="{{ route('customer.danhgia.show', $review->MaDG) }}">
                                     <td>
                                         {{ $review->getTenDichVu() }}
                                     </td>
@@ -65,17 +131,6 @@
                                         {{ \Illuminate\Support\Str::limit($review->Nhanxet, 50) }}
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($review->Ngaydanhgia)->format('d/m/Y') }}</td>
-                                   
-                                    <td>
-                                        <a href="{{ route('customer.danhgia.show', $review->MaDG) }}" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i> Xem
-                                        </a>
-                                        @if(!$review->PhanHoi)
-                                            <a href="{{ route('customer.danhgia.edit', $review->MaDG) }}" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-edit"></i> Sửa
-                                            </a>
-                                        @endif
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -89,4 +144,17 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+</script>
+@endpush
 @endsection 

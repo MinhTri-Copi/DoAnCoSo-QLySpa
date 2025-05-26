@@ -35,19 +35,15 @@
         <div class="row">
             @foreach($featuredAds as $ad)
             <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="position-relative">
-                        @if($ad->Image)
-                        <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}" style="height: 200px; object-fit: cover;">
-                        @else
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="fas fa-image fa-3x"></i>
-                        </div>
-                        @endif
-                        <div class="position-absolute top-0 end-0 bg-primary text-white px-2 py-1 m-2 rounded-pill">
-                            Nổi bật
-                        </div>
+                <div class="card h-100 border-0 shadow-sm position-relative">
+                    @if($ad->Image)
+                    <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}">
+                    @else
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x"></i>
                     </div>
+                    @endif
+                    <div class="badge-featured">Nổi bật</div>
                     <div class="card-body">
                         <h5 class="card-title">{{ $ad->Tieude }}</h5>
                         <p class="card-text text-muted small">
@@ -57,12 +53,15 @@
                         </p>
                         <p class="card-text">{{ \Illuminate\Support\Str::limit($ad->Noidung, 100) }}</p>
                     </div>
-                    <div class="card-footer bg-white border-0 pt-0">
-                        <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                    <div class="card-footer">
+                        <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn btn-outline-primary">Chi tiết</a>
                     </div>
                 </div>
             </div>
             @endforeach
+        </div>
+        <div class="text-center">
+            <a href="{{ route('customer.quangcao.index') }}" class="see-all-btn">Xem tất cả ưu đãi</a>
         </div>
     </div>
 </section>
@@ -76,33 +75,29 @@
         <div class="row">
             @foreach($featuredServices as $service)
             <div class="col-md-3 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="position-relative">
-                        @if($service->Image)
-                        <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}" style="height: 200px; object-fit: cover;">
-                        @else
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="fas fa-spa fa-3x"></i>
-                        </div>
-                        @endif
-                        <div class="position-absolute bottom-0 start-0 bg-primary text-white px-2 py-1 m-2">
-                            {{ number_format($service->Gia, 0, ',', '.') }} VND
-                        </div>
+                <div class="card h-100 border-0 shadow-sm position-relative">
+                    @if($service->Image)
+                    <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}">
+                    @else
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-spa fa-3x"></i>
                     </div>
+                    @endif
+                    <div class="price-badge">{{ number_format($service->Gia, 0, ',', '.') }} VND</div>
                     <div class="card-body">
                         <h5 class="card-title">{{ $service->Tendichvu }}</h5>
                         <p class="card-text">{{ \Illuminate\Support\Str::limit($service->MoTa ?? 'Không có mô tả', 80) }}</p>
                     </div>
-                    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
-                        <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-sm btn-primary">Đặt lịch</a>
+                    <div class="card-footer">
+                        <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">Chi tiết</a>
+                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-primary">Đặt lịch</a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
         <div class="text-center mt-4">
-            <a href="{{ route('customer.dichvu.index') }}" class="btn btn-outline-primary">Xem tất cả dịch vụ</a>
+            <a href="{{ route('customer.dichvu.index') }}" class="see-all-btn">Xem tất cả dịch vụ</a>
         </div>
     </div>
 </section>
@@ -155,17 +150,29 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="h1 mb-4">{{ $promotionAds[0]->Tieude ?? 'Ưu đãi đặc biệt' }}</h2>
-                <p class="lead mb-4">{{ $promotionAds[0]->Noidung ?? 'Hãy khám phá các ưu đãi độc quyền của chúng tôi dành cho bạn.' }}</p>
-                @if(isset($promotionAds[0]))
-                <a href="{{ route('customer.quangcao.show', $promotionAds[0]->MaQC) }}" class="btn btn-primary btn-lg">Khám phá ngay</a>
-                @endif
+                <h2 class="h1 mb-4">Phun xăm thẩm mỹ giảm giá sốc</h2>
+                <ul class="promo-sticker-list mb-4">
+                    <li>✨ <b>PHUN XĂM THẨM MỸ – GIẢM GIÁ 15%</b></li>
+                    <li>💖 Đẹp tự nhiên – Không đau – An toàn tuyệt đối</li>
+                    <li>🎯 Kỹ thuật chuẩn y khoa – Mực hữu cơ nhập khẩu 🦉</li>
+                    <li>👁️ Dáng mày hài hòa, sắc nét, khắc phục khuyết điểm</li>
+                    <li>📍 Chuyên viên tay nghề cao – Trang thiết bị vô trùng 🎁</li>
+                    <li>Đặt lịch ngay – Ưu đãi chỉ áp dụng trong tuần này!</li>
+                </ul>
+                <a href="#" class="btn btn-pink btn-lg">Khám phá ngay</a>
             </div>
             <div class="col-lg-6 text-center">
                 @if(isset($promotionAds[0]) && $promotionAds[0]->Image)
-                <img src="{{ asset($promotionAds[0]->Image) }}" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="{{ asset($promotionAds[0]->Image) }}"
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Promotion';"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @else
-                <img src="https://placehold.co/600x400?text=Ưu+đãi+đặc+biệt" class="img-fluid rounded-3 shadow" alt="Promotion" style="max-width: 80%; max-height: 400px; object-fit: contain;">
+                    <img src="https://placehold.co/600x400?text=Promotion"
+                         class="img-fluid rounded-3 shadow promo-banner-img"
+                         alt="Promotion"
+                         style="max-width: 100%; max-height: 520px; object-fit: cover; object-position: center;">
                 @endif
             </div>
         </div>

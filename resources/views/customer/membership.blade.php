@@ -44,7 +44,43 @@
             $nextRank = $ranks[$i+1] ?? null;
         }
     }
-    $progress = $nextRank ? min(100, ($total - $currentRank['min']) / ($nextRank['min'] - $currentRank['min']) * 100) : 100;
+    
+    // Set fixed positions for level markers in percentage (of total width)
+    $markersPositions = [
+        0 => 0,      // 0đ at 0% position
+        100 => 20,   // 100đ at 20% position 
+        1000 => 60,  // 1.000đ at 60% position
+        5000 => 100  // 5.000đ at 100% position
+    ];
+    
+    // Calculate point position based on its value relative to the fixed markers
+    function calculatePosition($value, $markersPositions) {
+        if ($value <= 0) return $markersPositions[0];
+        if ($value >= 5000) return $markersPositions[5000];
+        
+        // Find the two closest markers
+        $lowerMarker = 0;
+        $upperMarker = 5000;
+        
+        foreach (array_keys($markersPositions) as $marker) {
+            if ($marker <= $value && $marker > $lowerMarker) {
+                $lowerMarker = $marker;
+            }
+            if ($marker > $value && $marker < $upperMarker) {
+                $upperMarker = $marker;
+            }
+        }
+        
+        // Calculate position using linear interpolation between markers
+        $valueDiff = $value - $lowerMarker;
+        $markerDiff = $upperMarker - $lowerMarker;
+        $positionDiff = $markersPositions[$upperMarker] - $markersPositions[$lowerMarker];
+        
+        return $markersPositions[$lowerMarker] + ($valueDiff / $markerDiff) * $positionDiff;
+    }
+    
+    // Get point position as percentage
+    $pointPosition = calculatePosition($total, $markersPositions);
 @endphp
 <div class="container py-5">
     <div class="row justify-content-center mb-4">
@@ -61,22 +97,41 @@
                     </div>
                     <h4 class="fw-bold mb-1" style="color: {{ $currentRank['color'] }};">Bạn đang là: {{ $currentRank['name'] }}</h4>
                     <div class="mb-2" style="font-size: 1.1rem; color: #333;">Tổng điểm tích lũy: <span style="color: #FF6B6B; font-weight: 700;">{{ number_format($total) }}</span></div>
-                    @if($total > 0)
-                        @if($nextRank)
-                            <div class="mb-2" style="color: #555;">Còn <span style="color: #FF6B6B; font-weight: 600;">{{ number_format($nextRank['min'] - $total) }}</span> điểm để lên hạng <span style="color: {{ $nextRank['color'] }}; font-weight: 600;">{{ $nextRank['name'] }}</span></div>
-                        @else
-                            <div class="mb-2" style="color: #FF6B6B; font-weight: 600;">Bạn đã đạt hạng cao nhất!</div>
-                        @endif
-                        <div class="progress mx-auto" style="height: 18px; background: #ffe3ea; max-width: 400px;">
-                            <div class="progress-bar" role="progressbar" style="width: {{ $progress }}%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color)); font-weight: 600;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="d-flex justify-content-between mt-1" style="font-size: 0.95rem; color: #ff6b6b; max-width: 400px; margin: 0 auto;">
-                            <span>0 đ</span>
-                            <span>100 đ</span>
-                            <span>1.000 đ</span>
-                            <span>5.000 đ</span>
-                        </div>
+                    @if($nextRank)
+                        <div class="mb-2" style="color: #555;">Còn <span style="color: #FF6B6B; font-weight: 600;">{{ number_format($nextRank['min'] - $total) }}</span> điểm để lên hạng <span style="color: {{ $nextRank['color'] }}; font-weight: 600;">{{ $nextRank['name'] }}</span></div>
+                    @else
+                        <div class="mb-2" style="color: #FF6B6B; font-weight: 600;">Bạn đã đạt hạng cao nhất!</div>
                     @endif
+
+                    <!-- Progress section -->
+                    <div class="mt-3">
+                        <!-- Point indicator bubble -->
+                        <div style="position: relative; height: 45px; max-width: 400px; margin: 0 auto;">
+                            <div style="position: absolute; top: 0; left: {{ $pointPosition }}%; transform: translateX(-50%);">
+                                <div style="background: #ff6b6b; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ number_format($total) }} đ</div>
+                                <div style="width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #ff6b6b; margin: 0 auto;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress bar with markers -->
+                        <div style="position: relative; max-width: 400px; margin: 0 auto;">
+                            <!-- Indicator dot -->
+                            <div style="position: absolute; top: 10px; left: {{ $pointPosition }}%; transform: translateX(-50%); width: 14px; height: 14px; background: white; border: 3px solid #ff6b6b; border-radius: 50%; z-index: 5;"></div>
+                            
+                            <!-- Progress bar -->
+                            <div style="height: 20px; background-color: #ffe3ea; border-radius: 10px; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; left: 0; height: 100%; width: {{ $pointPosition }}%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color));"></div>
+                            </div>
+                            
+                            <!-- Evenly positioned markers -->
+                            <div style="position: relative; margin-top: 8px; height: 30px; max-width: 400px;">
+                                <span style="position: absolute; left: 0; font-size: 0.95rem; color: #888; white-space: nowrap;">0 đ</span>
+                                <span style="position: absolute; left: 20%; transform: translateX(-50%); font-size: 0.95rem; color: #888; white-space: nowrap;">100 đ</span>
+                                <span style="position: absolute; left: 60%; transform: translateX(-50%); font-size: 0.95rem; color: #888; white-space: nowrap;">1.000 đ</span>
+                                <span style="position: absolute; right: 0; font-size: 0.95rem; color: #888; white-space: nowrap;">5.000 đ</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,9 +163,6 @@
 
 @push('styles')
 <style>
-    .progress-bar {
-        font-size: 1rem;
-    }
     .card {
         border-radius: 16px;
     }
@@ -122,4 +174,4 @@
         letter-spacing: 0.5px;
     }
 </style>
-@endpush 
+@endpush

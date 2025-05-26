@@ -165,6 +165,8 @@
                                         <span class="badge bg-success">Đã thanh toán</span>
                                     @elseif($invoice->Matrangthai == 2)
                                         <span class="badge bg-warning">Chờ thanh toán</span>
+                                    @elseif($invoice->Matrangthai == 3)
+                                        <span class="badge bg-completed">Hoàn tất</span>
                                     @else
                                         <span class="badge bg-secondary">{{ $invoice->trangThai->Tentrangthai ?? 'N/A' }}</span>
                                     @endif
@@ -249,6 +251,56 @@
     }
     .pagination {
         margin-bottom: 0;
+    }
+
+    /* Status badge styling */
+    .badge {
+        padding: 8px 12px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    /* Đã thanh toán - Pink */
+    .bg-success {
+        background-color: #ff69b4 !important;
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 2px 4px rgba(255, 105, 180, 0.2);
+    }
+
+    /* Hoàn tất - Silver */
+    .bg-completed {
+        background-color: #f5f5f5 !important;
+        color: #666666 !important;
+        border: 1px solid #dddddd;
+    }
+
+    /* Chờ thanh toán - Soft yellow */
+    .bg-warning {
+        background-color: #FFF3E0 !important;
+        color: #E65100 !important;
+        border: 1px solid #FFB74D;
+    }
+
+    /* Animation for "Đánh giá ngay" button */
+    .btn-success:not(:disabled) {
+        animation: glowingButton 2s infinite;
+    }
+
+    @keyframes glowingButton {
+        0% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5);
+            transform: scale(1);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            transform: scale(1.05);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            transform: scale(1);
+        }
     }
 </style>
 @endsection
