@@ -12,86 +12,86 @@ use Illuminate\Support\Facades\DB;
 class LinkGuestBookingsController extends Controller
 {
     /**
-     * Hiển thị trang xác nhận liên kết lịch đặt khách vãng lai
+     * Hiển thị danh sách các lịch đặt của khách vãng lai có cùng số điện thoại
      */
     public function index()
     {
-        // Kiểm tra nếu người dùng đã đăng nhập
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        // Lấy thông tin user đã đăng nhập
-        $account = Auth::user();
-        $user = User::where('MaTK', $account->MaTK)->first();
-
+        // Lấy thông tin người dùng hiện tại
+        $user = User::where('MaTK', Auth::id())->first();
+        
         if (!$user) {
             return redirect()->route('customer.home')
                 ->with('error', 'Không tìm thấy thông tin người dùng.');
         }
-
-        // Lấy danh sách đặt lịch khách vãng lai có số điện thoại trùng với người dùng
+        
+        // Lấy các lịch đặt của khách vãng lai có cùng số điện thoại
         $guestBookings = DatLich::whereNull('Manguoidung')
             ->where('SDT_khach', $user->SDT)
-            ->with('dichVu')
+            ->with('dichVu') // Eager load dịch vụ để hiển thị thông tin
             ->get();
-
+        
+        // Nếu không tìm thấy lịch đặt nào, chuyển hướng về trang chủ
         if ($guestBookings->isEmpty()) {
             return redirect()->route('customer.home')
-                ->with('info', 'Không tìm thấy lịch đặt nào trùng với số điện thoại của bạn.');
+                ->with('info', 'Không tìm thấy lịch đặt nào của bạn trước đây.');
         }
-
-        return view('customer.link-guest-bookings', compact('guestBookings', 'user'));
+        
+        return view('customer.datlich.link-guest-bookings', [
+            'guestBookings' => $guestBookings,
+            'user' => $user
+        ]);
     }
-
+    
     /**
-     * Liên kết các đặt lịch đã chọn vào tài khoản người dùng
+     * Xử lý việc liên kết các lịch đặt được chọn với tài khoản người dùng
      */
-    public function link(Request $request)
+    public function store(Request $request)
     {
-        // Kiểm tra nếu người dùng đã đăng nhập
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        // Validate input
+        // Validate dữ liệu đầu vào
         $request->validate([
             'booking_ids' => 'required|array',
-            'booking_ids.*' => 'exists:DATLICH,MaDL',
+            'booking_ids.*' => 'exists:DATLICH,MaDL'
         ], [
-            'booking_ids.required' => 'Vui lòng chọn ít nhất một lịch đặt.',
-            'booking_ids.array' => 'Dữ liệu không hợp lệ.',
+            'booking_ids.required' => 'Vui lòng chọn ít nhất một lịch đặt để liên kết.',
             'booking_ids.*.exists' => 'Lịch đặt không tồn tại.'
         ]);
-
-        // Lấy thông tin user đã đăng nhập
-        $account = Auth::user();
-        $user = User::where('MaTK', $account->MaTK)->first();
-
+        
+        // Lấy thông tin người dùng hiện tại
+        $user = User::where('MaTK', Auth::id())->first();
+        
         if (!$user) {
-            return redirect()->route('customer.home')
+            return redirect()->back()
                 ->with('error', 'Không tìm thấy thông tin người dùng.');
         }
-
+        
         try {
             DB::beginTransaction();
-
-            // Cập nhật các lịch đặt đã chọn
+            
+            // Cập nhật Manguoidung cho các lịch đặt được chọn
             $updatedCount = DatLich::whereIn('MaDL', $request->booking_ids)
                 ->whereNull('Manguoidung')
-                ->where('SDT_khach', $user->SDT)
-                ->update([
-                    'Manguoidung' => $user->Manguoidung,
-                    'updated_at' => now()
-                ]);
-
+                ->update(['Manguoidung' => $user->Manguoidung]);
+            
             DB::commit();
-
+            
             return redirect()->route('customer.lichsudatlich.index')
-                ->with('success', "Đã liên kết $updatedCount lịch đặt vào tài khoản của bạn.");
+                ->with('success', "Đã liên kết thành công {$updatedCount} lịch đặt vào tài khoản của bạn.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Đã xảy ra lỗi khi liên kết lịch đặt: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Bỏ qua việc liên kết lịch đặt
+     */
+    public function skip()
+    {
+        // Xóa thông tin session về việc tìm thấy lịch đặt cũ
+        session()->forget(['found_guest_bookings', 'guest_bookings_count']);
+        
+        return redirect()->route('customer.home')
+            ->with('info', 'Bạn đã bỏ qua việc liên kết các lịch đặt cũ.');
     }
 } 

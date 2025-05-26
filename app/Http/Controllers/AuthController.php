@@ -112,8 +112,16 @@ class AuthController extends Controller
             $user->Gioitinh = $request->gioitinh;
             $user->save();
 
-            // Tạo hạng thành viên mới (nếu cần)
-            // Thêm logic để tạo hạng thành viên mới ở đây
+            // Tạo hạng thành viên mới
+            $maxMaHang = DB::table('HANGTHANHVIEN')->max('Mahang') ?? 0;
+            $mahang = $maxMaHang + 1;
+
+            $hangThanhVien = new HangThanhVien();
+            $hangThanhVien->Mahang = $mahang;
+            $hangThanhVien->Tenhang = 'Thành viên bạc';
+            $hangThanhVien->Mota = 'Hạng thành viên mặc định khi đăng ký';
+            $hangThanhVien->Manguoidung = $manguoidung;
+            $hangThanhVien->save();
 
             DB::commit();
 

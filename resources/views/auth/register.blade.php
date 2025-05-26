@@ -78,20 +78,34 @@
                     <div class="form-row">
                         <!-- Tên đăng nhập -->
                         <div class="form-group">
-                            <label for="Tendangnhap">Tên đăng nhập <span class="required">*</span></label>
+                            <label for="tendangnhap">Tên đăng nhập <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="Tendangnhap" id="Tendangnhap" placeholder="Nhập tên đăng nhập" value="{{ old('Tendangnhap') }}" required>
+                                <input type="text" name="tendangnhap" id="tendangnhap" placeholder="Nhập tên đăng nhập" value="{{ old('tendangnhap') }}" required>
                             </div>
                         </div>
                         
                         <!-- Mật khẩu -->
                         <div class="form-group">
-                            <label for="Matkhau">Mật khẩu <span class="required">*</span></label>
+                            <label for="matkhau">Mật khẩu <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="Matkhau" id="Matkhau" placeholder="Nhập mật khẩu" required>
-                                <button type="button" class="toggle-password" onclick="togglePassword('Matkhau')">
+                                <input type="password" name="matkhau" id="matkhau" placeholder="Nhập mật khẩu" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('matkhau')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Xác nhận mật khẩu -->
+                        <div class="form-group">
+                            <label for="matkhau_confirmation">Xác nhận mật khẩu <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="matkhau_confirmation" id="matkhau_confirmation" placeholder="Nhập lại mật khẩu" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('matkhau_confirmation')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -101,19 +115,19 @@
                     <div class="form-row">
                         <!-- Họ tên -->
                         <div class="form-group">
-                            <label for="Hoten">Họ tên <span class="required">*</span></label>
+                            <label for="hoten">Họ tên <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-id-card"></i>
-                                <input type="text" name="Hoten" id="Hoten" placeholder="Nhập họ tên đầy đủ" value="{{ old('Hoten') }}" required>
+                                <input type="text" name="hoten" id="hoten" placeholder="Nhập họ tên đầy đủ" value="{{ old('hoten') }}" required>
                             </div>
                         </div>
                         
                         <!-- Email -->
                         <div class="form-group">
-                            <label for="Email">Email <span class="required">*</span></label>
+                            <label for="email">Email <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="Email" id="Email" placeholder="Nhập địa chỉ email" value="{{ old('Email') }}" required>
+                                <input type="email" name="email" id="email" placeholder="Nhập địa chỉ email" value="{{ old('email') }}" required>
                             </div>
                         </div>
                     </div>
@@ -121,19 +135,19 @@
                     <div class="form-row">
                         <!-- Số điện thoại -->
                         <div class="form-group">
-                            <label for="SDT">Số điện thoại</label>
+                            <label for="sdt">Số điện thoại <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-phone"></i>
-                                <input type="text" name="SDT" id="SDT" placeholder="Nhập số điện thoại" value="{{ old('SDT') }}">
+                                <input type="text" name="sdt" id="sdt" placeholder="Nhập số điện thoại" value="{{ old('sdt') }}" required>
                             </div>
                         </div>
                         
                         <!-- Ngày sinh -->
                         <div class="form-group">
-                            <label for="Ngaysinh">Ngày sinh</label>
+                            <label for="ngaysinh">Ngày sinh <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-calendar-alt"></i>
-                                <input type="date" name="Ngaysinh" id="Ngaysinh" value="{{ old('Ngaysinh') }}">
+                                <input type="date" name="ngaysinh" id="ngaysinh" value="{{ old('ngaysinh') }}" required>
                             </div>
                         </div>
                     </div>
@@ -141,24 +155,24 @@
                     <div class="form-row">
                         <!-- Giới tính -->
                         <div class="form-group">
-                            <label for="Gioitinh">Giới tính</label>
+                            <label for="gioitinh">Giới tính <span class="required">*</span></label>
                             <div class="select-with-icon">
                                 <i class="fas fa-venus-mars"></i>
-                                <select name="Gioitinh" id="Gioitinh">
+                                <select name="gioitinh" id="gioitinh" required>
                                     <option value="">Chọn giới tính</option>
-                                    <option value="Nam" {{ old('Gioitinh') == 'Nam' ? 'selected' : '' }}>Nam</option>
-                                    <option value="Nu" {{ old('Gioitinh') == 'Nu' ? 'selected' : '' }}>Nữ</option>
-                                    <option value="Khac" {{ old('Gioitinh') == 'Khac' ? 'selected' : '' }}>Khác</option>
+                                    <option value="Nam" {{ old('gioitinh') == 'Nam' ? 'selected' : '' }}>Nam</option>
+                                    <option value="Nu" {{ old('gioitinh') == 'Nu' ? 'selected' : '' }}>Nữ</option>
+                                    <option value="Khac" {{ old('gioitinh') == 'Khac' ? 'selected' : '' }}>Khác</option>
                                 </select>
                             </div>
                         </div>
                         
                         <!-- Địa chỉ -->
                         <div class="form-group">
-                            <label for="DiaChi">Địa chỉ</label>
+                            <label for="diachi">Địa chỉ <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="DiaChi" id="DiaChi" placeholder="Nhập địa chỉ" value="{{ old('DiaChi') }}">
+                                <input type="text" name="diachi" id="diachi" placeholder="Nhập địa chỉ" value="{{ old('diachi') }}" required>
                             </div>
                         </div>
                     </div>

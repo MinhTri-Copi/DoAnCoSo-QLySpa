@@ -102,7 +102,8 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
 
     // Liên kết lịch đặt khách vãng lai
     Route::get('/link-guest-bookings', [LinkGuestBookingsController::class, 'index'])->name('link-guest-bookings');
-    Route::post('/link-guest-bookings', [LinkGuestBookingsController::class, 'link'])->name('link-guest-bookings.link');
+    Route::post('/link-guest-bookings', [LinkGuestBookingsController::class, 'store'])->name('link-guest-bookings.store');
+    Route::get('/link-guest-bookings/skip', [LinkGuestBookingsController::class, 'skip'])->name('link-guest-bookings.skip');
 
     // Services - actions requiring authentication
     Route::get('/dich-vu/api/check-availability', [App\Http\Controllers\Customer\DichVuController::class, 'checkAvailability'])->name('dichvu.availability');

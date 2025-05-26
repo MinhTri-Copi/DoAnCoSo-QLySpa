@@ -48,9 +48,11 @@
                     <p>Đăng nhập để tiếp tục trải nghiệm dịch vụ của Rosa Spa</p>
                 </div>
                 
-                <div class="alert alert-danger hidden">
-                    <!-- Hiển thị lỗi nếu có -->
+                @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
                 </div>
+                @endif
                 
                 <form action="{{ route('login') }}" method="POST">
                     @csrf 
