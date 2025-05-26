@@ -42,6 +42,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Routes công khai - Khách vãng lai có thể truy cập
 Route::prefix('customer')->name('customer.')->group(function () {
+    // Trang chủ
+    Route::get('/home', [App\Http\Controllers\Customer\HomeController::class, 'welcome'])->name('home.guest');
+    
     // Dịch vụ
     Route::get('/dich-vu', [App\Http\Controllers\Customer\DichVuController::class, 'index'])->name('dichvu.index');
     Route::get('/dich-vu/{id}', [App\Http\Controllers\Customer\DichVuController::class, 'show'])->name('dichvu.show');

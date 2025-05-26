@@ -557,7 +557,7 @@
                 <div class="nav-section collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('customer.home') }}">
+                            <a class="nav-link" href="{{ route('welcome') }}">
                                 <i class="fas fa-home"></i> Trang chủ
                             </a>
                         </li>
