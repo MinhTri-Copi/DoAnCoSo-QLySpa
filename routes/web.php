@@ -25,6 +25,7 @@ use App\Http\Controllers\DatLichDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Models\HangThanhVien;
 use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\LinkGuestBookingsController;
 
 
 
@@ -55,6 +56,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'create'])->name('datlich.create');
     Route::get('/dat-lich/check-availability', [App\Http\Controllers\Customer\DatLichController::class, 'checkAvailability'])->name('datlich.checkAvailability');
     Route::get('/dat-lich/calendar-bookings', [App\Http\Controllers\Customer\DatLichController::class, 'getCalendarBookings'])->name('datlich.calendarBookings');
+    // Cho phép khách vãng lai đặt lịch mà không cần đăng nhập
+    Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
 
     // Quảng cáo
     Route::get('/quang-cao', [App\Http\Controllers\Customer\QuangCaoController::class, 'index'])->name('quangcao.index');
@@ -97,11 +100,14 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
     Route::put('/profile', [App\Http\Controllers\Customer\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::post('/password', [App\Http\Controllers\Customer\HomeController::class, 'updatePassword'])->name('password.update');
 
+    // Liên kết lịch đặt khách vãng lai
+    Route::get('/link-guest-bookings', [LinkGuestBookingsController::class, 'index'])->name('link-guest-bookings');
+    Route::post('/link-guest-bookings', [LinkGuestBookingsController::class, 'link'])->name('link-guest-bookings.link');
+
     // Services - actions requiring authentication
     Route::get('/dich-vu/api/check-availability', [App\Http\Controllers\Customer\DichVuController::class, 'checkAvailability'])->name('dichvu.availability');
 
     // Bookings - actions requiring authentication
-    Route::post('/dat-lich', [App\Http\Controllers\Customer\DatLichController::class, 'store'])->name('datlich.store');
     Route::get('/dat-lich/search-services', [App\Http\Controllers\Customer\DatLichController::class, 'searchServices'])->name('datlich.searchServices');
     Route::get('/dat-lich/recommend-times', [App\Http\Controllers\Customer\DatLichController::class, 'recommendTimes'])->name('datlich.recommendTimes');
     Route::get('/get-user-info', [App\Http\Controllers\Customer\DatLichController::class, 'getUserInfo'])->name('getUserInfo');
