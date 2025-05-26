@@ -31,11 +31,28 @@ class AuthController extends Controller
 
         $account = Account::where('Tendangnhap', $credentials['Tendangnhap'])->first();
 
+        if (!$account) {
+            // Tài khoản không tồn tại
+            return redirect()->back()
+                ->withInput($request->only('Tendangnhap'))
+                ->with('error', 'Tài khoản không tồn tại. Vui lòng kiểm tra lại hoặc đăng ký mới.');
+        }
+
+        if ($account && !Hash::check($credentials['Matkhau'], $account->Matkhau)) {
+            // Mật khẩu không đúng
+            return redirect()->back()
+                ->withInput($request->only('Tendangnhap'))
+                ->with('error', 'Mật khẩu không chính xác. Vui lòng thử lại.');
+        }
+
         if ($account && Hash::check($credentials['Matkhau'], $account->Matkhau)) {
             Auth::login($account);
 
             // Log successful login
             Log::info('User logged in successfully: ' . $account->Tendangnhap . ' with RoleID: ' . $account->RoleID);
+            
+            // Thông báo đăng nhập thành công
+            session()->flash('success', 'Đăng nhập thành công!');
 
             if ($account->RoleID == 1) {
                 // Admin - Chuyển hướng đến dashboard
@@ -46,7 +63,8 @@ class AuthController extends Controller
             }
         }
 
-        return redirect()->back()->with('error', 'Tên đăng nhập hoặc mật khẩu không đúng.');
+        // Trường hợp khác không xác định
+        return redirect()->back()->with('error', 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.');
     }
 
     public function showRegisterForm()
@@ -157,20 +175,25 @@ class AuthController extends Controller
             Auth::login($account);
             Log::info('User logged in after registration: ' . $account->Tendangnhap);
 
+            // Thông báo đăng ký thành công
+            toastr()->success('Đăng ký tài khoản thành công!', ['timeOut' => 3000], 'Chào mừng đến với Rosa Spa');
+
             // Kiểm tra nếu có lịch đặt cần liên kết, chuyển hướng đến trang xác nhận
             if (session('found_guest_bookings')) {
-                return redirect()->route('customer.link-guest-bookings')
-                    ->with('success', 'Đăng ký tài khoản thành công!');
+                return redirect()->route('customer.link-guest-bookings');
             }
 
-            return redirect()->route('customer.home')
-                ->with('success', 'Đăng ký tài khoản thành công!');
+            return redirect()->route('customer.home');
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in registration: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
+            
+            // Thông báo lỗi khi đăng ký
+            toastr()->error('Đã xảy ra lỗi: ' . $e->getMessage(), ['timeOut' => 5000], 'Đăng ký không thành công');
+            
+            return redirect()->back()->withInput();
         }
     }
 
@@ -179,7 +202,8 @@ class AuthController extends Controller
         $pendingAccount = PendingAccount::where('token', $token)->first();
 
         if (!$pendingAccount) {
-            return redirect()->route('login')->with('error', 'Liên kết xác nhận không hợp lệ hoặc đã hết hạn.');
+            toastr()->error('Liên kết xác nhận không hợp lệ hoặc đã hết hạn.', ['timeOut' => 3000], 'Lỗi xác nhận');
+            return redirect()->route('login');
         }
 
         $lastAccount = Account::orderBy('MaTK', 'desc')->first();
@@ -206,7 +230,8 @@ class AuthController extends Controller
 
         $pendingAccount->delete();
 
-        return redirect()->route('login')->with('success', 'Tài khoản Admin đã được xác nhận và tạo thành công.');
+        toastr()->success('Tài khoản Admin đã được xác nhận và tạo thành công.', ['timeOut' => 3000], 'Xác nhận thành công');
+        return redirect()->route('login');
     }
 
     public function logout()
@@ -216,7 +241,10 @@ class AuthController extends Controller
         
         Auth::logout();
         
-        // Redirect all users to the welcome page, with a session message
-        return redirect()->route('welcome')->with('success', 'Đã đăng xuất thành công!');
+        // Thông báo đăng xuất thành công - sửa lại cú pháp đúng
+        session()->flash('info', 'Đã đăng xuất thành công!');
+        
+        // Redirect all users to the welcome page
+        return redirect()->route('welcome');
     }
 }

@@ -8,6 +8,25 @@
     <link href="auth/css/register.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <style>
+        /* Tùy chỉnh thêm cho toastr */
+        .toast-success {
+            background-color: #51A351;
+        }
+        .toast-error {
+            background-color: #BD362F;
+        }
+        .toast-info {
+            background-color: #2F96B4;
+        }
+        .toast-warning {
+            background-color: #F89406;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -202,51 +221,51 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hiển thị thông báo thành công nếu có
-            @if (session('success'))
-                document.getElementById('success-alert').classList.remove('hidden');
-            @endif
-            
-            // Hiển thị thông báo lỗi nếu có
-            @if ($errors->any())
-                const errorList = document.getElementById('error-list');
-                errorList.innerHTML = '';
-                
-                @foreach ($errors->all() as $error)
-                    const li = document.createElement('li');
-                    li.textContent = '{{ $error }}';
-                    errorList.appendChild(li);
-                @endforeach
-                
-                document.getElementById('error-alert').classList.remove('hidden');
-            @endif
-
-            // Debug form submission
-            const form = document.getElementById('register-form');
-            form.addEventListener('submit', function(e) {
-                console.log('Form is being submitted...');
-                
-                // Check if terms checkbox is checked
-                const termsCheckbox = document.getElementById('terms');
-                if (!termsCheckbox.checked) {
-                    e.preventDefault();
-                    alert('Vui lòng đồng ý với điều khoản dịch vụ và chính sách bảo mật.');
-                    console.log('Form submission stopped: terms not accepted');
-                    return false;
-                }
-                
-                // Log form data
-                const formData = new FormData(form);
-                console.log('Form data:');
-                for (let pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-                
-                return true;
-            });
-        });
+        // Cấu hình Toastr
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Hiển thị thông báo từ session
+        @if(Session::has('error'))
+            toastr.error("{{ Session::get('error') }}", "Lỗi");
+        @endif
+        
+        @if(Session::has('success'))
+            toastr.success("{{ Session::get('success') }}", "Thành công");
+        @endif
+        
+        @if(Session::has('info'))
+            toastr.info("{{ Session::get('info') }}");
+        @endif
+        
+        @if(Session::has('warning'))
+            toastr.warning("{{ Session::get('warning') }}");
+        @endif
+        
+        // Hiển thị lỗi validation
+        @if($errors->any())
+            @foreach($errors->all() as $error)
+                toastr.error("{{ $error }}", "Lỗi");
+            @endforeach
+        @endif
         
         // Hàm hiển thị/ẩn mật khẩu
         function togglePassword(inputId) {
