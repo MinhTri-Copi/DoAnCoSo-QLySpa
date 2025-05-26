@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -53,7 +54,9 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validate dữ liệu đầu vào
+        Log::info('Register request received: ' . json_encode($request->all()));
+
+        // Validate dữ liệu đầu vào với tên trường từ form
         $request->validate([
             'tendangnhap' => 'required|unique:ACCOUNT,Tendangnhap|min:5',
             'hoten' => 'required',
@@ -84,10 +87,12 @@ class AuthController extends Controller
 
         try {
             DB::beginTransaction();
+            Log::info('Starting transaction for user registration');
 
             // Tạo tài khoản mới
             $maxMaTK = DB::table('ACCOUNT')->max('MaTK') ?? 0;
             $matk = $maxMaTK + 1;
+            Log::info('Generated new MaTK: ' . $matk);
 
             // Tạo account mới
             $account = new Account();
@@ -96,10 +101,12 @@ class AuthController extends Controller
             $account->Matkhau = bcrypt($request->matkhau);
             $account->RoleID = 3; // Role mặc định là khách hàng
             $account->save();
+            Log::info('Account created with MaTK: ' . $matk);
 
             // Tạo user mới
             $maxMaUser = DB::table('USER')->max('Manguoidung') ?? 0;
             $manguoidung = $maxMaUser + 1;
+            Log::info('Generated new Manguoidung: ' . $manguoidung);
 
             $user = new User();
             $user->Manguoidung = $manguoidung;
@@ -111,10 +118,12 @@ class AuthController extends Controller
             $user->Ngaysinh = $request->ngaysinh;
             $user->Gioitinh = $request->gioitinh;
             $user->save();
+            Log::info('User created with Manguoidung: ' . $manguoidung);
 
             // Tạo hạng thành viên mới
             $maxMaHang = DB::table('HANGTHANHVIEN')->max('Mahang') ?? 0;
             $mahang = $maxMaHang + 1;
+            Log::info('Generated new Mahang: ' . $mahang);
 
             $hangThanhVien = new HangThanhVien();
             $hangThanhVien->Mahang = $mahang;
@@ -122,8 +131,10 @@ class AuthController extends Controller
             $hangThanhVien->Mota = 'Hạng thành viên mặc định khi đăng ký';
             $hangThanhVien->Manguoidung = $manguoidung;
             $hangThanhVien->save();
+            Log::info('Membership rank created with Mahang: ' . $mahang);
 
             DB::commit();
+            Log::info('Transaction committed successfully');
 
             // Kiểm tra các lịch đặt cũ của khách vãng lai theo số điện thoại
             $guestBookings = \App\Models\DatLich::whereNull('Manguoidung')
@@ -134,10 +145,12 @@ class AuthController extends Controller
             if ($guestBookings->count() > 0) {
                 // Lưu thông tin để hiển thị sau khi đăng nhập
                 session(['found_guest_bookings' => true, 'guest_bookings_count' => $guestBookings->count()]);
+                Log::info('Found ' . $guestBookings->count() . ' guest bookings for phone: ' . $request->sdt);
             }
 
             // Đăng nhập người dùng sau khi đăng ký
             Auth::login($account);
+            Log::info('User logged in after registration: ' . $account->Tendangnhap);
 
             // Kiểm tra nếu có lịch đặt cần liên kết, chuyển hướng đến trang xác nhận
             if (session('found_guest_bookings')) {
@@ -150,6 +163,8 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in registration: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())->withInput();
         }
     }

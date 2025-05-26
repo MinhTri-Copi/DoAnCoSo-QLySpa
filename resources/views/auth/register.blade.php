@@ -73,7 +73,7 @@
                     @csrf
                     
                     <!-- Input hidden cho vai trò mặc định là user -->
-                    <input type="hidden" name="RoleID" value="2">
+                    <input type="hidden" name="RoleID" value="3">
                     
                     <div class="form-row">
                         <!-- Tên đăng nhập -->
@@ -222,6 +222,30 @@
                 
                 document.getElementById('error-alert').classList.remove('hidden');
             @endif
+
+            // Debug form submission
+            const form = document.getElementById('register-form');
+            form.addEventListener('submit', function(e) {
+                console.log('Form is being submitted...');
+                
+                // Check if terms checkbox is checked
+                const termsCheckbox = document.getElementById('terms');
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Vui lòng đồng ý với điều khoản dịch vụ và chính sách bảo mật.');
+                    console.log('Form submission stopped: terms not accepted');
+                    return false;
+                }
+                
+                // Log form data
+                const formData = new FormData(form);
+                console.log('Form data:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                
+                return true;
+            });
         });
         
         // Hàm hiển thị/ẩn mật khẩu
