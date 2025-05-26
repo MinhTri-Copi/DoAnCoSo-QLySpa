@@ -70,8 +70,8 @@ class PhieuHoTroController extends Controller
         $maxMaphieuHT = PhieuHoTro::max('MaphieuHT') ?? 0;
         $newMaphieuHT = $maxMaphieuHT + 1;
 
-        // Lấy mã trạng thái mặc định (Đang xử lý)
-        $trangThai = TrangThai::where('Tentrangthai', 'Đang xử lý')->first();
+        // Lấy mã trạng thái mặc định (Chờ xử lý)
+        $trangThai = TrangThai::where('Tentrangthai', 'Chờ xử lý')->first();
 
         $phieuHoTro = new PhieuHoTro();
         $phieuHoTro->MaphieuHT = $newMaphieuHT;
@@ -121,7 +121,7 @@ class PhieuHoTroController extends Controller
             ->where('Manguoidung', $customer->Manguoidung)
             ->with(['trangThai', 'ptHoTro'])
             ->firstOrFail();
-        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý') {
+        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý' && $phieuHoTro->trangThai->Tentrangthai !== 'Chờ xử lý') {
             return redirect()->route('customer.phieuhotro.show', $id)
                 ->with('error', 'Bạn không thể chỉnh sửa phiếu hỗ trợ này vì nó đang được xử lý hoặc đã hoàn thành.');
         }
@@ -148,7 +148,7 @@ class PhieuHoTroController extends Controller
             ->where('Manguoidung', $customer->Manguoidung)
             ->with(['trangThai', 'ptHoTro'])
             ->firstOrFail();
-        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý') {
+        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý' && $phieuHoTro->trangThai->Tentrangthai !== 'Chờ xử lý') {
             return redirect()->route('customer.phieuhotro.show', $id)
                 ->with('error', 'Bạn không thể chỉnh sửa phiếu hỗ trợ này vì nó đang được xử lý hoặc đã hoàn thành.');
         }
@@ -173,7 +173,7 @@ class PhieuHoTroController extends Controller
             ->where('Manguoidung', $customer->Manguoidung)
             ->with(['trangThai', 'ptHoTro'])
             ->firstOrFail();
-        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý') {
+        if ($phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý' && $phieuHoTro->trangThai->Tentrangthai !== 'Chờ xử lý') {
             return redirect()->route('customer.phieuhotro.show', $id)
                 ->with('error', 'Bạn không thể hủy phiếu hỗ trợ này vì nó đang được xử lý hoặc đã hoàn thành.');
         }
@@ -241,8 +241,8 @@ class PhieuHoTroController extends Controller
         if (!$phieuHoTro) {
             return redirect()->route('customer.phieuhotro.index')->with('error', 'Không tìm thấy phiếu hỗ trợ.');
         }
-        if ($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý') {
-            return redirect()->route('customer.phieuhotro.index')->with('error', 'Chỉ có thể xoá phiếu hỗ trợ khi đang ở trạng thái Đang xử lý.');
+        if ($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai !== 'Đang xử lý' && $phieuHoTro->trangThai->Tentrangthai !== 'Chờ xử lý') {
+            return redirect()->route('customer.phieuhotro.index')->with('error', 'Chỉ có thể xoá phiếu hỗ trợ khi đang ở trạng thái Đang xử lý hoặc Chờ xử lý.');
         }
         $phieuHoTro->delete();
         return redirect()->route('customer.phieuhotro.index')->with('success', 'Xoá phiếu hỗ trợ thành công.');

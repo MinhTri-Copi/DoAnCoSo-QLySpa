@@ -31,37 +31,51 @@
 @if(count($featuredAds) > 0)
 <section class="featured-ads py-5 bg-light">
     <div class="container">
-        <h2 class="section-title text-center mb-4">Ưu đãi đặc biệt</h2>
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Ưu đãi đặc biệt</h2>
+            <div class="section-divider">
+                <span class="section-divider-line"></span>
+                <span class="section-divider-icon"><i class="fas fa-gift"></i></span>
+                <span class="section-divider-line"></span>
+            </div>
+            <p class="section-subtitle">Khám phá những ưu đãi hấp dẫn đang diễn ra tại Rosa Spa</p>
+        </div>
+        
         <div class="row">
             @foreach($featuredAds as $ad)
             <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm position-relative">
-                    @if($ad->Image)
-                    <img src="{{ asset($ad->Image) }}" class="card-img-top" alt="{{ $ad->Tieude }}">
-                    @else
-                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-image fa-3x"></i>
+                <div class="promo-card">
+                    <div class="promo-card-img">
+                        @if($ad->Image)
+                        <img src="{{ asset($ad->Image) }}" alt="{{ $ad->Tieude }}">
+                        @else
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        @endif
+                        <div class="promo-badge">Nổi bật</div>
+                        <div class="promo-overlay">
+                            <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn-details">Xem chi tiết</a>
+                        </div>
                     </div>
-                    @endif
-                    <div class="badge-featured">Nổi bật</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $ad->Tieude }}</h5>
-                        <p class="card-text text-muted small">
-                            <i class="fas fa-calendar-alt me-1"></i> 
-                            {{ \Carbon\Carbon::parse($ad->Ngaybatdau)->format('d/m/Y') }} - 
-                            {{ \Carbon\Carbon::parse($ad->Ngayketthuc)->format('d/m/Y') }}
-                        </p>
-                        <p class="card-text">{{ \Illuminate\Support\Str::limit($ad->Noidung, 100) }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="{{ route('customer.quangcao.show', $ad->MaQC) }}" class="btn btn-outline-primary">Chi tiết</a>
+                    <div class="promo-card-body">
+                        <h3 class="promo-title">{{ $ad->Tieude }}</h3>
+                        <div class="promo-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>{{ \Carbon\Carbon::parse($ad->Ngaybatdau)->format('d/m/Y') }} - 
+                            {{ \Carbon\Carbon::parse($ad->Ngayketthuc)->format('d/m/Y') }}</span>
+                        </div>
+                        <p class="promo-desc">{{ \Illuminate\Support\Str::limit($ad->Noidung, 100) }}</p>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-        <div class="text-center">
-            <a href="{{ route('customer.quangcao.index') }}" class="see-all-btn">Xem tất cả ưu đãi</a>
+        <div class="text-center mt-5">
+            <a href="{{ route('customer.quangcao.index') }}" class="see-all-promos">
+                <span>Xem tất cả ưu đãi</span>
+                <i class="fas fa-long-arrow-alt-right"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -71,33 +85,48 @@
 @if(count($featuredServices) > 0)
 <section class="featured-services py-5">
     <div class="container">
-        <h2 class="section-title text-center mb-4">Dịch vụ nổi bật</h2>
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Dịch vụ nổi bật</h2>
+            <div class="section-divider">
+                <span class="section-divider-line"></span>
+                <span class="section-divider-icon"><i class="fas fa-spa"></i></span>
+                <span class="section-divider-line"></span>
+            </div>
+            <p class="section-subtitle">Trải nghiệm những dịch vụ cao cấp và phổ biến nhất tại Rosa Spa</p>
+        </div>
+
         <div class="row">
             @foreach($featuredServices as $service)
             <div class="col-md-3 mb-4">
-                <div class="card h-100 border-0 shadow-sm position-relative">
-                    @if($service->Image)
-                    <img src="{{ asset($service->Image) }}" class="card-img-top" alt="{{ $service->Tendichvu }}">
-                    @else
-                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-spa fa-3x"></i>
-                    </div>
-                    @endif
-                    <div class="price-badge">{{ number_format($service->Gia, 0, ',', '.') }} VND</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $service->Tendichvu }}</h5>
-                        <p class="card-text">{{ \Illuminate\Support\Str::limit($service->MoTa ?? 'Không có mô tả', 80) }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="btn btn-outline-primary">Chi tiết</a>
-                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn btn-primary">Đặt lịch</a>
+                <div class="service-card">
+                    <a href="{{ route('customer.dichvu.show', $service->MaDV) }}" class="service-card-link">
+                        <div class="service-card-img">
+                            @if($service->Image)
+                            <img src="{{ asset($service->Image) }}" alt="{{ $service->Tendichvu }}">
+                            @else
+                            <div class="no-image">
+                                <i class="fas fa-spa"></i>
+                            </div>
+                            @endif
+                            <div class="service-price">{{ number_format($service->Gia, 0, ',', '.') }} VND</div>
+                        </div>
+                        <div class="service-card-body">
+                            <h3 class="service-title">{{ $service->Tendichvu }}</h3>
+                            <p class="service-desc">{{ \Illuminate\Support\Str::limit($service->MoTa ?? 'Không có mô tả', 80) }}</p>
+                        </div>
+                    </a>
+                    <div class="service-actions">
+                        <a href="{{ route('customer.datlich.create', ['service_id' => $service->MaDV, 'step' => 2] ) }}" class="btn-book">Đặt lịch</a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-        <div class="text-center mt-4">
-            <a href="{{ route('customer.dichvu.index') }}" class="see-all-btn">Xem tất cả dịch vụ</a>
+        <div class="text-center mt-5">
+            <a href="{{ route('customer.dichvu.index') }}" class="see-all-services">
+                <span>Xem tất cả dịch vụ</span>
+                <i class="fas fa-long-arrow-alt-right"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -107,38 +136,81 @@
 @if(isset($upcomingBookings) && count($upcomingBookings) > 0)
 <section class="upcoming-bookings py-5 bg-light">
     <div class="container">
-        <h2 class="section-title text-center mb-4">Lịch đặt sắp tới của bạn</h2>
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Lịch đặt sắp tới của bạn</h2>
+            <div class="section-divider">
+                <span class="section-divider-line"></span>
+                <span class="section-divider-icon"><i class="fas fa-calendar-check"></i></span>
+                <span class="section-divider-line"></span>
+            </div>
+            <p class="section-subtitle">Theo dõi và quản lý các lịch hẹn spa của bạn</p>
+        </div>
+        
         <div class="row">
             @foreach($upcomingBookings as $booking)
+            @php
+                $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich);
+                $now = \Carbon\Carbon::now();
+                $hoursDiff = $now->diffInHours($bookingTime, false);
+                $daysDiff = $now->diffInDays($bookingTime, false);
+                $isWithin24Hours = $hoursDiff > 0 && $hoursDiff <= 24;
+                $isWithin48Hours = $daysDiff >= 0 && $daysDiff <= 2;
+                $comingClass = $isWithin24Hours ? 'appointment-coming-soon-24h' : ($isWithin48Hours ? 'appointment-coming-soon-48h' : '');
+            @endphp
             <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $booking->dichVu->Tendichvu ?? 'Dịch vụ không xác định' }}</h5>
-                        <p class="card-text">
-                            <i class="fas fa-calendar-alt me-2"></i>
-                            {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y') }}
-                        </p>
-                        <p class="card-text">
-                            <i class="fas fa-clock me-2"></i>
-                            {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('H:i') }}
-                        </p>
-                        @if($booking->Trangthai_ == 1)
-                            <span class="badge bg-warning">Chờ xác nhận</span>
-                        @elseif($booking->Trangthai_ == 2)
-                            <span class="badge bg-success">Đã xác nhận</span>
-                        @elseif($booking->Trangthai_ == 3)
-                            <span class="badge bg-info">Đang thực hiện</span>
-                        @endif
+                <div class="appointment-card {{ $comingClass }}">
+                    @if($isWithin48Hours)
+                    <div class="coming-soon-badge">
+                        <i class="fas fa-stopwatch"></i> Sắp đến
                     </div>
-                    <div class="card-footer bg-white border-0">
-                        <a href="{{ route('customer.lichsudatlich.show', $booking->MaDL) }}" class="btn btn-sm btn-outline-primary w-100">Chi tiết</a>
+                    @endif
+                    <div class="appointment-header" style="background-image: url('{{ asset($booking->dichVu->Image ?? 'images/default-service.jpg') }}')">
+                        <div class="appointment-overlay">
+                            <div class="service-name">{{ $booking->dichVu->Tendichvu ?? 'Dịch vụ không xác định' }}</div>
+                        </div>
+                    </div>
+                    <div class="appointment-body">
+                        <div class="appointment-info">
+                            <div class="info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>{{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y') }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('H:i') }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                @if($booking->Trangthai_ == 1)
+                                    <span class="status pending">Chờ xác nhận</span>
+                                @elseif($booking->Trangthai_ == 2)
+                                    <span class="status confirmed">Đã xác nhận</span>
+                                @elseif($booking->Trangthai_ == 3)
+                                    <span class="status in-progress">Đang thực hiện</span>
+                                @endif
+                            </div>
+                            @if($isWithin24Hours)
+                            <div class="info-item countdown-timer" data-booking-time="{{ $booking->Thoigiandatlich }}">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span class="countdown-text">Còn lại: <span class="time-left">Đang tính...</span></span>
+                            </div>
+                            @endif
+                        </div>
+                        <a href="{{ route('customer.lichsudatlich.show', $booking->MaDL) }}" class="btn-view-details">
+                            <span>Xem chi tiết</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-        <div class="text-center mt-4">
-            <a href="{{ route('customer.lichsudatlich.index') }}" class="btn btn-outline-primary">Xem tất cả lịch đặt</a>
+        
+        <div class="text-center mt-5">
+            <a href="{{ route('customer.lichsudatlich.index') }}" class="see-all-appointments">
+                <span>Xem tất cả lịch đặt</span>
+                <i class="fas fa-long-arrow-alt-right"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -663,6 +735,628 @@
         transform: scale(0);
         pointer-events: none;
     }
+
+    /* Section Header Styles */
+    .section-header {
+        margin-bottom: 40px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .section-subtitle {
+        color: #6c757d;
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .section-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px 0;
+    }
+    
+    .section-divider-line {
+        height: 2px;
+        width: 70px;
+        background: linear-gradient(90deg, transparent, #ff6b9d, transparent);
+    }
+    
+    .section-divider-icon {
+        margin: 0 15px;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #ff6b9d 0%, #e55a8a 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+    }
+
+    /* Service Card Styling */
+    .service-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        transition: all 0.3s ease;
+        height: 100%;
+        background-color: #fff;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .service-card-img {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+    .service-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .service-card:hover .service-card-img img {
+        transform: scale(1.08);
+    }
+
+    .no-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #FFE6E6, #FFD1D1);
+        color: #FF9A9E;
+        font-size: 3rem;
+    }
+
+    .service-price {
+        position: absolute;
+        top: 15px;
+        right: 0;
+        background-color: #e5686d;
+        color: white;
+        padding: 8px 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: 20px 0 0 20px;
+        box-shadow: -2px 2px 10px rgba(255, 154, 158, 0.3);
+    }
+
+    .service-card-body {
+        padding: 25px 20px 15px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .service-title {
+        margin-bottom: 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .service-desc {
+        color: #777;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    .service-actions {
+        padding: 0 20px 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-view, .btn-book {
+        padding: 10px 15px;
+        border-radius: 30px;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .btn-view {
+        color: #FF9A9E;
+        background-color: rgba(255, 154, 158, 0.1);
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .btn-book {
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        text-align: center;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        text-decoration: none;
+        color: white;
+        background-color: #e5686d;
+        flex: 1;
+        display: block;
+        max-width: 200px;
+        margin: 0 auto;
+        box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-view:hover {
+        background-color: rgba(255, 154, 158, 0.2);
+        color: #FF6B6B;
+    }
+
+    .btn-book:hover {
+        background-color: #FF6B6B;
+    }
+
+    .see-all-services {
+        display: inline-flex;
+        align-items: center;
+        color: #FF9A9E;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 10px 25px;
+        border: 2px solid rgba(255, 154, 158, 0.3);
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .see-all-services span {
+        margin-right: 10px;
+    }
+
+    .see-all-services:hover {
+        background-color: #FF9A9E;
+        color: white;
+        border-color: #FF9A9E;
+    }
+
+    /* Promo Card Styling */
+    .promo-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+        height: 100%;
+        background-color: #fff;
+        position: relative;
+    }
+
+    .promo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 22px rgba(0,0,0,0.09);
+    }
+
+    .promo-card-img {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+    .promo-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .promo-card:hover .promo-card-img img {
+        transform: scale(1.05);
+    }
+
+    .no-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #F8E4E8, #FFD1D1);
+        color: #FF9A9E;
+        font-size: 3rem;
+    }
+
+    .promo-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: rgba(255, 107, 107, 0.85);
+        color: white;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 20px;
+        backdrop-filter: blur(3px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .promo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .promo-card:hover .promo-overlay {
+        opacity: 1;
+    }
+
+    .btn-details {
+        background: white;
+        color: #FF6B6B;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .promo-card:hover .btn-details {
+        transform: translateY(0);
+    }
+
+    .btn-details:hover {
+        background: #FF6B6B;
+        color: white;
+    }
+
+    .promo-card-body {
+        padding: 20px;
+    }
+
+    .promo-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #333;
+        line-height: 1.4;
+    }
+
+    .promo-date {
+        display: flex;
+        align-items: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .promo-date i {
+        margin-right: 6px;
+        color: #FF9A9E;
+    }
+
+    .promo-desc {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .see-all-promos {
+        display: inline-flex;
+        align-items: center;
+        color: #FF9A9E;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 10px 25px;
+        border: 2px solid rgba(255, 154, 158, 0.3);
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .see-all-promos span {
+        margin-right: 10px;
+    }
+
+    .see-all-promos:hover {
+        background-color: #FF9A9E;
+        color: white;
+        border-color: #FF9A9E;
+    }
+
+    .service-card-link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    /* Appointment Card Styles */
+    .appointment-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .appointment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(255, 107, 157, 0.1);
+    }
+    
+    .appointment-header {
+        height: 160px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    
+    .appointment-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+        display: flex;
+        align-items: flex-end;
+        padding: 20px;
+    }
+    
+    .service-name {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
+    }
+    
+    .appointment-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .appointment-info {
+        margin-bottom: 20px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .info-item i {
+        width: 20px;
+        color: #ff6b9d;
+        margin-right: 10px;
+    }
+    
+    .status {
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    
+    .status.pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status.confirmed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status.in-progress {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .btn-view-details {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        background: linear-gradient(135deg, #ff6b9d 0%, #e55a8a 100%);
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view-details:hover {
+        background: linear-gradient(135deg, #e55a8a 0%, #d04b7b 100%);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-view-details i {
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-view-details:hover i {
+        transform: translateX(5px);
+    }
+    
+    .see-all-appointments {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: #ff6b9d;
+        text-decoration: none;
+        padding: 10px 20px;
+        border: 2px solid #ff6b9d;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+    
+    .see-all-appointments:hover {
+        background-color: #ff6b9d;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .see-all-appointments i {
+        transition: transform 0.3s ease;
+    }
+    
+    .see-all-appointments:hover i {
+        transform: translateX(5px);
+    }
+
+    /* Hiệu ứng pulse cho lịch đặt trong vòng 24h */
+    .appointment-coming-soon-24h {
+        animation: pulse-shadow 2s infinite;
+        border: 2px solid #ff6b9d;
+    }
+
+    .appointment-coming-soon-48h {
+        border: 2px solid #ffaacc;
+        box-shadow: 0 5px 15px rgba(255, 107, 157, 0.2);
+    }
+
+    @keyframes pulse-shadow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(255, 107, 157, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 157, 0);
+        }
+    }
+
+    /* Nhãn Sắp đến */
+    .coming-soon-badge {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        background: linear-gradient(135deg, #ff6b9d, #ff4d82);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        z-index: 10;
+        box-shadow: 0 3px 10px rgba(255, 107, 157, 0.4);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .coming-soon-badge i {
+        margin-right: 5px;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    /* Countdown timer */
+    .countdown-timer {
+        background-color: #fff3cd;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        border-left: 3px solid #ff6b9d;
+    }
+
+    .countdown-timer i {
+        color: #ff6b9d;
+        animation: rotateHourglass 2s linear infinite;
+    }
+
+    @keyframes rotateHourglass {
+        0% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(10deg);
+        }
+        75% {
+            transform: rotate(-10deg);
+        }
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+
+    .time-left {
+        font-weight: 600;
+        color: #e55a8a;
+    }
+
+    /* Hiệu ứng glow cho tất cả thẻ lịch đặt */
+    .appointment-card {
+        position: relative;
+    }
+
+    .appointment-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        box-shadow: 0 0 15px rgba(255, 107, 157, 0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .appointment-card:hover::after {
+        opacity: 1;
+    }
 </style>
 @endsection
 
@@ -831,6 +1525,39 @@
                 }, 10);
             });
         }
+    });
+
+    // Hàm tính toán thời gian còn lại và cập nhật đồng hồ đếm ngược
+    function updateCountdowns() {
+        document.querySelectorAll('.countdown-timer').forEach(function(timer) {
+            const bookingTimeStr = timer.dataset.bookingTime;
+            const bookingTime = new Date(bookingTimeStr).getTime();
+            const now = new Date().getTime();
+            const timeLeft = bookingTime - now;
+            
+            // Nếu thời gian còn lại là dương (chưa tới lịch hẹn)
+            if (timeLeft > 0) {
+                // Tính giờ, phút, giây
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                
+                // Hiển thị kết quả
+                timer.querySelector('.time-left').textContent = 
+                    hours + "h " + minutes + "m " + seconds + "s";
+            } else {
+                // Nếu đã đến thời gian lịch hẹn
+                timer.querySelector('.time-left').textContent = "Đã đến giờ!";
+                timer.classList.add('time-reached');
+            }
+        });
+    }
+    
+    // Cập nhật đồng hồ đếm ngược ngay khi trang tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCountdowns();
+        // Cập nhật mỗi giây
+        setInterval(updateCountdowns, 1000);
     });
 </script>
 @endpush

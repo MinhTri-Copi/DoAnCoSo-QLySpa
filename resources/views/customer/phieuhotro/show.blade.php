@@ -372,9 +372,14 @@
                     </div>
 
                 <div>
-                    @if($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
+                    @if($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai == 'Chờ xử lý')
                         <span class="status-badge status-processing">
                             <i class="fas fa-spinner fa-spin"></i>
+                            {{ $phieuHoTro->trangThai->Tentrangthai }}
+                        </span>
+                    @elseif($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
+                        <span class="status-badge status-processing">
+                            <i class="fas fa-cog fa-spin"></i>
                             {{ $phieuHoTro->trangThai->Tentrangthai }}
                         </span>
                     @elseif($phieuHoTro->trangThai && $phieuHoTro->trangThai->Tentrangthai == 'Đã hoàn thành')
@@ -419,7 +424,7 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Actions Card -->
-                @if($phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý')
+                @if($phieuHoTro->trangThai->Tentrangthai == 'Đang xử lý' || $phieuHoTro->trangThai->Tentrangthai == 'Chờ xử lý')
                 <div class="sidebar-card">
                     <h3>
                         <i class="fas fa-tools" style="color: var(--primary-color);"></i>

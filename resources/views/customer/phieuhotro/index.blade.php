@@ -409,9 +409,13 @@
                             </div>
                             
                             <div class="ms-auto">
-                                @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
+                                @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Chờ xử lý')
                                     <span class="status-badge status-processing">
-                                        <i class="fas fa-spinner fa-spin"></i>Đang xử lý
+                                        <i class="fas fa-spinner fa-spin"></i>Chờ xử lý
+                                    </span>
+                                @elseif($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
+                                    <span class="status-badge status-processing">
+                                        <i class="fas fa-cog fa-spin"></i>Đang xử lý
                                     </span>
                                 @elseif($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đã hoàn thành')
                                     <span class="status-badge status-completed">
@@ -442,7 +446,7 @@
                                             <i class="fas fa-eye"></i>
                                             </button>
 
-                                @if($phieu->trangThai && $phieu->trangThai->Tentrangthai == 'Đang xử lý')
+                                @if($phieu->trangThai && ($phieu->trangThai->Tentrangthai == 'Đang xử lý' || $phieu->trangThai->Tentrangthai == 'Chờ xử lý'))
                                     <button class="action-btn action-edit" 
                                             onclick="window.location.href='{{ route('customer.phieuhotro.edit', $phieu->MaphieuHT) }}'"
                                             title="Chỉnh sửa">

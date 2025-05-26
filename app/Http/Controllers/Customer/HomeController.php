@@ -80,8 +80,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Get authenticated user
-        $user = Auth::user();
+        // Get authenticated account
+        $account = Auth::user();
+        
+        // Get the User record associated with this Account
+        $user = \App\Models\User::where('MaTK', $account->MaTK)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        }
         
         // Get featured services
         $featuredServices = DichVu::where('featured', true)
@@ -90,7 +97,7 @@ class HomeController extends Controller
             ->get();
             
         // Get upcoming bookings for the user
-        $upcomingBookings = DatLich::where('Manguoidung', $user->id)
+        $upcomingBookings = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('Thoigiandatlich', '>=', Carbon::now())
             ->where('Trangthai_', '!=', 4) // Not cancelled
             ->with('dichVu')
