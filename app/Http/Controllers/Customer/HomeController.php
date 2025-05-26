@@ -16,6 +16,64 @@ use Carbon\Carbon;
 class HomeController extends Controller
 {
     /**
+     * Display the welcome page for guests
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function welcome()
+    {
+        // Get featured services
+        $featuredServices = DichVu::where('featured', true)
+            ->orderBy('MaDV', 'desc')
+            ->limit(4)
+            ->get();
+            
+        // Get top rated services
+        $topRatedServices = DichVu::where('featured', true)
+            ->orderBy('MaDV', 'desc')
+            ->limit(3)
+            ->get();
+            
+        // Get latest reviews with highest ratings - limited to 4
+        $latestReviews = DanhGia::join('USER', 'DANHGIA.Manguoidung', '=', 'USER.Manguoidung')
+            ->leftJoin('HOADON_VA_THANHTOAN', 'DANHGIA.MaHD', '=', 'HOADON_VA_THANHTOAN.MaHD')
+            ->leftJoin('DATLICH', 'HOADON_VA_THANHTOAN.MaDL', '=', 'DATLICH.MaDL')
+            ->leftJoin('DICHVU', 'DATLICH.MaDV', '=', 'DICHVU.MaDV')
+            ->select('DANHGIA.*', 'USER.Hoten', 'DICHVU.Tendichvu as TenDichVu')
+            ->orderBy('DANHGIA.Danhgiasao', 'desc')
+            ->orderBy('DANHGIA.Ngaydanhgia', 'desc')
+            ->limit(4)
+            ->get();
+            
+        // Get active advertisements for slideshow (status code = 1)
+        $activeAds = QuangCao::where('MaTTQC', 1)
+            ->get();
+            
+        // Get advertisement data from QuangCaoController
+        try {
+            $quangCaoController = new QuangCaoController();
+            $featuredAds = $quangCaoController->getFeaturedAdsData(3);
+            $promotionAds = $quangCaoController->getPromotionAdsData();
+            $eventAds = $quangCaoController->getEventAdsData();
+        } catch (\Exception $e) {
+            \Log::error('Error loading advertisements: ' . $e->getMessage());
+            $featuredAds = collect();
+            $promotionAds = collect();
+            $eventAds = collect();
+        }
+
+        return view('customer.home', compact(
+            'featuredServices',
+            'topRatedServices',
+            'latestReviews',
+            'featuredAds',
+            'promotionAds',
+            'eventAds',
+            'activeAds'
+        ));
+    }
+
+    /**
      * Display the customer dashboard.
      *
      * @return \Illuminate\Http\Response

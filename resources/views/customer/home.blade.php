@@ -109,7 +109,7 @@
 @endif
 
 <!-- Upcoming Bookings Section (Only for logged in users) -->
-@if(count($upcomingBookings) > 0)
+@if(isset($upcomingBookings) && count($upcomingBookings) > 0)
 <section class="upcoming-bookings py-5 bg-light">
     <div class="container">
         <h2 class="section-title text-center mb-4">Lịch đặt sắp tới của bạn</h2>
@@ -150,7 +150,7 @@
 @endif
 
 <!-- Promotional Banner -->
-@if(count($promotionAds) > 0)
+@if(isset($promotionAds) && count($promotionAds) > 0)
 <section class="promo-banner py-5" style="background-color: #FFF5F7;">
     <div class="container">
         <div class="row align-items-center">
@@ -230,8 +230,54 @@
 </section>
 @endif
 
+<!-- Guest Membership Promotion (Only for non-logged in users) -->
+@guest
+<section class="membership-promo py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="h1 mb-4">Đăng ký để nhận đặc quyền thành viên</h2>
+                <p class="lead mb-4">Trở thành thành viên của ROSA SPA để nhận nhiều ưu đãi hấp dẫn và tích lũy điểm thưởng với mỗi lần sử dụng dịch vụ.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Nhận ưu đãi độc quyền dành cho thành viên</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Tích điểm với mỗi lần sử dụng dịch vụ</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Nhận quà sinh nhật đặc biệt</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Đặt lịch ưu tiên và quản lý lịch hẹn dễ dàng</li>
+                </ul>
+                <div class="d-flex gap-3">
+                    <a href="{{ route('register') }}" class="btn btn-primary">Đăng ký ngay</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary">Đăng nhập</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="membership-card-container position-relative">
+                    <div class="membership-card shadow p-4 rounded-3 mx-auto diamond-effect" style="max-width: 350px; background: linear-gradient(135deg, #FF6B81 0%, #e84c60 100%); color: #fff; position: relative; overflow: hidden;">
+                        <!-- Lớp chứa hiệu ứng kim cương -->
+                        <div class="diamond-shine-container"></div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
+                            <h4 class="m-0 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ROSA SPA</h4>
+                            <i class="fas fa-crown fa-2x text-warning" style="filter: drop-shadow(0 0 5px gold);"></i>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <h5 class="mb-1 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Thành viên VIP</h5>
+                            <p class="small m-0 fw-bold" style="text-shadow: 0px 1px 2px rgba(0,0,0,0.5);">Hưởng đặc quyền và ưu đãi độc quyền</p>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-between position-relative">
+                            <span class="text-warning" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i></span>
+                            <span class="fw-bold" style="text-shadow: 0px 1px 2px rgba(0,0,0,0.5);">Tích điểm mỗi lần sử dụng dịch vụ</span>
+                        </div>
+                    </div>
+                    <div class="membership-card-shadow position-absolute" style="top: 15px; left: 50%; width: 90%; height: 100%; background-color: rgba(0,0,0,0.2); border-radius: 12px; z-index: -1; transform: translateX(-50%);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endguest
+
 <!-- Booking Form Section -->
-<section class="booking-cta py-5 bg-pink text-white position-relative overflow-hidden animated-bg">
+<section class="booking-cta py-5 bg-pink position-relative overflow-hidden animated-bg">
     <div class="animation-circles">
         <div class="circle circle-1"></div>
         <div class="circle circle-2"></div>
@@ -240,16 +286,23 @@
     <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-lg-10 text-center">
-                <h2 class="mb-4 animate__animated animate__fadeInDown">Bạn muốn đặt lịch ngay?</h2>
-                <p class="lead mb-4 animate__animated animate__fadeInUp">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
+                <h2 class="mb-4 animate__animated animate__fadeInDown text-dark">Bạn muốn đặt lịch ngay?</h2>
+                <p class="lead mb-4 animate__animated animate__fadeInUp text-dark">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
+                
+                @auth
+                <!-- Đã đăng nhập - Hiển thị nút đặt lịch bình thường -->
                 <a href="{{ route('customer.datlich.create') }}" class="btn btn-cta btn-lg px-5 py-3 animate__animated animate__pulse animate__infinite">Đặt lịch ngay</a>
+                @else
+                <!-- Chưa đăng nhập - Hiển thị nút giống với đã đăng nhập nhưng chuyển hướng tới login -->
+                <a href="{{ route('login') }}?redirect=booking" class="btn btn-cta btn-lg px-5 py-3 animate__animated animate__pulse animate__infinite">Đặt lịch ngay</a>
+                @endauth
             </div>
         </div>
     </div>
 </section>
 
 <!-- Reviews Section -->
-@if(count($latestReviews) > 0)
+@if(isset($latestReviews) && count($latestReviews) > 0)
 <section class="reviews py-5 bg-light">
     <div class="container">
         <h2 class="section-title text-center mb-5">Khách hàng nói gì về chúng tôi</h2>
@@ -573,6 +626,36 @@
             transform: scale3d(1, 1, 1);
         }
     }
+
+    /* Diamond effect styles */
+    .diamond-effect {
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 215, 0, 0.5);
+    }
+    
+    .diamond-shine-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
+    }
+    
+    .diamond-shine {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.8), 
+                   0 0 12px 6px rgba(255, 215, 0, 0.6);
+        opacity: 0;
+        transform: scale(0);
+        pointer-events: none;
+    }
 </style>
 @endsection
 
@@ -644,6 +727,103 @@
                 console.log('Near end of video, preparing to switch');
             }
         });
+
+        // Diamond Shine Effect for VIP Card
+        const cardElement = document.querySelector('.diamond-effect');
+        const shineContainer = document.querySelector('.diamond-shine-container');
+        
+        if (cardElement && shineContainer) {
+            // Create diamond shine points
+            const createDiamondShine = () => {
+                const shine = document.createElement('div');
+                shine.classList.add('diamond-shine');
+                
+                // Random position within the card
+                const x = Math.random() * 100; // percentage
+                const y = Math.random() * 100; // percentage
+                shine.style.left = `${x}%`;
+                shine.style.top = `${y}%`;
+                
+                // Random size (slightly varied)
+                const size = 4 + Math.random() * 8; // between 4px and 12px
+                shine.style.width = `${size}px`;
+                shine.style.height = `${size}px`;
+                
+                // Add to container
+                shineContainer.appendChild(shine);
+                
+                // Animate the shine
+                setTimeout(() => {
+                    shine.style.transition = 'all 0.5s ease-in-out';
+                    shine.style.opacity = '1';
+                    shine.style.transform = 'scale(1)';
+                    
+                    // Sparkle effect
+                    setTimeout(() => {
+                        shine.style.opacity = '0';
+                        shine.style.transform = 'scale(1.5)';
+                        
+                        // Remove after animation completes
+                        setTimeout(() => {
+                            shine.remove();
+                        }, 600);
+                    }, 300 + Math.random() * 400);
+                }, 10);
+            };
+            
+            // Create shine effects regularly
+            const createShineEffect = () => {
+                // Create 1-3 shine points at once
+                const shineCount = 1 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < shineCount; i++) {
+                    setTimeout(() => {
+                        createDiamondShine();
+                    }, i * 150); // Stagger the creation
+                }
+            };
+            
+            // Start the shine effects
+            setInterval(createShineEffect, 800);
+            
+            // Also trigger when hovering over the card for extra effect
+            cardElement.addEventListener('mousemove', (e) => {
+                // Create shine at mouse position
+                const shine = document.createElement('div');
+                shine.classList.add('diamond-shine');
+                
+                // Position at mouse within the card
+                const rect = cardElement.getBoundingClientRect();
+                const x = e.clientX - rect.left; // mouse position relative to card
+                const y = e.clientY - rect.top;
+                
+                shine.style.left = `${x}px`;
+                shine.style.top = `${y}px`;
+                
+                // Random size (slightly larger on hover)
+                const size = 8 + Math.random() * 10;
+                shine.style.width = `${size}px`;
+                shine.style.height = `${size}px`;
+                
+                // Add to container
+                shineContainer.appendChild(shine);
+                
+                // Animate
+                setTimeout(() => {
+                    shine.style.transition = 'all 0.6s ease-out';
+                    shine.style.opacity = '1';
+                    shine.style.transform = 'scale(1)';
+                    
+                    setTimeout(() => {
+                        shine.style.opacity = '0';
+                        shine.style.transform = 'scale(2)';
+                        
+                        setTimeout(() => {
+                            shine.remove();
+                        }, 700);
+                    }, 200);
+                }, 10);
+            });
+        }
     });
 </script>
 @endpush
