@@ -8,6 +8,25 @@
     <link href="auth/css/login.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <style>
+        /* Tùy chỉnh thêm cho toastr */
+        .toast-success {
+            background-color: #51A351;
+        }
+        .toast-error {
+            background-color: #BD362F;
+        }
+        .toast-info {
+            background-color: #2F96B4;
+        }
+        .toast-warning {
+            background-color: #F89406;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -48,17 +67,13 @@
                     <p>Đăng nhập để tiếp tục trải nghiệm dịch vụ của Rosa Spa</p>
                 </div>
                 
-                <div class="alert alert-danger hidden">
-                    <!-- Hiển thị lỗi nếu có -->
-                </div>
-                
                 <form action="{{ route('login') }}" method="POST">
                     @csrf 
                     <div class="form-group">
                         <label for="Tendangnhap">Tên đăng nhập</label>
                         <div class="input-with-icon">
                             <i class="fas fa-user"></i>
-                            <input type="text" name="Tendangnhap" id="Tendangnhap" placeholder="Nhập tên đăng nhập" required>
+                            <input type="text" name="Tendangnhap" id="Tendangnhap" placeholder="Nhập tên đăng nhập" value="{{ old('Tendangnhap') }}" required>
                         </div>
                     </div>
                     
@@ -109,5 +124,45 @@
             </div>
         </div>
     </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
+    <script>
+        // Cấu hình Toastr
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Hiển thị thông báo từ session
+        @if(Session::has('error'))
+            toastr.error("{{ Session::get('error') }}", "Lỗi đăng nhập");
+        @endif
+        
+        @if(Session::has('success'))
+            toastr.success("{{ Session::get('success') }}", "Thành công");
+        @endif
+        
+        @if(Session::has('info'))
+            toastr.info("{{ Session::get('info') }}");
+        @endif
+        
+        @if(Session::has('warning'))
+            toastr.warning("{{ Session::get('warning') }}");
+        @endif
+    </script>
 </body>
 </html>

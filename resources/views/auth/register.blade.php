@@ -8,6 +8,25 @@
     <link href="auth/css/register.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <style>
+        /* Tùy chỉnh thêm cho toastr */
+        .toast-success {
+            background-color: #51A351;
+        }
+        .toast-error {
+            background-color: #BD362F;
+        }
+        .toast-info {
+            background-color: #2F96B4;
+        }
+        .toast-warning {
+            background-color: #F89406;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -78,20 +97,34 @@
                     <div class="form-row">
                         <!-- Tên đăng nhập -->
                         <div class="form-group">
-                            <label for="Tendangnhap">Tên đăng nhập <span class="required">*</span></label>
+                            <label for="tendangnhap">Tên đăng nhập <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="Tendangnhap" id="Tendangnhap" placeholder="Nhập tên đăng nhập" value="{{ old('Tendangnhap') }}" required>
+                                <input type="text" name="tendangnhap" id="tendangnhap" placeholder="Nhập tên đăng nhập" value="{{ old('tendangnhap') }}" required>
                             </div>
                         </div>
                         
                         <!-- Mật khẩu -->
                         <div class="form-group">
-                            <label for="Matkhau">Mật khẩu <span class="required">*</span></label>
+                            <label for="matkhau">Mật khẩu <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="Matkhau" id="Matkhau" placeholder="Nhập mật khẩu" required>
-                                <button type="button" class="toggle-password" onclick="togglePassword('Matkhau')">
+                                <input type="password" name="matkhau" id="matkhau" placeholder="Nhập mật khẩu" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('matkhau')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Xác nhận mật khẩu -->
+                        <div class="form-group">
+                            <label for="matkhau_confirmation">Xác nhận mật khẩu <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="matkhau_confirmation" id="matkhau_confirmation" placeholder="Nhập lại mật khẩu" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('matkhau_confirmation')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -101,19 +134,19 @@
                     <div class="form-row">
                         <!-- Họ tên -->
                         <div class="form-group">
-                            <label for="Hoten">Họ tên <span class="required">*</span></label>
+                            <label for="hoten">Họ tên <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-id-card"></i>
-                                <input type="text" name="Hoten" id="Hoten" placeholder="Nhập họ tên đầy đủ" value="{{ old('Hoten') }}" required>
+                                <input type="text" name="hoten" id="hoten" placeholder="Nhập họ tên đầy đủ" value="{{ old('hoten') }}" required>
                             </div>
                         </div>
                         
                         <!-- Email -->
                         <div class="form-group">
-                            <label for="Email">Email <span class="required">*</span></label>
+                            <label for="email">Email <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="Email" id="Email" placeholder="Nhập địa chỉ email" value="{{ old('Email') }}" required>
+                                <input type="email" name="email" id="email" placeholder="Nhập địa chỉ email" value="{{ old('email') }}" required>
                             </div>
                         </div>
                     </div>
@@ -121,19 +154,19 @@
                     <div class="form-row">
                         <!-- Số điện thoại -->
                         <div class="form-group">
-                            <label for="SDT">Số điện thoại</label>
+                            <label for="sdt">Số điện thoại <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-phone"></i>
-                                <input type="text" name="SDT" id="SDT" placeholder="Nhập số điện thoại" value="{{ old('SDT') }}">
+                                <input type="text" name="sdt" id="sdt" placeholder="Nhập số điện thoại" value="{{ old('sdt') }}" required>
                             </div>
                         </div>
                         
                         <!-- Ngày sinh -->
                         <div class="form-group">
-                            <label for="Ngaysinh">Ngày sinh</label>
+                            <label for="ngaysinh">Ngày sinh <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-calendar-alt"></i>
-                                <input type="date" name="Ngaysinh" id="Ngaysinh" value="{{ old('Ngaysinh') }}">
+                                <input type="date" name="ngaysinh" id="ngaysinh" value="{{ old('ngaysinh') }}" required>
                             </div>
                         </div>
                     </div>
@@ -141,24 +174,24 @@
                     <div class="form-row">
                         <!-- Giới tính -->
                         <div class="form-group">
-                            <label for="Gioitinh">Giới tính</label>
+                            <label for="gioitinh">Giới tính <span class="required">*</span></label>
                             <div class="select-with-icon">
                                 <i class="fas fa-venus-mars"></i>
-                                <select name="Gioitinh" id="Gioitinh">
+                                <select name="gioitinh" id="gioitinh" required>
                                     <option value="">Chọn giới tính</option>
-                                    <option value="Nam" {{ old('Gioitinh') == 'Nam' ? 'selected' : '' }}>Nam</option>
-                                    <option value="Nu" {{ old('Gioitinh') == 'Nu' ? 'selected' : '' }}>Nữ</option>
-                                    <option value="Khac" {{ old('Gioitinh') == 'Khac' ? 'selected' : '' }}>Khác</option>
+                                    <option value="Nam" {{ old('gioitinh') == 'Nam' ? 'selected' : '' }}>Nam</option>
+                                    <option value="Nu" {{ old('gioitinh') == 'Nu' ? 'selected' : '' }}>Nữ</option>
+                                    <option value="Khac" {{ old('gioitinh') == 'Khac' ? 'selected' : '' }}>Khác</option>
                                 </select>
                             </div>
                         </div>
                         
                         <!-- Địa chỉ -->
                         <div class="form-group">
-                            <label for="DiaChi">Địa chỉ</label>
+                            <label for="diachi">Địa chỉ <span class="required">*</span></label>
                             <div class="input-with-icon">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="DiaChi" id="DiaChi" placeholder="Nhập địa chỉ" value="{{ old('DiaChi') }}">
+                                <input type="text" name="diachi" id="diachi" placeholder="Nhập địa chỉ" value="{{ old('diachi') }}" required>
                             </div>
                         </div>
                     </div>
@@ -188,27 +221,51 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hiển thị thông báo thành công nếu có
-            @if (session('success'))
-                document.getElementById('success-alert').classList.remove('hidden');
-            @endif
-            
-            // Hiển thị thông báo lỗi nếu có
-            @if ($errors->any())
-                const errorList = document.getElementById('error-list');
-                errorList.innerHTML = '';
-                
-                @foreach ($errors->all() as $error)
-                    const li = document.createElement('li');
-                    li.textContent = '{{ $error }}';
-                    errorList.appendChild(li);
-                @endforeach
-                
-                document.getElementById('error-alert').classList.remove('hidden');
-            @endif
-        });
+        // Cấu hình Toastr
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Hiển thị thông báo từ session
+        @if(Session::has('error'))
+            toastr.error("{{ Session::get('error') }}", "Lỗi");
+        @endif
+        
+        @if(Session::has('success'))
+            toastr.success("{{ Session::get('success') }}", "Thành công");
+        @endif
+        
+        @if(Session::has('info'))
+            toastr.info("{{ Session::get('info') }}");
+        @endif
+        
+        @if(Session::has('warning'))
+            toastr.warning("{{ Session::get('warning') }}");
+        @endif
+        
+        // Hiển thị lỗi validation
+        @if($errors->any())
+            @foreach($errors->all() as $error)
+                toastr.error("{{ $error }}", "Lỗi");
+            @endforeach
+        @endif
         
         // Hàm hiển thị/ẩn mật khẩu
         function togglePassword(inputId) {

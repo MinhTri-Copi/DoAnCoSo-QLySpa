@@ -601,7 +601,7 @@
         <div class="stat-icon">
             <i class="fas fa-file-invoice-dollar"></i>
         </div>
-        <div class="stat-value">{{ number_format($hoaDons->count(), 0, ',', '.') }}</div>
+        <div class="stat-value">{{ number_format(App\Models\HoaDonVaThanhToan::count(), 0, ',', '.') }}</div>
         <div class="stat-label">Tổng Số Hóa Đơn</div>
         <div class="stat-progress">
             <div class="stat-progress-bar progress-1"></div>

@@ -104,7 +104,7 @@
 @endif
 
 <!-- Upcoming Bookings Section (Only for logged in users) -->
-@if(count($upcomingBookings) > 0)
+@if(isset($upcomingBookings) && count($upcomingBookings) > 0)
 <section class="upcoming-bookings py-5 bg-light">
     <div class="container">
         <h2 class="section-title text-center mb-4">Lịch đặt sắp tới của bạn</h2>
@@ -145,7 +145,7 @@
 @endif
 
 <!-- Promotional Banner -->
-@if(count($promotionAds) > 0)
+@if(isset($promotionAds) && count($promotionAds) > 0)
 <section class="promo-banner py-5" style="background-color: #FFF5F7;">
     <div class="container">
         <div class="row align-items-center">
@@ -237,8 +237,54 @@
 </section>
 @endif
 
+<!-- Guest Membership Promotion (Only for non-logged in users) -->
+@guest
+<section class="membership-promo py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="h1 mb-4">Đăng ký để nhận đặc quyền thành viên</h2>
+                <p class="lead mb-4">Trở thành thành viên của ROSA SPA để nhận nhiều ưu đãi hấp dẫn và tích lũy điểm thưởng với mỗi lần sử dụng dịch vụ.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Nhận ưu đãi độc quyền dành cho thành viên</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Tích điểm với mỗi lần sử dụng dịch vụ</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Nhận quà sinh nhật đặc biệt</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Đặt lịch ưu tiên và quản lý lịch hẹn dễ dàng</li>
+                </ul>
+                <div class="d-flex gap-3">
+                    <a href="{{ route('register') }}" class="btn btn-primary">Đăng ký ngay</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary">Đăng nhập</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="membership-card-container position-relative">
+                    <div class="membership-card shadow p-4 rounded-3 mx-auto diamond-effect" style="max-width: 350px; background: linear-gradient(135deg, #FF6B81 0%, #e84c60 100%); color: #fff; position: relative; overflow: hidden;">
+                        <!-- Lớp chứa hiệu ứng kim cương -->
+                        <div class="diamond-shine-container"></div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
+                            <h4 class="m-0 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ROSA SPA</h4>
+                            <i class="fas fa-crown fa-2x text-warning" style="filter: drop-shadow(0 0 5px gold);"></i>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <h5 class="mb-1 fw-bold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Thành viên VIP</h5>
+                            <p class="small m-0 fw-bold" style="text-shadow: 0px 1px 2px rgba(0,0,0,0.5);">Hưởng đặc quyền và ưu đãi độc quyền</p>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-between position-relative">
+                            <span class="text-warning" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i></span>
+                            <span class="fw-bold" style="text-shadow: 0px 1px 2px rgba(0,0,0,0.5);">Tích điểm mỗi lần sử dụng dịch vụ</span>
+                        </div>
+                    </div>
+                    <div class="membership-card-shadow position-absolute" style="top: 15px; left: 50%; width: 90%; height: 100%; background-color: rgba(0,0,0,0.2); border-radius: 12px; z-index: -1; transform: translateX(-50%);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endguest
+
 <!-- Booking Form Section -->
-<section class="booking-cta py-5 bg-pink text-white position-relative overflow-hidden animated-bg">
+<section class="booking-cta py-5 bg-pink position-relative overflow-hidden animated-bg">
     <div class="animation-circles">
         <div class="circle circle-1"></div>
         <div class="circle circle-2"></div>
@@ -247,16 +293,23 @@
     <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-lg-10 text-center">
-                <h2 class="mb-4 animate__animated animate__fadeInDown">Bạn muốn đặt lịch ngay?</h2>
-                <p class="lead mb-4 animate__animated animate__fadeInUp">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
+                <h2 class="mb-4 animate__animated animate__fadeInDown text-dark">Bạn muốn đặt lịch ngay?</h2>
+                <p class="lead mb-4 animate__animated animate__fadeInUp text-dark">Chúng tôi sẵn sàng mang đến cho bạn trải nghiệm spa tuyệt vời nhất</p>
+                
+                @auth
+                <!-- Đã đăng nhập - Hiển thị nút đặt lịch bình thường -->
                 <a href="{{ route('customer.datlich.create') }}" class="btn btn-cta btn-lg px-5 py-3 animate__animated animate__pulse animate__infinite">Đặt lịch ngay</a>
+                @else
+                <!-- Chưa đăng nhập - Hiển thị nút giống với đã đăng nhập nhưng chuyển hướng tới login -->
+                <a href="{{ route('login') }}?redirect=booking" class="btn btn-cta btn-lg px-5 py-3 animate__animated animate__pulse animate__infinite">Đặt lịch ngay</a>
+                @endauth
             </div>
         </div>
     </div>
 </section>
 
 <!-- Reviews Section -->
-@if(count($latestReviews) > 0)
+@if(isset($latestReviews) && count($latestReviews) > 0)
 <section class="reviews py-5 bg-light">
     <div class="container">
         <h2 class="section-title text-center mb-5">Khách hàng nói gì về chúng tôi</h2>
@@ -581,276 +634,34 @@
         }
     }
 
-    .featured-services .card {
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
-        border: 2px solid #ffe3ea;
+    /* Diamond effect styles */
+    .diamond-effect {
+        position: relative;
         overflow: hidden;
-        transition: all 0.3s cubic-bezier(.4,2,.3,1);
-        background: #fff;
+        border: 2px solid rgba(255, 215, 0, 0.5);
     }
-    .featured-services .card:hover {
-        box-shadow: 0 16px 48px 0 rgba(255,107,157,0.18);
-        transform: translateY(-4px) scale(1.01);
-    }
-    .featured-services .card-img-top {
-        border-radius: 20px 20px 0 0;
-        height: 210px;
-        object-fit: cover;
-    }
-    .featured-services .price-badge {
+    
+    .diamond-shine-container {
         position: absolute;
-        top: 18px;
-        left: 18px;
-        background: linear-gradient(90deg,#3b82f6 0%,#60a5fa 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.08rem;
-        border-radius: 10px;
-        padding: 0.4rem 1.1rem;
-        box-shadow: 0 2px 8px #b3d4fc;
-        z-index: 2;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
     }
-    .featured-services .card-title {
-        font-size: 1.18rem;
-        font-weight: 700;
-        color: #22223b;
-        margin-bottom: 0.3rem;
-    }
-    .featured-services .card-text {
-        color: #888;
-        font-size: 0.98rem;
-        min-height: 38px;
-    }
-    .featured-services .card-footer {
-        background: #fff;
-        border-top: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 1rem 1.2rem 1rem 1.2rem;
-    }
-    .featured-services .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 1.02rem;
-        padding: 0.6rem 1.3rem;
-        transition: all 0.2s;
-        box-shadow: 0 2px 8px #ffe3ea;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .featured-services .btn-primary {
-        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
-        color: #fff;
-        border: none;
-    }
-    .featured-services .btn-primary:hover {
-        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
-        color: #fff;
-        transform: translateY(-2px) scale(1.04);
-    }
-    .featured-services .btn-outline-primary {
-        color: #ff6b9d;
-        border: 2px solid #ff6b9d;
-        background: #fff;
-    }
-    .featured-services .btn-outline-primary:hover {
-        background: #ff6b9d;
-        color: #fff;
-        border: 2px solid #ff6b9d;
-    }
-    @media (max-width: 900px) {
-        .featured-services .card-img-top {
-            height: 150px;
-        }
-    }
-    @media (max-width: 600px) {
-        .featured-services .card {
-            border-radius: 12px;
-        }
-        .featured-services .card-img-top {
-            border-radius: 12px 12px 0 0;
-            height: 110px;
-        }
-        .featured-services .card-title {
-            font-size: 1rem;
-        }
-        .featured-services .btn {
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-        }
-    }
-
-    .featured-ads .card {
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.10);
-        border: 2px solid #ffe3ea;
-        overflow: hidden;
-        transition: all 0.3s cubic-bezier(.4,2,.3,1);
-        background: #fff;
-    }
-    .featured-ads .card:hover {
-        box-shadow: 0 16px 48px 0 rgba(255,107,157,0.18);
-        transform: translateY(-4px) scale(1.01);
-    }
-    .featured-ads .card-img-top {
-        border-radius: 20px 20px 0 0;
-        height: 210px;
-        object-fit: cover;
-    }
-    .featured-ads .badge-featured {
+    
+    .diamond-shine {
         position: absolute;
-        top: 18px;
-        right: 18px;
-        background: linear-gradient(90deg,#3b82f6 0%,#60a5fa 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.08rem;
-        border-radius: 10px;
-        padding: 0.4rem 1.1rem;
-        box-shadow: 0 2px 8px #b3d4fc;
-        z-index: 2;
-    }
-    .featured-ads .card-title {
-        font-size: 1.18rem;
-        font-weight: 700;
-        color: #22223b;
-        margin-bottom: 0.3rem;
-    }
-    .featured-ads .card-text {
-        color: #888;
-        font-size: 0.98rem;
-        min-height: 38px;
-    }
-    .featured-ads .card-footer {
-        background: #fff;
-        border-top: none;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 1rem 1.2rem 1rem 1.2rem;
-    }
-    .featured-ads .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 1.02rem;
-        padding: 0.6rem 1.3rem;
-        transition: all 0.2s;
-        box-shadow: 0 2px 8px #ffe3ea;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .featured-ads .btn-outline-primary {
-        color: #ff6b9d;
-        border: 2px solid #ff6b9d;
-        background: #fff;
-    }
-    .featured-ads .btn-outline-primary:hover {
-        background: #ff6b9d;
-        color: #fff;
-        border: 2px solid #ff6b9d;
-    }
-    .featured-ads .see-all-btn {
-        margin-top: 24px;
-        border-radius: 12px;
-        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
-        color: #fff;
-        font-weight: 600;
-        font-size: 1.08rem;
-        padding: 0.7rem 2.2rem;
-        border: none;
-        box-shadow: 0 2px 8px #ffe3ea;
-        transition: all 0.2s;
-        display: inline-block;
-    }
-    .featured-ads .see-all-btn:hover {
-        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
-        color: #fff;
-        transform: translateY(-2px) scale(1.04);
-    }
-    @media (max-width: 900px) {
-        .featured-ads .card-img-top {
-            height: 150px;
-        }
-    }
-    @media (max-width: 600px) {
-        .featured-ads .card {
-            border-radius: 12px;
-        }
-        .featured-ads .card-img-top {
-            border-radius: 12px 12px 0 0;
-            height: 110px;
-        }
-        .featured-ads .card-title {
-            font-size: 1rem;
-        }
-        .featured-ads .btn {
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-        }
-    }
-    .see-all-btn {
-        margin-top: 24px;
-        border-radius: 12px;
-        background: linear-gradient(90deg,#ff6b9d 0%,#ffb3d1 100%);
-        color: #fff;
-        font-weight: 600;
-        font-size: 1.08rem;
-        padding: 0.7rem 2.2rem;
-        border: none;
-        box-shadow: 0 2px 8px #ffe3ea;
-        transition: all 0.2s;
-        display: inline-block;
-    }
-    .see-all-btn:hover {
-        background: linear-gradient(90deg,#ff4785 0%,#ffb3d1 100%);
-        color: #fff;
-        transform: translateY(-2px) scale(1.04);
-    }
-    .promo-sticker-list {
-        list-style: none;
-        padding-left: 0;
-        margin-bottom: 1.5rem;
-    }
-    .promo-sticker-list li {
-        font-size: 1.18rem;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5em;
-        line-height: 1.6;
-    }
-    .promo-sticker-list li b {
-        color: #d72660;
-        font-weight: 700;
-    }
-    .btn-pink {
-        background: #ff6b9d;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 0.7rem 2.2rem;
-        font-size: 1.15rem;
-        font-weight: 600;
-        box-shadow: 0 4px 16px rgba(255,107,157,0.10);
-        transition: background 0.2s;
-    }
-    .btn-pink:hover {
-        background: #ff4785;
-        color: #fff;
-    }
-    .promo-banner-img {
-        max-width: 100% !important;
-        max-height: 520px !important;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px 0 rgba(255,107,157,0.13);
-        object-fit: cover;
-        object-position: center;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.8), 
+                   0 0 12px 6px rgba(255, 215, 0, 0.6);
+        opacity: 0;
+        transform: scale(0);
+        pointer-events: none;
     }
 </style>
 @endsection
@@ -923,6 +734,103 @@
                 console.log('Near end of video, preparing to switch');
             }
         });
+
+        // Diamond Shine Effect for VIP Card
+        const cardElement = document.querySelector('.diamond-effect');
+        const shineContainer = document.querySelector('.diamond-shine-container');
+        
+        if (cardElement && shineContainer) {
+            // Create diamond shine points
+            const createDiamondShine = () => {
+                const shine = document.createElement('div');
+                shine.classList.add('diamond-shine');
+                
+                // Random position within the card
+                const x = Math.random() * 100; // percentage
+                const y = Math.random() * 100; // percentage
+                shine.style.left = `${x}%`;
+                shine.style.top = `${y}%`;
+                
+                // Random size (slightly varied)
+                const size = 4 + Math.random() * 8; // between 4px and 12px
+                shine.style.width = `${size}px`;
+                shine.style.height = `${size}px`;
+                
+                // Add to container
+                shineContainer.appendChild(shine);
+                
+                // Animate the shine
+                setTimeout(() => {
+                    shine.style.transition = 'all 0.5s ease-in-out';
+                    shine.style.opacity = '1';
+                    shine.style.transform = 'scale(1)';
+                    
+                    // Sparkle effect
+                    setTimeout(() => {
+                        shine.style.opacity = '0';
+                        shine.style.transform = 'scale(1.5)';
+                        
+                        // Remove after animation completes
+                        setTimeout(() => {
+                            shine.remove();
+                        }, 600);
+                    }, 300 + Math.random() * 400);
+                }, 10);
+            };
+            
+            // Create shine effects regularly
+            const createShineEffect = () => {
+                // Create 1-3 shine points at once
+                const shineCount = 1 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < shineCount; i++) {
+                    setTimeout(() => {
+                        createDiamondShine();
+                    }, i * 150); // Stagger the creation
+                }
+            };
+            
+            // Start the shine effects
+            setInterval(createShineEffect, 800);
+            
+            // Also trigger when hovering over the card for extra effect
+            cardElement.addEventListener('mousemove', (e) => {
+                // Create shine at mouse position
+                const shine = document.createElement('div');
+                shine.classList.add('diamond-shine');
+                
+                // Position at mouse within the card
+                const rect = cardElement.getBoundingClientRect();
+                const x = e.clientX - rect.left; // mouse position relative to card
+                const y = e.clientY - rect.top;
+                
+                shine.style.left = `${x}px`;
+                shine.style.top = `${y}px`;
+                
+                // Random size (slightly larger on hover)
+                const size = 8 + Math.random() * 10;
+                shine.style.width = `${size}px`;
+                shine.style.height = `${size}px`;
+                
+                // Add to container
+                shineContainer.appendChild(shine);
+                
+                // Animate
+                setTimeout(() => {
+                    shine.style.transition = 'all 0.6s ease-out';
+                    shine.style.opacity = '1';
+                    shine.style.transform = 'scale(1)';
+                    
+                    setTimeout(() => {
+                        shine.style.opacity = '0';
+                        shine.style.transform = 'scale(2)';
+                        
+                        setTimeout(() => {
+                            shine.remove();
+                        }, 700);
+                    }, 200);
+                }, 10);
+            });
+        }
     });
 </script>
 @endpush

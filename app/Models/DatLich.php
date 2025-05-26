@@ -9,7 +9,16 @@ class DatLich extends Model
     protected $table = 'DATLICH';
     protected $primaryKey = 'MaDL';
     public $incrementing = false;
-    protected $fillable = ['MaDL', 'Manguoidung', 'Thoigiandatlich', 'Trangthai_', 'MaDV'];
+    protected $fillable = [
+        'MaDL', 
+        'Manguoidung', 
+        'Thoigiandatlich', 
+        'Trangthai_', 
+        'MaDV',
+        'Ghichu',
+        'Hoten_khach',
+        'SDT_khach'
+    ];
     public $timestamps = false; // Thêm dòng này để tắt timestamps
 
     public function user()

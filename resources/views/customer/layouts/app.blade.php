@@ -217,12 +217,21 @@
         .action-buttons .btn {
             display: flex;
             align-items: center;
-            padding: 8px 16px;
-            font-size: 1.05rem;
+            padding: 4px 10px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            height: 32px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
         }
         
         .action-buttons .btn i {
-            margin-right: 6px;
+            margin-right: 4px;
+            font-size: 0.9rem;
         }
         
         .navbar-toggler {
@@ -548,7 +557,7 @@
                 <div class="nav-section collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('customer.home') }}">
+                            <a class="nav-link" href="{{ route('welcome') }}">
                                 <i class="fas fa-home"></i> Trang chủ
                             </a>
                         </li>
@@ -581,11 +590,13 @@
                                 <i class="fas fa-calendar-check"></i> Đặt lịch
                             </a>
                         </li>
+                        @auth
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('customer.thanhvien.index') }}">
                                 <i class="fas fa-crown"></i> Thành viên
                             </a>
                         </li>
+                        @endauth
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('customer.lienhe') }}">
                                 <i class="fas fa-phone-alt"></i> Liên hệ
@@ -630,20 +641,23 @@
                                 <li><a class="dropdown-item" href="{{ route('customer.danhgia.index') }}">
                                     <i class="fas fa-star"></i> Đánh giá của tôi
                                 </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="logout-button" title="Đăng xuất">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </form>
                     @else
                         <div class="action-buttons">
-                            <a href="{{ route('login') }}" class="btn btn-outline-primary me-2">
+                            <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm me-2">
                                 <i class="fas fa-sign-in-alt"></i> Đăng nhập
                             </a>
-                            <a href="{{ route('register') }}" class="btn btn-primary">
+                            <a href="{{ route('register') }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-user-plus"></i> Đăng ký
                             </a>
                         </div>
@@ -678,7 +692,9 @@
                         <li class="mb-2"><a href="{{ route('customer.dichvu.index') }}" class="footer-link">Dịch vụ</a></li>
                         <li class="mb-2"><a href="{{ route('customer.quangcao.index') }}" class="footer-link">Khuyến mãi</a></li>
                         <li class="mb-2"><a href="{{ route('customer.lienhe') }}" class="footer-link">Liên hệ</a></li>
+                        @auth
                         <li class="mb-2"><a href="{{ route('customer.thanhvien.index') }}" class="footer-link">Thành viên</a></li>
+                        @endauth
                     </ul>
                 </div>
                 <div class="col-lg-4">

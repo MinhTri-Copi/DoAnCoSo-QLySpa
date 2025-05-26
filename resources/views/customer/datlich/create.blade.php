@@ -727,6 +727,14 @@
             <!-- Step 3: Confirmation -->
             <div id="booking-confirmation" style="{{ $step == 3 ? '' : 'display: none;' }}">                <h3 class="section-title">Xác nhận thông tin đặt lịch</h3>
                 
+                <form id="booking-form" action="{{ route('customer.datlich.store') }}" method="POST" onsubmit="return validateBookingForm()">
+                    @csrf
+                    <input type="hidden" name="service_id" id="service_id" value="{{ $selectedService ? $selectedService->MaDV : '' }}">
+                    <input type="hidden" name="booking_date" id="booking_date" value="{{ $selectedDate }}">
+                    <input type="hidden" name="booking_time" id="booking_time">
+                    
+                    <!-- Card hiển thị thông tin khách hàng nếu đã đăng nhập -->
+                    @auth
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Thông tin khách hàng</h5>
@@ -742,12 +750,37 @@
                         </div>
                     </div>
                 </div>
-
-                <form id="booking-form" action="{{ route('customer.datlich.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="service_id" id="service_id">
-                    <input type="hidden" name="booking_date" id="booking_date">
-                    <input type="hidden" name="booking_time" id="booking_time">
+                    @else
+                    <!-- Form nhập thông tin cho khách vãng lai nếu chưa đăng nhập -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Thông tin khách hàng</h5>
+                            <p class="text-muted mb-3">Vui lòng cung cấp thông tin để chúng tôi có thể liên hệ xác nhận lịch hẹn</p>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="guest_name" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="guest_name" name="guest_name" required>
+                                    @if($errors->has('guest_name'))
+                                        <div class="text-danger mt-1">{{ $errors->first('guest_name') }}</div>
+                                    @endif
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="guest_phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="guest_phone" name="guest_phone" required>
+                                    @if($errors->has('guest_phone'))
+                                        <div class="text-danger mt-1">{{ $errors->first('guest_phone') }}</div>
+                                    @endif
+                                </div>
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> 
+                                        <strong>Lưu ý:</strong> Nếu bạn <a href="{{ route('login') }}" target="_blank">đăng nhập</a> hoặc <a href="{{ route('register') }}" target="_blank">đăng ký tài khoản</a>, bạn sẽ dễ dàng quản lý lịch đặt và nhận được nhiều ưu đãi hơn.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endauth
 
                     <div class="card mb-4">
                         <div class="card-body">
@@ -760,7 +793,10 @@
                         <button type="button" class="btn btn-outline-secondary back-to-datetime">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="submit" class="btn btn-primary btn-submit-booking" onclick="return validateBookingForm()">
+                        <button type="button" class="btn btn-info mx-2" onclick="testFormData()">
+                            Test Form
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-submit-booking">
                             Xác nhận đặt lịch <i class="fas fa-check"></i>
                         </button>
                     </div>
@@ -805,36 +841,41 @@
 
 @section('scripts')
 <script>
-    // Validation function for the booking form (placed outside document.ready to be globally accessible)
-    function validateBookingForm() {
-        // Get the values from the hidden inputs
-        var serviceId = $('#service_id').val();
-        var bookingDate = $('#booking_date').val();
-        var bookingTime = $('#booking_time').val();
+    // Hàm test form data
+    function testFormData() {
+        var formData = new FormData(document.getElementById('booking-form'));
+        var formDataObj = {};
         
-        console.log('Validating form with values:', {
-            serviceId: serviceId,
-            bookingDate: bookingDate,
-            bookingTime: bookingTime
+        formData.forEach(function(value, key){
+            formDataObj[key] = value;
         });
         
-        // Attempt to re-set values from the global variables if needed
-        if (!serviceId && window.selectedService) {
-            serviceId = window.selectedService.MaDV;
-            $('#service_id').val(serviceId);
-        }
+        alert('Form Data: ' + JSON.stringify(formDataObj, null, 2));
         
-        if (!bookingDate && window.selectedDate) {
-            bookingDate = window.selectedDate;
-            $('#booking_date').val(bookingDate);
-        }
+        // Log các trường quan trọng
+        console.log('service_id:', $('#service_id').val());
+        console.log('booking_date:', $('#booking_date').val());
+        console.log('booking_time:', $('#booking_time').val());
+        console.log('guest_name:', $('#guest_name').val());
+        console.log('guest_phone:', $('#guest_phone').val());
+    }
+    
+    // Validation function for the booking form (placed outside document.ready to be globally accessible)
+    function validateBookingForm() {
+        // Đảm bảo các giá trị từ form được đồng bộ vào hidden fields
+        var serviceId = window.selectedService ? window.selectedService.MaDV : '';
+        var bookingDate = window.selectedDate || '';
+        var bookingTime = window.selectedTime || '';
+
+        // Cập nhật các hidden fields liên quan đến booking
+        $('#service_id').val(serviceId);
+        $('#booking_date').val(bookingDate);
+        $('#booking_time').val(bookingTime);
         
-        if (!bookingTime && window.selectedTime) {
-            bookingTime = window.selectedTime;
-            $('#booking_time').val(bookingTime);
-        }
+        console.log('Validating form with time:', bookingTime);
+        console.log('Hidden input value:', $('#booking_time').val());
         
-        // Final validation
+        // Kiểm tra thông tin đặt lịch
         if (!serviceId) {
             alert('Vui lòng chọn dịch vụ');
             return false;
@@ -850,11 +891,24 @@
             return false;
         }
         
-        console.log('Form validation passed. Final values:', {
-            service_id: $('#service_id').val(),
-            booking_date: $('#booking_date').val(),
-            booking_time: $('#booking_time').val()
-        });
+        // Kiểm tra thông tin khách vãng lai nếu chưa đăng nhập
+        var isAuthenticated = {{ Auth::check() ? 'true' : 'false' }};
+        if (!isAuthenticated) {
+            var guestName = $('#guest_name').val();
+            var guestPhone = $('#guest_phone').val();
+            
+            if (!guestName || guestName.trim() === '') {
+                alert('Vui lòng nhập đầy đủ thông tin họ tên.');
+                $('#guest_name').focus();
+                return false;
+            }
+            
+            if (!guestPhone || guestPhone.trim() === '') {
+                alert('Vui lòng nhập đầy đủ thông tin số điện thoại.');
+                $('#guest_phone').focus();
+                return false;
+            }
+        }
         
         return true;
     }
@@ -876,9 +930,13 @@
                 $('#service_id').val(window.selectedService.MaDV);
             }
             $('#booking_date').val(window.selectedDate);
-            if (window.selectedTime) {
-                $('#booking_time').val(window.selectedTime);
-            }
+            
+            // Nếu đã có selectedTime từ query parameters, gán cho window.selectedTime
+            @if(request()->has('booking_time'))
+            window.selectedTime = "{{ request('booking_time') }}";
+            $('#booking_time').val(window.selectedTime);
+            $('#summary-time').text(window.selectedTime);
+            @endif
         }
 
         // Khởi tạo thông tin tóm tắt nếu đã chọn dịch vụ
@@ -939,6 +997,9 @@
             $('#booking_date').val(window.selectedDate);
             $('#booking_time').val(window.selectedTime);
             
+            console.log('Continuing to confirmation with time:', window.selectedTime);
+            console.log('Hidden input value:', $('#booking_time').val());
+            
             // Show confirmation step
             $('#datetime-selection').hide();
             $('#booking-confirmation').show();
@@ -948,11 +1009,13 @@
             // Load customer info immediately
             loadUserInfo();
             
-            console.log('Form values before confirmation step:', {
-                service_id: $('#service_id').val(),
-                booking_date: $('#booking_date').val(),
-                booking_time: $('#booking_time').val()
-            });
+            // Đặt focus vào trường guest_name nếu là khách vãng lai
+            var isAuthenticated = {{ Auth::check() ? 'true' : 'false' }};
+            if (!isAuthenticated) {
+                setTimeout(function() {
+                    $('#guest_name').focus();
+                }, 100);
+            }
         });
 
         // Back to datetime selection
@@ -1024,6 +1087,9 @@
                 $('#booking_time').val(window.selectedTime);
                 $('#summary-time').text(window.selectedTime);
                 $('.continue-to-confirm').prop('disabled', false);
+                
+                console.log('Time selected:', window.selectedTime);
+                console.log('booking_time value:', $('#booking_time').val());
             });
         },
         error: function(xhr, status, error) {
@@ -1119,21 +1185,115 @@
 
         // Form submission check
         $('#booking-form').submit(function(e) {
-            console.log('Form submission checking values:');
-            console.log('Service ID:', $('#service_id').val());
-            console.log('Booking Date:', $('#booking_date').val());
-            console.log('Booking Time:', $('#booking_time').val());
+            e.preventDefault(); // Ngăn form submit mặc định
+            console.log('Form đang được submit...');
             
-            // Re-populate hidden fields right before submission
-            $('#service_id').val(window.selectedService.MaDV);
-            $('#booking_date').val(window.selectedDate);
-            $('#booking_time').val(window.selectedTime);
+            // Cập nhật lại giá trị vào hidden field từ variables toàn cục
+            $('#service_id').val(window.selectedService ? window.selectedService.MaDV : '');
+            $('#booking_date').val(window.selectedDate || '');
+            $('#booking_time').val(window.selectedTime || '');
             
+            console.log('Submitting form with time:', window.selectedTime);
+            console.log('Hidden input value before submit:', $('#booking_time').val());
+            
+            // Kiểm tra lại các thông tin quan trọng trước khi submit
             if (!$('#service_id').val() || !$('#booking_date').val() || !$('#booking_time').val()) {
-                e.preventDefault();
-                alert('Vui lòng chọn đầy đủ thông tin dịch vụ, ngày và giờ đặt lịch');
+                alert('Thiếu thông tin đặt lịch. Vui lòng chọn đầy đủ dịch vụ, ngày và giờ.');
                 return false;
             }
+            
+            // Kiểm tra thông tin khách vãng lai nếu chưa đăng nhập
+            var isAuthenticated = {{ Auth::check() ? 'true' : 'false' }};
+            if (!isAuthenticated) {
+                var guestName = $('#guest_name').val();
+                var guestPhone = $('#guest_phone').val();
+                
+                if (!guestName || guestName.trim() === '') {
+                    alert('Vui lòng nhập đầy đủ thông tin họ tên.');
+                    $('#guest_name').focus();
+                    return false;
+                }
+                
+                if (!guestPhone || guestPhone.trim() === '') {
+                    alert('Vui lòng nhập đầy đủ thông tin số điện thoại.');
+                    $('#guest_phone').focus();
+                    return false;
+                }
+            }
+            
+            // Hiển thị thông báo đang xử lý
+            var submitBtn = $('.btn-submit-booking');
+            var originalText = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+            submitBtn.prop('disabled', true);
+            
+            // Tạo form data (truyền thống thay vì sử dụng FormData để dễ debug)
+            var formData = {
+                _token: $('input[name="_token"]').val(),
+                service_id: $('#service_id').val(),
+                booking_date: $('#booking_date').val(),
+                booking_time: $('#booking_time').val(),
+                notes: $('textarea[name="notes"]').val()
+            };
+            
+            // Thêm thông tin khách vãng lai nếu cần
+            if (!isAuthenticated) {
+                formData.guest_name = $('#guest_name').val();
+                formData.guest_phone = $('#guest_phone').val();
+            }
+            
+            // Log form data để debug
+            console.log('Form data:', formData);
+            
+            // Sử dụng AJAX để submit form
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    console.log('Form submitted successfully', response);
+                    if (response.redirect) {
+                        window.location.href = response.redirect;
+                    } else {
+                        // Nếu server không trả về URL redirect, chuyển hướng đến trang lịch sử đặt lịch
+                        if (isAuthenticated) {
+                            window.location.href = "{{ route('customer.lichsudatlich.index') }}";
+                        } else {
+                            window.location.href = "{{ route('welcome') }}";
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error submitting form:', error);
+                    console.error('Response status:', xhr.status);
+                    console.error('Response text:', xhr.responseText);
+                    
+                    try {
+                        // Thử phân tích JSON response
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        console.error('Detailed error:', jsonResponse);
+                        
+                        if (jsonResponse.message) {
+                            alert('Lỗi: ' + jsonResponse.message);
+                        } else if (jsonResponse.errors) {
+                            var errorMessage = 'Vui lòng kiểm tra lại thông tin:\n';
+                            $.each(jsonResponse.errors, function(key, value) {
+                                errorMessage += '- ' + value[0] + '\n';
+                            });
+                            alert(errorMessage);
+                        }
+                    } catch (e) {
+                        // Nếu không phải JSON
+                        alert('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại sau.');
+                    }
+                    
+                    // Khôi phục nút submit
+                    submitBtn.html(originalText);
+                    submitBtn.prop('disabled', false);
+                }
+            });
+            
+            return false; // Ngăn form submit mặc định
         });
     });
 </script>
