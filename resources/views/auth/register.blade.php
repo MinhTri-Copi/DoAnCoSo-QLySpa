@@ -73,7 +73,7 @@
                     @csrf
                     
                     <!-- Input hidden cho vai trò mặc định là user -->
-                    <input type="hidden" name="RoleID" value="3">
+                    <input type="hidden" name="RoleID" value="2">
                     
                     <div class="form-row">
                         <!-- Tên đăng nhập -->

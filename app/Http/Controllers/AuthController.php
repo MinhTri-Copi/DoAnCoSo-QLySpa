@@ -61,9 +61,9 @@ class AuthController extends Controller
             'tendangnhap' => 'required|unique:ACCOUNT,Tendangnhap|min:5',
             'hoten' => 'required',
             'sdt' => 'required|min:10|max:15',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:USER,Email',
             'diachi' => 'required',
-            'ngaysinh' => 'required|date|before:today',
+            'ngaysinh' => 'required|date',
             'gioitinh' => 'required',
             'matkhau' => 'required|min:6|confirmed',
         ], [
@@ -75,10 +75,10 @@ class AuthController extends Controller
             'sdt.min' => 'Số điện thoại phải có ít nhất 10 ký tự',
             'email.required' => 'Vui lòng nhập email',
             'email.email' => 'Email không hợp lệ',
+            'email.unique' => 'Email này đã được sử dụng',
             'diachi.required' => 'Vui lòng nhập địa chỉ',
             'ngaysinh.required' => 'Vui lòng chọn ngày sinh',
             'ngaysinh.date' => 'Ngày sinh không hợp lệ',
-            'ngaysinh.before' => 'Ngày sinh phải là ngày trong quá khứ',
             'gioitinh.required' => 'Vui lòng chọn giới tính',
             'matkhau.required' => 'Vui lòng nhập mật khẩu',
             'matkhau.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
@@ -98,8 +98,8 @@ class AuthController extends Controller
             $account = new Account();
             $account->MaTK = $matk;
             $account->Tendangnhap = $request->tendangnhap;
-            $account->Matkhau = bcrypt($request->matkhau);
-            $account->RoleID = 3; // Role mặc định là khách hàng
+            $account->Matkhau = Hash::make($request->matkhau);
+            $account->RoleID = 2; // Role mặc định là khách hàng (2)
             $account->save();
             Log::info('Account created with MaTK: ' . $matk);
 
