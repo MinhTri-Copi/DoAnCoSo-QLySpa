@@ -426,6 +426,24 @@
 </section>
 @endif
 
+<!-- Quick Contact Float Menu -->
+<div class="quick-contact-menu">
+    <div class="quick-contact-toggle" id="toggleQuickContact">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="quick-contact-items">
+        <a href="#" class="quick-contact-item zalo-item">
+            <img src="{{ asset('images/icons/zalo-icon-removebg-preview.png') }}" alt="Zalo" onerror="this.src='https://sp-ao.shortpixel.ai/client/to_auto,q_glossy,ret_img,w_32,h_32/https://ads-network.net/wp-content/uploads/2022/06/zalo-icon.png'">
+        </a>
+        <a href="#" class="quick-contact-item messenger-item">
+            <i class="fab fa-facebook-messenger" style="border-bottom: none;"></i>
+        </a>
+        <a href="#" class="quick-contact-item phone-item">
+            <i class="fas fa-phone" style="border-bottom: none;"></i>
+        </a>
+    </div>
+</div>
+
 @endsection
 
 @section('styles')
@@ -1357,6 +1375,121 @@
     .appointment-card:hover::after {
         opacity: 1;
     }
+
+    .quick-contact-menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+
+    .quick-contact-toggle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #1a237e;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        font-size: 24px; /* Tăng kích thước icon */
+    }
+
+    .quick-contact-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    .quick-contact-items {
+        display: flex;
+        flex-direction: column-reverse; /* Đảo ngược hướng từ trên xuống thành từ dưới lên */
+        gap: 16px; /* Tăng khoảng cách giữa các nút từ 12px lên 16px */
+        margin-top: 14px; /* Tăng margin-top từ 10px lên 14px */
+    }
+
+    .quick-contact-item {
+        width: 60px; /* Tăng kích thước từ 48px lên 60px */
+        height: 60px; /* Tăng kích thước từ 48px lên 60px */
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(-20px); /* Thay đổi hướng từ lên xuống thành từ dưới lên */
+        pointer-events: none;
+        font-size: 28px; /* Tăng kích thước icon */
+        text-decoration: none; /* Loại bỏ đường gạch ngang dưới */
+    }
+    
+    .quick-contact-item i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-bottom: none;
+    }
+
+    .quick-contact-menu.active .quick-contact-item {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .zalo-item {
+        background-color: #0068ff;
+        margin-bottom: 8px; /* Thêm khoảng cách với nút phía dưới */
+    }
+
+    .zalo-item img {
+        width: 36px; /* Tăng kích thước từ 28px lên 36px */
+        height: 36px; /* Tăng kích thước từ 28px lên 36px */
+        padding: 4px; /* Thêm khoảng cách trong icon */
+    }
+
+    .messenger-item {
+        background-color: #0084ff;
+        color: white;
+        font-size: 30px; /* Tăng kích thước từ 24px lên 30px */
+    }
+    
+    .messenger-item i {
+        margin-bottom: 0;
+    }
+
+    .phone-item {
+        background-color: #4caf50;
+        color: white;
+        font-size: 30px; /* Tăng kích thước từ 24px lên 30px */
+    }
+    
+    .phone-item i {
+        margin-bottom: 0;
+    }
+
+    .quick-contact-item:hover {
+        transform: scale(1.1);
+    }
+
+    /* Timing for animations - ngược lại thứ tự */
+    .quick-contact-menu.active .phone-item {
+        transition-delay: 0.1s;
+    }
+    
+    .quick-contact-menu.active .messenger-item {
+        transition-delay: 0.2s;
+    }
+    
+    .quick-contact-menu.active .zalo-item {
+        transition-delay: 0.3s;
+    }
 </style>
 @endsection
 
@@ -1558,6 +1691,30 @@
         updateCountdowns();
         // Cập nhật mỗi giây
         setInterval(updateCountdowns, 1000);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const quickContactMenu = document.querySelector('.quick-contact-menu');
+        const toggleButton = document.getElementById('toggleQuickContact');
+        
+        toggleButton.addEventListener('click', function() {
+            quickContactMenu.classList.toggle('active');
+            
+            // Change icon based on state
+            const icon = toggleButton.querySelector('i');
+            if (quickContactMenu.classList.contains('active')) {
+                icon.classList.remove('fa-comments');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-comments');
+            }
+        });
+        
+        // Initial icon
+        const icon = toggleButton.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-comments');
     });
 </script>
 @endpush
