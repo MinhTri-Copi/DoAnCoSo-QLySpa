@@ -5,6 +5,40 @@
 @section('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
+    /* CSS để ẩn các khung giờ sau 17:30 */
+    [data-time="18:00"],
+    [data-time="18:30"],
+    [data-time="19:00"],
+    [data-time="19:30"],
+    [data-time="20:00"],
+    [data-time="20:30"],
+    [data-time="21:00"],
+    [data-time="21:30"],
+    [data-time="22:00"],
+    [data-time="22:30"],
+    [data-time="23:00"],
+    [data-time="23:30"],
+    [data-time="00:00"],
+    [data-time="00:30"] {
+        display: none !important;
+    }
+    
+    /* Ẩn button với text "00:00" và các giờ sau 17:30 */
+    .btn.btn-secondary,
+    .btn.btn-pink {
+        /* Hiển thị mặc định */
+        display: inline-block;
+    }
+    
+    /* CSS nhắm đến các button cụ thể trong ảnh của bạn */
+    .time-slots .btn-secondary:last-child,
+    #time-slots-container .btn-secondary:last-child,
+    .time-slots button:contains("00:00") {
+        display: none !important; 
+    }
+    
+    /* Thêm một đoạn JavaScript để ẩn các button có text là "00:00" */
+    
     :root {
         --primary-color: #ff6b9d;
         --primary-hover: #ff4785;
@@ -893,6 +927,51 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
+    // Thêm script để ẩn button 00:00 và các giờ sau 17:30
+    $(document).ready(function() {
+        // Hàm để ẩn tất cả các button hiển thị thời gian sau 17:30
+        function hideTimeAfter1730() {
+            // Lặp qua tất cả các button
+            $('button').each(function() {
+                // Lấy text content của button
+                const buttonText = $(this).text().trim();
+                
+                // Kiểm tra nếu text là các giờ sau 17:30 hoặc là 00:00
+                if (buttonText === '00:00' || 
+                    buttonText === '18:00' || 
+                    buttonText === '18:30' || 
+                    buttonText === '19:00' || 
+                    buttonText === '19:30' || 
+                    buttonText === '20:00' || 
+                    buttonText === '20:30' || 
+                    buttonText === '21:00' || 
+                    buttonText === '21:30' || 
+                    buttonText === '22:00' || 
+                    buttonText === '22:30' || 
+                    buttonText === '23:00' || 
+                    buttonText === '23:30' || 
+                    buttonText === '00:30') {
+                    // Ẩn button
+                    $(this).hide();
+                }
+            });
+        }
+        
+        // Gọi hàm ẩn ban đầu
+        hideTimeAfter1730();
+        
+        // Gọi lại hàm này mỗi khi có thay đổi trong DOM (ví dụ: khi load time slots)
+        const observer = new MutationObserver(function(mutations) {
+            hideTimeAfter1730();
+        });
+        
+        // Quan sát các thay đổi trong DOM
+        observer.observe(document.getElementById('time-slots-container'), {
+            childList: true,
+            subtree: true
+        });
+    });
+
     // Hàm test form data
     function testFormData() {
         var formData = new FormData(document.getElementById('booking-form'));
@@ -1124,11 +1203,22 @@
                         const selectedDateObj = new Date(window.selectedDate);
                         const isToday = selectedDateObj.toDateString() === today.toDateString();
                         
+                        // Tạo mảng các giờ có sẵn từ 8:00 đến 17:30
+                        const availableHours = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', 
+                                              '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', 
+                                              '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', 
+                                              '17:00', '17:30'];
+                        
                         // Tạo khung giờ dạng ban đầu (không phải dạng lưới)
                         html += '<div class="row">';
                         
+                        // Lọc response.timeSlots để chỉ giữ các giờ trong danh sách availableHours
+                        const filteredTimeSlots = response.timeSlots.filter(slot => 
+                            availableHours.includes(slot.time)
+                        );
+                        
                         // Lọc và hiển thị các khung giờ
-                        response.timeSlots.forEach(slot => {
+                        filteredTimeSlots.forEach(slot => {
                             // Kiểm tra nếu là thời gian quá khứ trong ngày hôm nay
                             const isPast = isToday && response.current_time && slot.time < response.current_time;
                             

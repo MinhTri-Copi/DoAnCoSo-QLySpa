@@ -529,11 +529,11 @@ class DatLichController extends Controller
         // Tạo danh sách các khung giờ có sẵn (ví dụ: từ 8:00 đến 18:00, mỗi 30 phút)
         $availableTimeSlots = [];
         $startHour = 8;
-        $endHour = 18;
+        $endHour = 17;
         $interval = 30; // phút
         
         $currentTime = Carbon::parse($date)->setHour($startHour)->setMinute(0)->setSecond(0);
-        $endTime = Carbon::parse($date)->setHour($endHour)->setMinute(0)->setSecond(0);
+        $endTime = Carbon::parse($date)->setHour($endHour)->setMinute(30)->setSecond(0);
         
         // Thiết lập múi giờ cho Việt Nam/TP.HCM
         $now = Carbon::now('Asia/Ho_Chi_Minh');
