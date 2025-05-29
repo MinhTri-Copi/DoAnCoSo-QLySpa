@@ -872,6 +872,9 @@
             <i class="fas fa-list"></i> Danh Sách Lịch Đặt
         </div>
         <div>
+            <a href="{{ route('admin.datlich.updateGuestInfo') }}" class="btn-action me-2" style="background-color: #17a2b8;" title="Cập nhật thông tin khách hàng">
+                <i class="fas fa-sync-alt"></i>
+            </a>
             <button class="btn-action" style="background-color: var(--primary-color);" id="toggleFilters">
                 <i class="fas fa-filter"></i>
             </button>
@@ -988,6 +991,16 @@
                             <div>
                                 <div style="font-weight: 500;">{{ $datLich->user->Hoten }}</div>
                                 <div style="font-size: 12px; color: #6c757d;">{{ $datLich->user->SDT ?? 'N/A' }}</div>
+                            </div>
+                        </div>
+                        @elseif($datLich->Hoten_khach)
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-2" style="background-color: #ffc107;">
+                                {{ substr($datLich->Hoten_khach, 0, 1) }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 500;">{{ $datLich->Hoten_khach }} <span class="badge bg-warning text-dark" style="font-size: 10px;">Khách vãng lai</span></div>
+                                <div style="font-size: 12px; color: #6c757d;">{{ $datLich->SDT_khach ?? 'N/A' }}</div>
                             </div>
                         </div>
                         @else

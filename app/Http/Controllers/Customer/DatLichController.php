@@ -346,6 +346,14 @@ class DatLichController extends Controller
                 if ($user) {
                     \Log::info("Đặt lịch cho user: {$user->Manguoidung} - {$user->Hoten}");
                     $datLich->Manguoidung = $user->Manguoidung;
+                    
+                    // Tự động cập nhật thông tin Hoten_khach và SDT_khach từ thông tin User
+                    $datLich->Hoten_khach = $user->Hoten;
+                    $datLich->SDT_khach = $user->SDT;
+                    \Log::info("Tự động cập nhật thông tin khách hàng từ User:", [
+                        'Hoten_khach' => $user->Hoten,
+                        'SDT_khach' => $user->SDT
+                    ]);
                 } else {
                     \Log::error("Không tìm thấy thông tin người dùng với MaTK: {$account->MaTK}");
                     
