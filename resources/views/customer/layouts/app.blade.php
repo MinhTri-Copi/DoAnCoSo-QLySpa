@@ -274,85 +274,99 @@
         /* Footer styling */
         footer {
             background-color: #f986a6;
-            padding: 3rem 0;
-            margin-top: 3rem;
             color: white;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .footer-title {
-
+        footer .footer-title {
             color: white;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
             position: relative;
+            padding-bottom: 10px;
         }
 
+        footer .footer-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, white, rgba(255, 255, 255, 0.5));
+        }
 
-        .footer-link {
+        footer .footer-link {
             color: rgba(255, 255, 255, 0.9);
-
             text-decoration: none;
+            transition: all 0.3s ease;
             display: inline-block;
+            padding: 2px 0;
         }
-        
+
         footer .footer-link:hover {
             color: white;
-            text-decoration: none;
-            padding-left: 5px;
+            transform: translateX(5px);
         }
-        
+
         footer .social-links a {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.2);
-            width: 36px;
-            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            margin-right: 10px;
-            transition: all 0.3s;
-        }
-        
-        footer .social-links a:hover {
-            background-color: white;
-            color: #FF9A9E;
-            transform: translateY(-3px);
-        }
-        
-        footer hr {
+            width: 36px;
+            height: 36px;
             background-color: rgba(255, 255, 255, 0.2);
-            margin: 2rem 0;
-            opacity: 0.3;
-            border-color: white;
-        }
-
-
-        .footer-link:hover {
+            border-radius: 50%;
             color: white;
-            text-decoration: underline;
-        }
-
-        .social-links a {
-            color: white;
-            margin-right: 1rem;
-            font-size: 1.5rem;
+            margin-right: 10px;
             transition: all 0.3s ease;
-            opacity: 0.9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .social-links a:hover {
-            color: white;
-            opacity: 1;
+        footer .social-links a:hover {
             transform: translateY(-3px);
+            color: #f986a6;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
         }
-        
+
+        footer li {
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        footer li i {
+            color: white;
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
         footer hr {
             border-color: rgba(255, 255, 255, 0.2);
         }
-        
+
         footer .text-center p {
             color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Adjust content layout to prevent footer overlap */
+        main {
+            min-height: calc(100vh - 400px); /* Adjust based on footer height */
+            padding-bottom: 30px;
+        }
+        
+        /* Specific adjustment for profile page */
+        body.profile-page main {
+            min-height: calc(100vh - 350px);
+            padding-bottom: 50px;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--primary-color);
+            font-weight: 500;
         }
 
         /* Welcome banner style giống trang admin */

@@ -150,4 +150,11 @@
         border-color: #ffe3ea;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    // Thêm class cho body để CSS cụ thể cho trang profile có hiệu lực
+    document.body.classList.add('profile-page');
+</script>
 @endpush 
