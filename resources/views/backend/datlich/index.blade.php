@@ -1034,6 +1034,12 @@
                     </td>
                     <td class="text-end">
                         <div class="action-buttons">
+                            @if($datLich->Trangthai_ == 'Chờ xác nhận')
+                            <button type="button" class="btn-action confirm-booking" style="background-color: #28a745;" title="Xác nhận lịch đặt" 
+                                data-id="{{ $datLich->MaDL }}" onclick="event.stopPropagation();">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            @endif
                             @if($datLich->Trangthai_ == 'Đã xác nhận')
                             <a href="{{ route('admin.hoadonvathanhtoan.create', ['booking_id' => $datLich->MaDL]) }}" class="btn-action btn-invoice" title="Lập hóa đơn">
                                 <i class="fas fa-file-invoice"></i>
@@ -1233,6 +1239,43 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.booking-row').forEach(row => {
         row.addEventListener('click', function() {
             window.location.href = this.dataset.url;
+        });
+    });
+
+    // Xử lý nút xác nhận lịch đặt
+    document.querySelectorAll('.confirm-booking').forEach(button => {
+        button.addEventListener('click', function() {
+            const bookingId = this.dataset.id;
+            
+            // Hiển thị xác nhận
+            if (confirm('Bạn có chắc chắn muốn xác nhận lịch đặt này?')) {
+                // Gửi AJAX request để cập nhật trạng thái
+                fetch(`/admin/datlich/${bookingId}/update-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        status: 'Đã xác nhận'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Hiển thị thông báo thành công
+                        alert('Đã xác nhận lịch đặt thành công!');
+                        // Tải lại trang để cập nhật UI
+                        window.location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi xác nhận lịch đặt');
+                });
+            }
         });
     });
 });
