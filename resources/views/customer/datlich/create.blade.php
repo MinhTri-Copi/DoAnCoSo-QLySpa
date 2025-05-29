@@ -292,36 +292,63 @@
     }
 
     .time-slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 10px;
-        margin-top: 1rem;
+        margin-top: 15px;
     }
 
+    .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+    }
+    
     .time-slot {
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 8px;
+        padding: 12px 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s;
+        position: relative;
+        font-weight: 500;
     }
-
-    .time-slot:hover:not(.disabled) {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-    }
-
+    
     .time-slot.active {
-        background-color: var(--primary-color);
+        background-color: #007bff;
         color: white;
-        border-color: var(--primary-color);
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
     }
-
+    
+    .time-slot:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
     .time-slot.disabled {
-        background-color: #f5f5f5;
+        background-color: #f1f1f1;
         color: #aaa;
         cursor: not-allowed;
+        opacity: 0.75;
+        position: relative;
+        text-decoration: line-through;
+        border-color: #e0e0e0;
+    }
+
+    .disabled-reason {
+        display: block;
+        font-size: 10px;
+        color: #dc3545;
+        margin-top: 4px;
+        font-weight: normal;
+        text-decoration: none;
     }
 
     .recommended-services {
@@ -443,6 +470,29 @@
         border-color: #dee2e6;
         color: #0056b3;
         z-index: 1;
+    }
+
+    /* Nút khung giờ màu hồng */
+    .btn-pink {
+        background-color: #ff6b9d;
+        color: white;
+        border-color: #ff6b9d;
+        transition: all 0.2s;
+    }
+    
+    .btn-pink:hover {
+        background-color: #ff5088;
+        border-color: #ff5088;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 107, 157, 0.3);
+    }
+    
+    .btn-pink.active {
+        background-color: #ff3975 !important;
+        border-color: #ff3975 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(255, 57, 117, 0.4) !important;
     }
 </style>
 @endsection
@@ -1028,82 +1078,103 @@
 
         // Load time slots
         function loadTimeSlots() {
-    if (!window.selectedService || !window.selectedDate) {
-        $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
-        return;
-    }
-
-    $('#time-slots-container').html(`
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
-        </div>
-    `);
-
-    $.ajax({
-        url: "{{ route('customer.datlich.checkAvailability') }}",
-        type: "GET",
-        data: {
-            service_id: window.selectedService.MaDV,
-            date: window.selectedDate
-        },
-        success: function(response) {
-            if (!response.available) {
-                $('#time-slots-container').html(`
-                    <div class="alert alert-warning">
-                        ${response.message}
-                    </div>
-                `);
+            if (!window.selectedService || !window.selectedDate) {
+                $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
                 return;
             }
 
-            let html = '';
-            if (response.timeSlots.length === 0) {
-                html = `
-                    <div class="alert alert-info">
-                        Không có khung giờ nào khả dụng cho ngày này.
-                    </div>
-                `;
-            } else {
-                response.timeSlots.forEach(slot => {
-                    html += `
-                        <div class="time-slot ${!slot.available ? 'disabled' : ''}" 
-                            data-time="${slot.time}" 
-                            ${!slot.available ? 'disabled' : ''}>
-                            ${slot.time}
-                        </div>
-                    `;
-                });
-            }
-
-            $('#time-slots-container').html(html);
-
-            $('.time-slot:not(.disabled)').click(function() {
-                $('.time-slot').removeClass('active');
-                $(this).addClass('active');
-                window.selectedTime = $(this).data('time');
-                $('#booking_time').val(window.selectedTime);
-                $('#summary-time').text(window.selectedTime);
-                $('.continue-to-confirm').prop('disabled', false);
-                
-                console.log('Time selected:', window.selectedTime);
-                console.log('booking_time value:', $('#booking_time').val());
-            });
-        },
-        error: function(xhr, status, error) {
             $('#time-slots-container').html(`
-                <div class="alert alert-danger">
-                    Đã xảy ra lỗi khi tải khung giờ: ${error}. Vui lòng thử lại.
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
                 </div>
             `);
-        },
-        complete: function() {
-            isLoading = false;
+
+            $.ajax({
+                url: "{{ route('customer.datlich.checkAvailability') }}",
+                type: "GET",
+                data: {
+                    service_id: window.selectedService.MaDV,
+                    date: window.selectedDate
+                },
+                success: function(response) {
+                    if (!response.available) {
+                        $('#time-slots-container').html(`
+                            <div class="alert alert-warning">
+                                ${response.message}
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    let html = '';
+                    if (response.timeSlots.length === 0) {
+                        html = `
+                            <div class="alert alert-info">
+                                Không có khung giờ nào khả dụng cho ngày này.
+                            </div>
+                        `;
+                    } else {
+                        // Kiểm tra nếu ngày được chọn là ngày hôm nay
+                        const today = new Date();
+                        const selectedDateObj = new Date(window.selectedDate);
+                        const isToday = selectedDateObj.toDateString() === today.toDateString();
+                        
+                        // Tạo khung giờ dạng ban đầu (không phải dạng lưới)
+                        html += '<div class="row">';
+                        
+                        // Lọc và hiển thị các khung giờ
+                        response.timeSlots.forEach(slot => {
+                            // Kiểm tra nếu là thời gian quá khứ trong ngày hôm nay
+                            const isPast = isToday && response.current_time && slot.time < response.current_time;
+                            
+                            // Slot bị vô hiệu hóa nếu đã đạt giới hạn hoặc là thời gian quá khứ
+                            const isDisabled = slot.disabled === true || isPast;
+                            
+                            // Tạo nút khung giờ với style phù hợp
+                            // Khả dụng: nền hồng, Không khả dụng: nền xám
+                            const btnClass = isDisabled ? 'btn-secondary disabled' : 'btn-pink';
+                            
+                            html += `
+                                <div class="col-md-3 col-6 mb-3">
+                                    <button type="button" class="btn ${btnClass} w-100 ${slot.time === window.selectedTime ? 'active' : ''}" 
+                                        data-time="${slot.time}" 
+                                        ${isDisabled ? 'disabled' : ''}>
+                                        ${slot.time}
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div>';
+                    }
+
+                    $('#time-slots-container').html(html);
+
+                    // Chỉ cho phép chọn các khung giờ không bị vô hiệu hóa
+                    $('.btn-pink:not(.disabled)').click(function() {
+                        $('.btn-pink').removeClass('active');
+                        $(this).addClass('active');
+                        window.selectedTime = $(this).data('time');
+                        $('#booking_time').val(window.selectedTime);
+                        $('#summary-time').text(window.selectedTime);
+                        $('.continue-to-confirm').prop('disabled', false);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    $('#time-slots-container').html(`
+                        <div class="alert alert-danger">
+                            Đã xảy ra lỗi khi tải khung giờ: ${error}. Vui lòng thử lại.
+                        </div>
+                    `);
+                },
+                complete: function() {
+                    isLoading = false;
+                }
+            });
         }
-    });
-}
 
         // Format date for display
         function formatDate(dateString) {
@@ -1298,3 +1369,4 @@
     });
 </script>
 @endsection
+                            
