@@ -139,7 +139,7 @@ class DatLichController extends Controller
         $maxPrice = DichVu::max('Gia');
     
         $availableDates = [];
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 30; $i++) {
             $date = now()->addDays($i);
             $availableDates[] = [
                 'date' => $date->toDateString(),

@@ -295,6 +295,55 @@
         gap: 10px;
         padding-bottom: 10px;
         margin-bottom: 1.5rem;
+        scrollbar-width: thin;
+        scrollbar-color: #ff6b9d #f0f0f0;
+        -webkit-overflow-scrolling: touch; /* Cải thiện cuộn trên iOS */
+    }
+    
+    /* Tùy chỉnh thanh cuộn cho Chrome, Edge và Safari */
+    .date-selector::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .date-selector::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    
+    .date-selector::-webkit-scrollbar-thumb {
+        background-color: #ff6b9d;
+        border-radius: 10px;
+    }
+    
+    /* Thêm nút cuộn cho mobile */
+    .date-selector-container {
+        position: relative;
+    }
+    
+    .date-scroll-buttons {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .date-scroll-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .date-scroll-btn {
+            background-color: #ff6b9d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
     }
 
     .date-item {
@@ -305,6 +354,7 @@
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
+        flex-shrink: 0;
     }
 
     .date-item:hover {
@@ -777,14 +827,20 @@
     <div class="mb-3">
         <strong>Ngày đã chọn:</strong> <span id="summary-date">{{ Carbon\Carbon::parse($selectedDate)->format('l, d/m/Y') }}</span>
     </div>
-                <div class="date-selector mb-4">
-                    @foreach($availableDates as $date)
-                    <div class="date-item {{ $date['date'] == $selectedDate ? 'active' : '' }}" data-date="{{ $date['date'] }}">
-                        <div class="date-day">{{ $date['day'] }}</div>
-                        <div class="date-month">{{ $date['month'] }}/{{ $date['year'] }}</div>
-                        <div class="date-weekday">{{ $date['day_short'] }}</div>
+                <div class="date-selector-container">
+                    <div class="date-scroll-buttons">
+                        <button type="button" class="date-scroll-btn scroll-left"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="date-scroll-btn scroll-right"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    @endforeach
+                    <div class="date-selector mb-4">
+                        @foreach($availableDates as $date)
+                        <div class="date-item {{ $date['date'] == $selectedDate ? 'active' : '' }}" data-date="{{ $date['date'] }}">
+                            <div class="date-day">{{ $date['day'] }}</div>
+                            <div class="date-month">{{ $date['month'] }}/{{ $date['year'] }}</div>
+                            <div class="date-weekday">{{ $date['day_short'] }}</div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div id="time-selection" class="mb-4">
@@ -929,6 +985,32 @@
 <script>
     // Thêm script để ẩn button 00:00 và các giờ sau 17:30
     $(document).ready(function() {
+        // Xử lý nút cuộn danh sách ngày
+        $('.scroll-left').click(function() {
+            $('.date-selector').animate({
+                scrollLeft: "-=200px"
+            }, 300);
+        });
+        
+        $('.scroll-right').click(function() {
+            $('.date-selector').animate({
+                scrollLeft: "+=200px"
+            }, 300);
+        });
+        
+        // Tự động cuộn đến ngày đang được chọn
+        if ($('.date-item.active').length) {
+            var activeItem = $('.date-item.active');
+            var container = $('.date-selector');
+            var containerWidth = container.width();
+            var itemLeft = activeItem.position().left;
+            
+            // Cuộn để item được chọn nằm ở giữa
+            container.animate({
+                scrollLeft: itemLeft - containerWidth / 2 + activeItem.width() / 2
+            }, 300);
+        }
+        
         // Hàm để ẩn tất cả các button hiển thị thời gian sau 17:30
         function hideTimeAfter1730() {
             // Lặp qua tất cả các button
