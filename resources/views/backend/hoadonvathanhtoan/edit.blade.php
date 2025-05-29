@@ -326,9 +326,9 @@
         </div>
         
         <div class="form-group">
-            <label for="Manguoidung" class="form-label">Người Dùng <span class="text-danger">*</span></label>
-            <select class="form-select @error('Manguoidung') is-invalid @enderror" id="Manguoidung" name="Manguoidung" required>
-                <option value="">-- Chọn người dùng --</option>
+            <label for="Manguoidung" class="form-label">Người Dùng</label>
+            <select class="form-select @error('Manguoidung') is-invalid @enderror" id="Manguoidung" name="Manguoidung">
+                <option value="">-- Khách vãng lai --</option>
                 @foreach($users as $user)
                     <option value="{{ $user->Manguoidung }}" {{ old('Manguoidung', $hoaDon->Manguoidung) == $user->Manguoidung ? 'selected' : '' }}>
                         {{ $user->Hoten }} ({{ $user->SDT ?? 'Không có SĐT' }})
@@ -338,6 +338,7 @@
             @error('Manguoidung')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
+            <small class="form-text text-muted">Để trống nếu là khách vãng lai. Thông tin khách vãng lai sẽ được lấy từ đặt lịch.</small>
         </div>
         
         <div class="form-group">

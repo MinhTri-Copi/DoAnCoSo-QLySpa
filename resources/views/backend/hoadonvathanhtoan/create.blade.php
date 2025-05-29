@@ -271,9 +271,12 @@
             <select class="form-select @error('MaDL') is-invalid @enderror" id="MaDL" name="MaDL" required>
                 <option value="">-- Chọn lịch đặt --</option>
                 @foreach($datLichs as $datLich)
-                <option value="{{ $datLich->MaDL }}" data-user="{{ $datLich->Manguoidung }}" 
+                <option value="{{ $datLich->MaDL }}" data-user="{{ $datLich->Manguoidung }}" data-guest-name="{{ $datLich->Hoten_khach }}" data-guest-phone="{{ $datLich->SDT_khach }}"
                     {{ old('MaDL') == $datLich->MaDL ? 'selected' : ($selectedBookingId == $datLich->MaDL ? 'selected' : '') }}>
                     {{ $datLich->MaDL }} - {{ optional($datLich->dichVu)->Tendichvu ?? 'N/A' }} ({{ \Carbon\Carbon::parse($datLich->Thoigiandatlich)->format('d/m/Y H:i') }})
+                    @if(!$datLich->Manguoidung && $datLich->Hoten_khach)
+                        <span style="color: #ff6b8b;"> - Khách vãng lai: {{ $datLich->Hoten_khach }}</span>
+                    @endif
                 </option>
                 @endforeach
             </select>
@@ -302,6 +305,19 @@
                 <div class="booking-detail-label">Trạng thái:</div>
                 <div class="booking-detail-value" id="bookingStatus">-</div>
             </div>
+            <div id="guest-info" style="margin-top: 10px; padding: 10px; background-color: #fff8e1; border-left: 3px solid #ffb300; border-radius: 5px; display: none;">
+                <div style="font-weight: 600; color: #f57c00; margin-bottom: 5px;">
+                    <i class="fas fa-user-tag mr-2"></i> Thông tin khách vãng lai
+                </div>
+                <div style="color: #555; font-size: 0.9rem;">
+                    <div style="margin-bottom: 5px;">
+                        <strong>Họ tên:</strong> <span id="guestNameValue">-</span>
+                    </div>
+                    <div>
+                        <strong>Số điện thoại:</strong> <span id="guestPhoneValue">-</span>
+                    </div>
+                </div>
+            </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="update_booking_status" name="update_booking_status" value="1" checked>
                 <label class="form-check-label" for="update_booking_status">
@@ -311,8 +327,8 @@
         </div>
         
         <div class="form-group">
-            <label for="Manguoidung" class="form-label">Người Dùng <span class="text-danger">*</span></label>
-            <select class="form-select @error('Manguoidung') is-invalid @enderror" id="Manguoidung" name="Manguoidung" required>
+            <label for="Manguoidung" class="form-label">Người Dùng</label>
+            <select class="form-select @error('Manguoidung') is-invalid @enderror" id="Manguoidung" name="Manguoidung">
                 <option value="">-- Chọn người dùng --</option>
                 @foreach($users as $user)
                     <option value="{{ $user->Manguoidung }}" {{ old('Manguoidung') == $user->Manguoidung ? 'selected' : '' }}>
@@ -320,6 +336,7 @@
                     </option>
                 @endforeach
             </select>
+            <small class="form-text text-muted">Có thể để trống nếu là khách vãng lai</small>
             @error('Manguoidung')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -402,6 +419,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicePrice = document.getElementById('servicePrice');
     const bookingStatus = document.getElementById('bookingStatus');
     const tongTienInput = document.getElementById('Tongtien');
+    const guestInfo = document.getElementById('guest-info');
+    const guestNameValue = document.getElementById('guestNameValue');
+    const guestPhoneValue = document.getElementById('guestPhoneValue');
     
     // Cập nhật thông tin đặt lịch khi chọn
     datLichSelect.addEventListener('change', function() {
@@ -446,15 +466,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             servicePrice.textContent = 'N/A';
                         }
                         
-                        // Cập nhật người dùng
-                        if (booking.Manguoidung) {
-                            userSelect.value = booking.Manguoidung;
+                        // Kiểm tra và hiển thị thông tin khách vãng lai
+                        if (!booking.Manguoidung && (booking.Hoten_khach || booking.SDT_khach)) {
+                            guestInfo.style.display = 'block';
+                            guestNameValue.textContent = booking.Hoten_khach || 'Không có thông tin';
+                            guestPhoneValue.textContent = booking.SDT_khach || 'Không có thông tin';
+                            
+                            // Xóa chọn người dùng nếu là khách vãng lai
+                            userSelect.value = '';
+                        } else {
+                            guestInfo.style.display = 'none';
+                            
+                            // Cập nhật người dùng nếu có
+                            if (booking.Manguoidung) {
+                                userSelect.value = booking.Manguoidung;
+                            }
                         }
                     } else {
                         serviceName.textContent = 'Không thể tải dữ liệu';
                         bookingTime.textContent = 'Không thể tải dữ liệu';
                         servicePrice.textContent = 'Không thể tải dữ liệu';
                         bookingStatus.textContent = 'Không thể tải dữ liệu';
+                        guestInfo.style.display = 'none';
                         console.error('API error:', data);
                     }
                 })
@@ -464,9 +497,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     bookingTime.textContent = 'Lỗi kết nối';
                     servicePrice.textContent = 'Lỗi kết nối';
                     bookingStatus.textContent = 'Lỗi kết nối';
+                    guestInfo.style.display = 'none';
                 });
         } else {
             bookingInfo.style.display = 'none';
+            guestInfo.style.display = 'none';
             tongTienInput.value = 0;
         }
     });
@@ -483,11 +518,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
     @endif
     
-    // Cập nhật người dùng khi chọn đặt lịch
+    // Cập nhật người dùng khi chọn đặt lịch theo dữ liệu có sẵn
     datLichSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
-        if (selectedOption && selectedOption.dataset.user) {
-            userSelect.value = selectedOption.dataset.user;
+        if (selectedOption) {
+            // Nếu là đặt lịch của khách vãng lai (có data-guest-name nhưng không có data-user hoặc data-user rỗng)
+            const hasGuestName = selectedOption.dataset.guestName && selectedOption.dataset.guestName.trim() !== '';
+            const hasUserId = selectedOption.dataset.user && selectedOption.dataset.user.trim() !== '';
+            
+            if (hasGuestName && !hasUserId) {
+                // Đối với khách vãng lai: xóa người dùng đã chọn
+                userSelect.value = '';
+            } else if (hasUserId) {
+                // Đối với người dùng đăng ký: chọn người dùng tương ứng
+                userSelect.value = selectedOption.dataset.user;
+            }
         }
     });
 });

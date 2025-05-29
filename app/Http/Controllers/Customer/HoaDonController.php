@@ -45,6 +45,9 @@ class HoaDonController extends Controller
             $query->where('Manguoidung', $customer->Manguoidung);
         })->with(['datLich.dichVu', 'phuongThuc']);
         
+        // Thêm điều kiện OR để lấy cả hóa đơn được liên kết trực tiếp với người dùng
+        $query->orWhere('Manguoidung', $customer->Manguoidung);
+        
         // Filter by payment status
         if ($request->has('payment_status') && $request->payment_status != '') {
             $query->where('Matrangthai', $request->payment_status);

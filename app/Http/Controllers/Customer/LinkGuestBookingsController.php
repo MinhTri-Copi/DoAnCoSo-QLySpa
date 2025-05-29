@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\DatLich;
 use App\Models\User;
+use App\Models\HoaDonVaThanhToan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,18 @@ class LinkGuestBookingsController extends Controller
             ->where('SDT_khach', $user->SDT)
             ->with('dichVu') // Eager load dịch vụ để hiển thị thông tin
             ->get();
+            
+        // Lấy số lượng hóa đơn liên quan
+        $guestInvoicesCount = 0;
+        if ($guestBookings->count() > 0) {
+            $guestBookingIds = $guestBookings->pluck('MaDL')->toArray();
+            $guestInvoicesCount = HoaDonVaThanhToan::whereIn('MaDL', $guestBookingIds)
+                ->whereNull('Manguoidung')
+                ->count();
+        }
+        
+        // Lưu số lượng hóa đơn vào session để hiển thị trên view
+        session(['guest_invoices_count' => $guestInvoicesCount]);
         
         // Nếu không tìm thấy lịch đặt nào, chuyển hướng về trang chủ
         if ($guestBookings->isEmpty()) {
@@ -68,14 +81,25 @@ class LinkGuestBookingsController extends Controller
             DB::beginTransaction();
             
             // Cập nhật Manguoidung cho các lịch đặt được chọn
-            $updatedCount = DatLich::whereIn('MaDL', $request->booking_ids)
+            $updatedBookingsCount = DatLich::whereIn('MaDL', $request->booking_ids)
+                ->whereNull('Manguoidung')
+                ->update(['Manguoidung' => $user->Manguoidung]);
+            
+            // Lấy tất cả các hóa đơn liên quan đến các lịch đặt được chọn
+            $relatedInvoicesCount = HoaDonVaThanhToan::whereIn('MaDL', $request->booking_ids)
                 ->whereNull('Manguoidung')
                 ->update(['Manguoidung' => $user->Manguoidung]);
             
             DB::commit();
             
+            $message = "Đã liên kết thành công {$updatedBookingsCount} lịch đặt";
+            if ($relatedInvoicesCount > 0) {
+                $message .= " và {$relatedInvoicesCount} hóa đơn liên quan";
+            }
+            $message .= " vào tài khoản của bạn.";
+            
             return redirect()->route('customer.lichsudatlich.index')
-                ->with('success', "Đã liên kết thành công {$updatedCount} lịch đặt vào tài khoản của bạn.");
+                ->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()

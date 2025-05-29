@@ -335,12 +335,29 @@
                     <div class="info-title">THÔNG TIN KHÁCH HÀNG</div>
                     <div class="info-row">
                         <div class="info-label">Họ và tên:</div>
-                        <div class="info-value">{{ $hoaDon->user->Hoten ?? 'N/A' }}</div>
+                        <div class="info-value">
+                            @if($hoaDon->user)
+                                {{ $hoaDon->user->Hoten }}
+                            @elseif($hoaDon->datLich && $hoaDon->datLich->Hoten_khach)
+                                <span style="font-weight: bold;">{{ $hoaDon->datLich->Hoten_khach }}</span>
+                            @else
+                                N/A
+                            @endif
+                        </div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Số điện thoại:</div>
-                        <div class="info-value">{{ $hoaDon->user->SDT ?? 'N/A' }}</div>
+                        <div class="info-value">
+                            @if($hoaDon->user)
+                                {{ $hoaDon->user->SDT ?? 'N/A' }}
+                            @elseif($hoaDon->datLich && $hoaDon->datLich->SDT_khach)
+                                {{ $hoaDon->datLich->SDT_khach }}
+                            @else
+                                N/A
+                            @endif
+                        </div>
                     </div>
+                    @if($hoaDon->user)
                     <div class="info-row">
                         <div class="info-label">Email:</div>
                         <div class="info-value">{{ $hoaDon->user->Email ?? 'N/A' }}</div>
@@ -349,6 +366,7 @@
                         <div class="info-label">Địa chỉ:</div>
                         <div class="info-value">{{ $hoaDon->user->DiaChi ?? 'N/A' }}</div>
                     </div>
+                    @endif
                 </div>
                 
                 <div class="payment-info">
@@ -446,7 +464,15 @@
                 <div class="signature-box">
                     <div class="signature-title">Khách hàng</div>
                     <div class="signature-line"></div>
-                    <div>{{ $hoaDon->user->Hoten ?? 'Khách hàng' }}</div>
+                    <div>
+                        @if($hoaDon->user)
+                            {{ $hoaDon->user->Hoten }}
+                        @elseif($hoaDon->datLich && $hoaDon->datLich->Hoten_khach)
+                            {{ $hoaDon->datLich->Hoten_khach }}
+                        @else
+                            Khách hàng
+                        @endif
+                    </div>
                 </div>
             </div>
             

@@ -173,7 +173,7 @@ class HoaDonVaThanhToanController extends Controller
             'Ngaythanhtoan' => 'required|date',
             'Tongtien' => 'required|numeric|min:0',
             'MaDL' => 'required|exists:DATLICH,MaDL',
-            'Manguoidung' => 'required|exists:USER,Manguoidung',
+            'Manguoidung' => 'nullable|exists:USER,Manguoidung',
             'Maphong' => 'required|exists:PHONG,Maphong',
             'MaPT' => 'nullable|exists:PHUONGTHUC,MaPT',
         ], [
@@ -184,7 +184,6 @@ class HoaDonVaThanhToanController extends Controller
             'Tongtien.min' => 'Tổng tiền không được nhỏ hơn 0.',
             'MaDL.required' => 'Đặt lịch không được để trống.',
             'MaDL.exists' => 'Đặt lịch không tồn tại.',
-            'Manguoidung.required' => 'Người dùng không được để trống.',
             'Manguoidung.exists' => 'Người dùng không tồn tại.',
             'Maphong.required' => 'Phòng không được để trống.',
             'Maphong.exists' => 'Phòng không tồn tại.',
@@ -203,32 +202,37 @@ class HoaDonVaThanhToanController extends Controller
 
             // Nếu không chọn trạng thái, mặc định là "Chờ thanh toán" (Matrangthai = 6)
             $matrangThai = $request->Matrangthai ?? 6;
+            
+            // Lấy Manguoidung từ request hoặc null nếu là khách vãng lai
+            $maNguoiDung = $request->Manguoidung ?: null;
 
             $hoaDon = HoaDonVaThanhToan::create([
                 'MaHD' => $newMaHD,
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
                 'Tongtien' => $tongtien, // Use the calculated total amount
                 'MaDL' => $request->MaDL,
-                'Manguoidung' => $request->Manguoidung,
+                'Manguoidung' => $maNguoiDung,
                 'Maphong' => $request->Maphong,
                 'MaPT' => $request->MaPT,
                 'Matrangthai' => $matrangThai,
             ]);
 
-            // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền
-            $soDiem = $this->calculateRewardPoints($tongtien);
-
-            if ($soDiem > 0) {
-                $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
-                $newMaLSDT = $maxMaLSDT + 1;
-                
-                LSDiemThuong::create([
-                    'MaLSDT' => $newMaLSDT,
-                    'Thoigian' => now(),
-                    'Sodiem' => $soDiem,
-                    'Manguoidung' => $request->Manguoidung,
-                    'MaHD' => $newMaHD,
-                ]);
+            // Tự động tạo bản ghi lịch sử điểm thưởng dựa trên tổng tiền (chỉ khi có Manguoidung)
+            if ($maNguoiDung) {
+                $soDiem = $this->calculateRewardPoints($tongtien);
+    
+                if ($soDiem > 0) {
+                    $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
+                    $newMaLSDT = $maxMaLSDT + 1;
+                    
+                    LSDiemThuong::create([
+                        'MaLSDT' => $newMaLSDT,
+                        'Thoigian' => now(),
+                        'Sodiem' => $soDiem,
+                        'Manguoidung' => $maNguoiDung,
+                        'MaHD' => $newMaHD,
+                    ]);
+                }
             }
             
             // Cập nhật trạng thái đặt lịch nếu cần
@@ -282,7 +286,7 @@ class HoaDonVaThanhToanController extends Controller
             'Ngaythanhtoan' => 'required|date',
             'Tongtien' => 'required|numeric|min:0',
             'MaDL' => 'required|exists:DATLICH,MaDL',
-            'Manguoidung' => 'required|exists:USER,Manguoidung',
+            'Manguoidung' => 'nullable|exists:USER,Manguoidung',
             'Maphong' => 'required|exists:PHONG,Maphong',
             'MaPT' => 'nullable|exists:PHUONGTHUC,MaPT',
         ], [
@@ -293,7 +297,6 @@ class HoaDonVaThanhToanController extends Controller
             'Tongtien.min' => 'Tổng tiền không được nhỏ hơn 0.',
             'MaDL.required' => 'Đặt lịch không được để trống.',
             'MaDL.exists' => 'Đặt lịch không tồn tại.',
-            'Manguoidung.required' => 'Người dùng không được để trống.',
             'Manguoidung.exists' => 'Người dùng không tồn tại.',
             'Maphong.required' => 'Phòng không được để trống.',
             'Maphong.exists' => 'Phòng không tồn tại.',
@@ -310,11 +313,14 @@ class HoaDonVaThanhToanController extends Controller
             // Nếu không chọn trạng thái, mặc định là "Chờ thanh toán" (Matrangthai = 6)
             $matrangThai = $request->Matrangthai ?? 6;
             
+            // Lấy Manguoidung từ request hoặc null nếu là khách vãng lai
+            $maNguoiDung = $request->Manguoidung ?: null;
+            
             $hoaDon->update([
                 'Ngaythanhtoan' => $request->Ngaythanhtoan,
                 'Tongtien' => $tongtien, // Use the calculated total amount
                 'MaDL' => $request->MaDL,
-                'Manguoidung' => $request->Manguoidung,
+                'Manguoidung' => $maNguoiDung,
                 'Maphong' => $request->Maphong,
                 'MaPT' => $request->MaPT,
                 'Matrangthai' => $matrangThai,
@@ -322,31 +328,40 @@ class HoaDonVaThanhToanController extends Controller
 
             // Cập nhật lịch sử điểm thưởng dựa trên tổng tiền
             $existingLSDT = LSDiemThuong::where('MaHD', $hoaDon->MaHD)->first();
-            $soDiem = $this->calculateRewardPoints($tongtien);
+            
+            // Chỉ xử lý điểm thưởng khi có người dùng
+            if ($maNguoiDung) {
+                $soDiem = $this->calculateRewardPoints($tongtien);
 
-            if ($soDiem > 0) {
-                if ($existingLSDT) {
-                    // Nếu đã có bản ghi, cập nhật số điểm
-                    $existingLSDT->update([
-                        'Sodiem' => $soDiem,
-                        'Thoigian' => now(),
-                        'Manguoidung' => $request->Manguoidung,
-                    ]);
+                if ($soDiem > 0) {
+                    if ($existingLSDT) {
+                        // Nếu đã có bản ghi, cập nhật số điểm
+                        $existingLSDT->update([
+                            'Sodiem' => $soDiem,
+                            'Thoigian' => now(),
+                            'Manguoidung' => $maNguoiDung,
+                        ]);
+                    } else {
+                        // Nếu chưa có bản ghi, tạo mới
+                        $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
+                        $newMaLSDT = $maxMaLSDT + 1;
+
+                        LSDiemThuong::create([
+                            'MaLSDT' => $newMaLSDT,
+                            'Thoigian' => now(),
+                            'Sodiem' => $soDiem,
+                            'Manguoidung' => $maNguoiDung,
+                            'MaHD' => $hoaDon->MaHD,
+                        ]);
+                    }
                 } else {
-                    // Nếu chưa có bản ghi, tạo mới
-                    $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
-                    $newMaLSDT = $maxMaLSDT + 1;
-
-                    LSDiemThuong::create([
-                        'MaLSDT' => $newMaLSDT,
-                        'Thoigian' => now(),
-                        'Sodiem' => $soDiem,
-                        'Manguoidung' => $request->Manguoidung,
-                        'MaHD' => $hoaDon->MaHD,
-                    ]);
+                    // Nếu tổng tiền < 100,000 và có bản ghi, xóa bản ghi
+                    if ($existingLSDT) {
+                        $existingLSDT->delete();
+                    }
                 }
             } else {
-                // Nếu tổng tiền < 100,000 và có bản ghi, xóa bản ghi
+                // Nếu không có người dùng và có bản ghi điểm thưởng, xóa bản ghi
                 if ($existingLSDT) {
                     $existingLSDT->delete();
                 }

@@ -164,11 +164,24 @@ class AuthController extends Controller
                 ->where('SDT_khach', $request->sdt)
                 ->get();
                 
-            // Nếu tìm thấy lịch đặt trùng số điện thoại
+            // Kiểm tra các hóa đơn liên quan đến các lịch đặt của khách vãng lai
+            $guestInvoicesCount = 0;
+            if ($guestBookings->count() > 0) {
+                $guestBookingIds = $guestBookings->pluck('MaDL')->toArray();
+                $guestInvoicesCount = \App\Models\HoaDonVaThanhToan::whereIn('MaDL', $guestBookingIds)
+                    ->whereNull('Manguoidung')
+                    ->count();
+            }
+                
+            // Nếu tìm thấy lịch đặt hoặc hóa đơn trùng số điện thoại
             if ($guestBookings->count() > 0) {
                 // Lưu thông tin để hiển thị sau khi đăng nhập
-                session(['found_guest_bookings' => true, 'guest_bookings_count' => $guestBookings->count()]);
-                Log::info('Found ' . $guestBookings->count() . ' guest bookings for phone: ' . $request->sdt);
+                session([
+                    'found_guest_bookings' => true, 
+                    'guest_bookings_count' => $guestBookings->count(),
+                    'guest_invoices_count' => $guestInvoicesCount
+                ]);
+                Log::info('Found ' . $guestBookings->count() . ' guest bookings and ' . $guestInvoicesCount . ' related invoices for phone: ' . $request->sdt);
             }
 
             // Đăng nhập người dùng sau khi đăng ký
