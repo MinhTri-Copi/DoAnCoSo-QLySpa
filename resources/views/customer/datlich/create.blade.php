@@ -3,6 +3,7 @@
 @section('title', 'Đặt lịch dịch vụ')
 
 @section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
     :root {
         --primary-color: #ff6b9d;
@@ -890,6 +891,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
     // Hàm test form data
     function testFormData() {
@@ -1323,16 +1325,27 @@
                 data: formData,
                 success: function(response) {
                     console.log('Form submitted successfully', response);
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
-                    } else {
-                        // Nếu server không trả về URL redirect, chuyển hướng đến trang lịch sử đặt lịch
-                        if (isAuthenticated) {
-                            window.location.href = "{{ route('customer.lichsudatlich.index') }}";
+                    
+                    // Hiển thị thông báo thành công
+                    Swal.fire({
+                        title: 'Đặt lịch thành công!',
+                        text: response.message || 'Chúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#ff6b9d'
+                    }).then((result) => {
+                        // Chuyển hướng sau khi người dùng đóng thông báo
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
                         } else {
-                            window.location.href = "{{ route('welcome') }}";
+                            // Nếu server không trả về URL redirect, chuyển hướng đến trang lịch sử đặt lịch
+                            if (isAuthenticated) {
+                                window.location.href = "{{ route('customer.lichsudatlich.index') }}";
+                            } else {
+                                window.location.href = "{{ route('welcome') }}";
+                            }
                         }
-                    }
+                    });
                 },
                 error: function(xhr, status, error) {
                     console.error('Error submitting form:', error);
@@ -1345,17 +1358,35 @@
                         console.error('Detailed error:', jsonResponse);
                         
                         if (jsonResponse.message) {
-                            alert('Lỗi: ' + jsonResponse.message);
+                            Swal.fire({
+                                title: 'Lỗi',
+                                text: jsonResponse.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#ff6b9d'
+                            });
                         } else if (jsonResponse.errors) {
                             var errorMessage = 'Vui lòng kiểm tra lại thông tin:\n';
                             $.each(jsonResponse.errors, function(key, value) {
                                 errorMessage += '- ' + value[0] + '\n';
                             });
-                            alert(errorMessage);
+                            Swal.fire({
+                                title: 'Lỗi',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#ff6b9d'
+                            });
                         }
                     } catch (e) {
                         // Nếu không phải JSON
-                        alert('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại sau.');
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: 'Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại sau.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#ff6b9d'
+                        });
                     }
                     
                     // Khôi phục nút submit
