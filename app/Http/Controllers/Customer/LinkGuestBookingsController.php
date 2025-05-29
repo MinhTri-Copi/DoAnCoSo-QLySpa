@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\DatLich;
 use App\Models\User;
 use App\Models\HoaDonVaThanhToan;
+use App\Models\LSDiemThuong;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LinkGuestBookingsController extends Controller
 {
@@ -86,9 +88,46 @@ class LinkGuestBookingsController extends Controller
                 ->update(['Manguoidung' => $user->Manguoidung]);
             
             // Lấy tất cả các hóa đơn liên quan đến các lịch đặt được chọn
-            $relatedInvoicesCount = HoaDonVaThanhToan::whereIn('MaDL', $request->booking_ids)
+            $relatedInvoices = HoaDonVaThanhToan::whereIn('MaDL', $request->booking_ids)
                 ->whereNull('Manguoidung')
-                ->update(['Manguoidung' => $user->Manguoidung]);
+                ->get();
+                
+            $relatedInvoicesCount = $relatedInvoices->count();
+            
+            // Cập nhật Manguoidung cho các hóa đơn
+            if ($relatedInvoicesCount > 0) {
+                HoaDonVaThanhToan::whereIn('MaDL', $request->booking_ids)
+                    ->whereNull('Manguoidung')
+                    ->update(['Manguoidung' => $user->Manguoidung]);
+                
+                // Xử lý điểm thưởng cho từng hóa đơn
+                $totalRewardPoints = 0;
+                foreach ($relatedInvoices as $invoice) {
+                    // Kiểm tra xem hóa đơn đã có điểm thưởng chưa
+                    $existingPoints = LSDiemThuong::where('MaHD', $invoice->MaHD)->exists();
+                    
+                    if (!$existingPoints) {
+                        // Tính điểm thưởng dựa trên tổng tiền
+                        $soDiem = $this->calculateRewardPoints($invoice->Tongtien);
+                        
+                        if ($soDiem > 0) {
+                            $maxMaLSDT = LSDiemThuong::max('MaLSDT') ?? 0;
+                            $newMaLSDT = $maxMaLSDT + 1;
+                            
+                            // Tạo bản ghi lịch sử điểm thưởng
+                            LSDiemThuong::create([
+                                'MaLSDT' => $newMaLSDT,
+                                'Thoigian' => Carbon::now(),
+                                'Sodiem' => $soDiem,
+                                'Manguoidung' => $user->Manguoidung,
+                                'MaHD' => $invoice->MaHD,
+                            ]);
+                            
+                            $totalRewardPoints += $soDiem;
+                        }
+                    }
+                }
+            }
             
             DB::commit();
             
@@ -98,6 +137,10 @@ class LinkGuestBookingsController extends Controller
             }
             $message .= " vào tài khoản của bạn.";
             
+            if (isset($totalRewardPoints) && $totalRewardPoints > 0) {
+                $message .= " Bạn đã được cộng {$totalRewardPoints} điểm thưởng từ các hóa đơn cũ.";
+            }
+            
             return redirect()->route('customer.lichsudatlich.index')
                 ->with('success', $message);
         } catch (\Exception $e) {
@@ -105,6 +148,27 @@ class LinkGuestBookingsController extends Controller
             return redirect()->back()
                 ->with('error', 'Đã xảy ra lỗi khi liên kết lịch đặt: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Tính điểm thưởng dựa trên tổng tiền hóa đơn
+     * 
+     * @param float $tongTien Tổng tiền hóa đơn
+     * @return int Số điểm thưởng
+     */
+    private function calculateRewardPoints($tongTien)
+    {
+        $soDiem = 0;
+
+        if ($tongTien >= 100000 && $tongTien < 500000) {
+            $soDiem = 100;
+        } elseif ($tongTien >= 500000 && $tongTien < 1000000) {
+            $soDiem = 300;
+        } elseif ($tongTien >= 1000000) {
+            $soDiem = 500;
+        }
+        
+        return $soDiem;
     }
     
     /**
