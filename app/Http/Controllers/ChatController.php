@@ -33,6 +33,14 @@ class ChatController extends Controller
         $userMessage = $request->message;
         
         try {
+            // Kiểm tra nếu khách hàng hỏi về danh sách dịch vụ
+            if ($this->containsAny($userMessage, ['danh sách dịch vụ', 'các dịch vụ', 'tất cả dịch vụ', 'dịch vụ có những gì'])) {
+                $reply = $this->getServicesList();
+                session()->flash('user', $userMessage);
+                session()->flash('reply', $reply);
+                return redirect()->back();
+            }
+            
             // Thử gọi OpenAI API
             $dbContext = $this->getRelevantDataFromDB($userMessage);
             $systemPrompt = "Bạn là trợ lý thông minh của Rosa Spa. Bạn có thể cung cấp thông tin về các dịch vụ spa, đặt lịch, giá cả và tư vấn khách hàng. Hãy trả lời một cách thân thiện và chuyên nghiệp. Dưới đây là một số thông tin từ hệ thống của chúng tôi:\n\n" . $dbContext;
@@ -45,7 +53,7 @@ class ChatController extends Controller
                 'Content-Type' => 'application/json',
             ])->post('https://api.chatanywhere.org/v1/chat/completions', [
                 'model' => 'gpt-3.5-turbo',
-                'messages' => [
+            'messages' => [
                     [
                         'role' => 'system',
                         'content' => $systemPrompt
@@ -54,8 +62,8 @@ class ChatController extends Controller
                         'role' => 'user',
                         'content' => $userMessage
                     ]
-                ],
-                'temperature' => 0.7,
+            ],
+            'temperature' => 0.7,
                 'max_tokens' => 500
             ]);
             
@@ -201,5 +209,54 @@ class ChatController extends Controller
             }
         }
         return false;
+    }
+
+    /**
+     * Lấy danh sách tất cả các dịch vụ của spa
+     */
+    private function getServicesList()
+    {
+        try {
+            // Truy vấn trực tiếp SQL để lấy dịch vụ
+            $services = DB::select('SELECT * FROM dichvu');
+            Log::info('Services fetched with direct SQL', ['count' => count($services)]);
+            
+            if (!empty($services)) {
+                $serviceList = "Dưới đây là danh sách đầy đủ các dịch vụ của Rosa Spa:\n\n";
+                
+                foreach ($services as $service) {
+                    // Lấy thông tin dịch vụ
+                    $tenDichVu = $service->Tendichvu ?? 'Dịch vụ';
+                    $gia = $service->Gia ?? 0;
+                    
+                    $serviceList .= "- {$tenDichVu}: " . number_format($gia, 0, ',', '.') . " VND\n";
+                    
+                    // Mô tả
+                    if (isset($service->MoTa) && !empty($service->MoTa)) {
+                        $serviceList .= "  Mô tả: {$service->MoTa}\n";
+                    }
+                    
+                    // Thời gian
+                    if (isset($service->Thoigian) && !empty($service->Thoigian)) {
+                        $serviceList .= "  Thời gian: {$service->Thoigian}\n";
+                    }
+                    
+                    $serviceList .= "\n";
+                }
+                
+                $serviceList .= "Bạn có thể đặt lịch sử dụng dịch vụ trên trang web của chúng tôi hoặc gọi số (028) 1234 5678. Bạn quan tâm đến dịch vụ nào?";
+                
+                return $serviceList;
+            } else {
+                Log::warning('No services found in the database');
+                return "Hiện tại chúng tôi đang cập nhật danh sách dịch vụ. Vui lòng liên hệ trực tiếp với chúng tôi qua số điện thoại (028) 1234 5678 để biết thêm chi tiết.";
+            }
+        } catch (\Exception $e) {
+            Log::error('Error getting services list: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return "Xin lỗi, tôi không thể lấy danh sách dịch vụ lúc này. Vui lòng thử lại sau hoặc liên hệ trực tiếp với Rosa Spa.";
+        }
     }
 }
