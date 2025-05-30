@@ -26,6 +26,7 @@ use App\Http\Controllers\ProfileController;
 use App\Models\HangThanhVien;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\LinkGuestBookingsController;
+use App\Http\Controllers\ChatController;
 
 
 
@@ -330,4 +331,8 @@ Route::get('/debug-images', function() {
 Route::get('/customer/diem-thuong', function () {
     return view('customer.diemthuong');
 })->name('customer.diemthuong.index');
+
+// Routes cho Chat
+Route::get('/chat', [App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
 

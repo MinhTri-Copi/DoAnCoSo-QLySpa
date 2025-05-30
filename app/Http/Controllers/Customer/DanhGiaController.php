@@ -128,7 +128,7 @@ class DanhGiaController extends Controller
             'Noidungdanhgia.required' => 'Vui lòng nhập nội dung đánh giá.',
             'Noidungdanhgia.max' => 'Nội dung đánh giá không quá 500 ký tự.',
         ]);
-        
+        //fuc fucS.fucsomething();
         // Lấy thông tin tài khoản đăng nhập
         $accountUser = Auth::user();
         

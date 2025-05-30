@@ -1717,4 +1717,7 @@
         icon.classList.add('fa-comments');
     });
 </script>
+
+<!-- Thêm chat widget -->
+@include('components.chat-widget')
 @endpush
