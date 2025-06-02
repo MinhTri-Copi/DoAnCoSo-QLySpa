@@ -291,6 +291,9 @@ Route::post('hoadonvathanhtoan/update-status', [HoaDonVaThanhToanController::cla
 // API để lấy thông tin đặt lịch cho hóa đơn
 Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
 
+// API để kiểm tra hạng thành viên và tỷ lệ giảm giá
+Route::get('/admin/api/check-membership-discount', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'checkMembershipDiscount']);
+
 // Routes cho profile
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('admin.profile.index');

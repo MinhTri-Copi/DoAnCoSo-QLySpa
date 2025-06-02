@@ -317,6 +317,19 @@
                 <div class="booking-detail-label">Trạng thái:</div>
                 <div class="booking-detail-value" id="bookingStatus">-</div>
             </div>
+            <div id="guest-info" style="margin-top: 10px; padding: 10px; background-color: #fff8e1; border-left: 3px solid #ffb300; border-radius: 5px; display: none;">
+                <div style="font-weight: 600; color: #f57c00; margin-bottom: 5px;">
+                    <i class="fas fa-user-tag mr-2"></i> Thông tin khách vãng lai
+                </div>
+                <div style="color: #555; font-size: 0.9rem;">
+                    <div style="margin-bottom: 5px;">
+                        <strong>Họ tên:</strong> <span id="guestNameValue">-</span>
+                    </div>
+                    <div>
+                        <strong>Số điện thoại:</strong> <span id="guestPhoneValue">-</span>
+                    </div>
+                </div>
+            </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="update_booking_status" name="update_booking_status" value="1">
                 <label class="form-check-label" for="update_booking_status">
@@ -366,11 +379,26 @@
         
         <div class="form-group">
             <label for="Tongtien" class="form-label">Tổng Tiền (VNĐ) <span class="text-danger">*</span></label>
-            <input type="number" class="form-control @error('Tongtien') is-invalid @enderror" id="Tongtien" name="Tongtien" value="{{ old('Tongtien', $hoaDon->Tongtien) }}" min="0" required>
+            <input type="number" class="form-control @error('Tongtien') is-invalid @enderror" id="Tongtien" name="Tongtien" value="{{ old('Tongtien', $hoaDon->Tongtien) }}" min="0" required readonly>
             @error('Tongtien')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="form-text">Điểm thưởng sẽ được tự động tính dựa trên tổng tiền.</small>
+            <div id="discount-info" class="mt-2" style="display: none;">
+                <div class="alert alert-info py-1 px-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small><i class="fas fa-tag me-1"></i> <span id="discount-text">Giảm giá 0%</span></small>
+                        </div>
+                        <div>
+                            <small>Tiền giảm: <span id="discount-amount">0 VNĐ</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <small class="form-text text-muted">Điểm thưởng sẽ được tự động tính dựa trên tổng tiền.</small>
+                <small class="text-primary"><strong>Giá gốc: <span id="original-price">0 VNĐ</span></strong></small>
+            </div>
         </div>
         
         <div class="form-group">
@@ -421,6 +449,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicePrice = document.getElementById('servicePrice');
     const bookingStatus = document.getElementById('bookingStatus');
     const tongTienInput = document.getElementById('Tongtien');
+    const discountInfo = document.getElementById('discount-info');
+    const discountText = document.getElementById('discount-text');
+    const discountAmount = document.getElementById('discount-amount');
+    const originalPrice = document.getElementById('original-price');
+    const guestInfo = document.getElementById('guest-info');
+    const guestNameValue = document.getElementById('guestNameValue');
+    const guestPhoneValue = document.getElementById('guestPhoneValue');
+    
+    // Lưu trữ giá gốc
+    let originalServicePrice = 0;
+    let currentDiscountRate = 0;
+    
+    // Hàm tính và hiển thị giảm giá
+    function applyDiscount() {
+        const userId = userSelect.value;
+        
+        if (!userId || originalServicePrice <= 0) {
+            // Không có người dùng hoặc không có giá dịch vụ - không giảm giá
+            tongTienInput.value = originalServicePrice;
+            discountInfo.style.display = 'none';
+            originalPrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalServicePrice);
+            return;
+        }
+        
+        // Gọi API để kiểm tra hạng thành viên và tính giảm giá
+        fetch(`/admin/api/check-membership-discount?userId=${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentDiscountRate = data.discountRate;
+                    const discountValue = originalServicePrice * currentDiscountRate;
+                    const finalPrice = originalServicePrice - discountValue;
+                    
+                    // Hiển thị thông tin giảm giá
+                    discountText.textContent = `Giảm giá ${currentDiscountRate * 100}% (${data.membershipRank})`;
+                    discountAmount.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discountValue);
+                    tongTienInput.value = finalPrice;
+                    discountInfo.style.display = 'block';
+                    originalPrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalServicePrice);
+                } else {
+                    // Không có thông tin giảm giá
+                    tongTienInput.value = originalServicePrice;
+                    discountInfo.style.display = 'none';
+                    originalPrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalServicePrice);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking membership discount:", error);
+                tongTienInput.value = originalServicePrice;
+                discountInfo.style.display = 'none';
+            });
+    }
     
     // Cập nhật thông tin đặt lịch khi chọn
     datLichSelect.addEventListener('change', function() {
@@ -453,27 +533,56 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.log('Service price:', serviceGia);
                             
                             if (!isNaN(serviceGia)) {
+                                // Lưu giá gốc
+                                originalServicePrice = serviceGia;
+                                
                                 // Hiển thị giá dịch vụ đã định dạng
                                 servicePrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(serviceGia);
                                 
-                                // Cập nhật tổng tiền
-                                tongTienInput.value = serviceGia;
+                                // Áp dụng giảm giá nếu có người dùng đã chọn
+                                applyDiscount();
                             } else {
                                 servicePrice.textContent = 'Không xác định';
+                                originalServicePrice = 0;
+                                tongTienInput.value = 0;
                             }
                         } else {
                             servicePrice.textContent = 'N/A';
+                            originalServicePrice = 0;
+                            tongTienInput.value = 0;
                         }
                         
                         // Cập nhật người dùng
                         if (booking.Manguoidung) {
                             userSelect.value = booking.Manguoidung;
+                            // Áp dụng giảm giá nếu đã có dịch vụ
+                            if (originalServicePrice > 0) {
+                                applyDiscount();
+                            }
+                            // Ẩn thông tin khách vãng lai
+                            guestInfo.style.display = 'none';
+                        }
+                        // Kiểm tra và hiển thị thông tin khách vãng lai
+                        else if (!booking.Manguoidung && (booking.Hoten_khach || booking.SDT_khach)) {
+                            guestInfo.style.display = 'block';
+                            guestNameValue.textContent = booking.Hoten_khach || 'Không có thông tin';
+                            guestPhoneValue.textContent = booking.SDT_khach || 'Không có thông tin';
+                            
+                            // Xóa chọn người dùng nếu là khách vãng lai
+                            userSelect.value = '';
+                            
+                            // Không có giảm giá cho khách vãng lai
+                            discountInfo.style.display = 'none';
+                        } else {
+                            guestInfo.style.display = 'none';
                         }
                     } else {
                         serviceName.textContent = 'Không thể tải dữ liệu';
                         bookingTime.textContent = 'Không thể tải dữ liệu';
                         servicePrice.textContent = 'Không thể tải dữ liệu';
                         bookingStatus.textContent = 'Không thể tải dữ liệu';
+                        guestInfo.style.display = 'none';
+                        discountInfo.style.display = 'none';
                         console.error('API error:', data);
                     }
                 })
@@ -483,24 +592,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     bookingTime.textContent = 'Lỗi kết nối';
                     servicePrice.textContent = 'Lỗi kết nối';
                     bookingStatus.textContent = 'Lỗi kết nối';
+                    guestInfo.style.display = 'none';
+                    discountInfo.style.display = 'none';
                 });
         } else {
             bookingInfo.style.display = 'none';
+            guestInfo.style.display = 'none';
+            discountInfo.style.display = 'none';
+            originalServicePrice = 0;
         }
+    });
+    
+    // Khi thay đổi người dùng, tính lại giảm giá
+    userSelect.addEventListener('change', function() {
+        applyDiscount();
     });
     
     // Khởi tạo giá trị ban đầu nếu đã có
     if (datLichSelect.value) {
         datLichSelect.dispatchEvent(new Event('change'));
-    }
-    
-    // Cập nhật người dùng khi chọn đặt lịch
-    datLichSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        if (selectedOption && selectedOption.dataset.user) {
-            userSelect.value = selectedOption.dataset.user;
+    } else {
+        // Nếu đã có dữ liệu hóa đơn, hiển thị giá gốc từ giá dịch vụ ban đầu
+        // Đây là trường hợp khi đang sửa hóa đơn hiện tại
+        const discountRate = {{ $hoaDon->TyLeGiamGia ?? 0 }} / 100;
+        const discountAmount = {{ $hoaDon->GiamGia ?? 0 }};
+        const totalAmount = {{ $hoaDon->Tongtien ?? 0 }};
+        
+        if (discountAmount > 0) {
+            // Lấy giá gốc bằng cách cộng lại giảm giá
+            originalServicePrice = totalAmount + discountAmount;
+            
+            // Hiển thị thông tin giảm giá
+            discountText.textContent = `Giảm giá ${discountRate * 100}% ({{ $hoaDon->HangThanhVien ?? 'Không có' }})`;
+            discountAmount.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discountAmount);
+            discountInfo.style.display = 'block';
+            originalPrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalServicePrice);
+        } else {
+            // Không có giảm giá
+            originalServicePrice = totalAmount;
+            originalPrice.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalServicePrice);
         }
-    });
+    }
 });
 </script>
 @endsection

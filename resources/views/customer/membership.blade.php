@@ -9,28 +9,28 @@
             'min' => 0,
             'color' => '#b0c4de',
             'icon' => 'fa-certificate',
-            'benefit' => 'Tặng 1 voucher, ưu đãi 5% dịch vụ.'
+            'benefit' => 'Tặng 1 voucher.'
         ],
         [
             'name' => 'Thành viên Vàng',
             'min' => 100,
             'color' => '#ffd700',
             'icon' => 'fa-crown',
-            'benefit' => 'Tặng 2 voucher, ưu đãi 10% dịch vụ.'
+            'benefit' => 'Tặng 2 voucher, ưu đãi 5% dịch vụ.'
         ],
         [
             'name' => 'Thành viên Bạch Kim',
             'min' => 1000,
             'color' => '#e5e4e2',
             'icon' => 'fa-gem',
-            'benefit' => 'Tặng 3 voucher, ưu đãi 12%, quà tặng đặc biệt.'
+            'benefit' => 'Tặng 3 voucher, ưu đãi 7%, quà tặng đặc biệt.'
         ],
         [
             'name' => 'Thành viên Kim Cương',
             'min' => 5000,
             'color' => '#00bfff',
             'icon' => 'fa-diamond',
-            'benefit' => 'Tặng 4 voucher, ưu đãi 15%, quà tặng VIP.'
+            'benefit' => 'Tặng 4 voucher, ưu đãi 10%, quà tặng VIP.'
         ],
     ];
     $user = auth()->user()->user ?? null;

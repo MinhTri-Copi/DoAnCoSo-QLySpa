@@ -118,6 +118,13 @@
             text-align: left;
         }
         
+        .invoice-table th:last-child, 
+        .invoice-table td:last-child,
+        .invoice-table th.text-right, 
+        .invoice-table td.text-right {
+            text-align: right;
+        }
+        
         .invoice-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #e9ecef;
@@ -144,9 +151,17 @@
             border-bottom: 1px solid #e9ecef;
         }
         
+        .summary-row div:first-child {
+            text-align: left;
+        }
+        
+        .summary-row div:last-child {
+            text-align: right;
+            min-width: 150px;
+        }
+        
         .summary-row:last-child {
             border-bottom: none;
-            border-top: 2px solid #ff6b8b;
             font-weight: bold;
             font-size: 18px;
             padding-top: 15px;
@@ -418,21 +433,41 @@
             </table>
             
             <div class="invoice-summary">
+                @php
+                    // Calculate original price (before discount)
+                    $originalPrice = $hoaDon->datLich && $hoaDon->datLich->dichVu 
+                        ? $hoaDon->datLich->dichVu->Gia
+                        : ($hoaDon->GiamGia ? $hoaDon->Tongtien + $hoaDon->GiamGia : $hoaDon->Tongtien);
+                    
+                    // Get discount amount
+                    $discountAmount = $hoaDon->GiamGia ?? 0;
+                    
+                    // Get discount percentage
+                    $discountPercentage = $hoaDon->TyLeGiamGia ?? 0;
+                    
+                    // Calculate final total (should match Tongtien)
+                    $finalTotal = $originalPrice - $discountAmount;
+                @endphp
+                
                 <div class="summary-row">
                     <div>Tổng tiền dịch vụ:</div>
-                    <div>{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
+                    <div>{{ number_format($originalPrice, 0, ',', '.') }} VNĐ</div>
                 </div>
-                <div class="summary-row">
-                    <div>Thuế VAT (10%):</div>
-                    <div>{{ number_format($hoaDon->Tongtien * 0.1, 0, ',', '.') }} VNĐ</div>
-                </div>
+                
                 <div class="summary-row">
                     <div>Giảm giá:</div>
-                    <div>0 VNĐ</div>
+                    <div>
+                        @if($discountAmount > 0)
+                            {{ number_format($discountAmount, 0, ',', '.') }} VNĐ ({{ $discountPercentage }}%{{ $hoaDon->HangThanhVien ? ' - '.$hoaDon->HangThanhVien : '' }})
+                        @else
+                            0 VNĐ
+                        @endif
+                    </div>
                 </div>
-                <div class="summary-row">
-                    <div class="total-label">Tổng thanh toán:</div>
-                    <div class="total-value">{{ number_format($hoaDon->Tongtien * 1.1, 0, ',', '.') }} VNĐ</div>
+                
+                <div class="summary-row" style="border-top: 1px solid #ff6b8b; margin-top: 10px; padding-top: 10px; border-bottom: none;">
+                    <div class="total-label" style="color: #ff6b8b; font-weight: bold;">Tổng thanh toán:</div>
+                    <div class="total-value" style="color: #ff6b8b; font-weight: bold;">{{ number_format($finalTotal, 0, ',', '.') }} VNĐ</div>
                 </div>
             </div>
             
