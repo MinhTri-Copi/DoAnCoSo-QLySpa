@@ -434,19 +434,15 @@
             
             <div class="invoice-summary">
                 @php
-                    // Calculate original price (before discount)
-                    $originalPrice = $hoaDon->datLich && $hoaDon->datLich->dichVu 
-                        ? $hoaDon->datLich->dichVu->Gia
-                        : ($hoaDon->GiamGia ? $hoaDon->Tongtien + $hoaDon->GiamGia : $hoaDon->Tongtien);
-                    
-                    // Get discount amount
-                    $discountAmount = $hoaDon->GiamGia ?? 0;
-                    
-                    // Get discount percentage
-                    $discountPercentage = $hoaDon->TyLeGiamGia ?? 0;
-                    
-                    // Calculate final total (should match Tongtien)
-                    $finalTotal = $originalPrice - $discountAmount;
+                    // Calculate original service price from the service
+                    if ($hoaDon->datLich && $hoaDon->datLich->dichVu) {
+                        $originalPrice = $hoaDon->datLich->dichVu->Gia;
+                    } else {
+                        // Fallback to discount + tongtien if available
+                        $originalPrice = property_exists($hoaDon, 'GiamGia') ? 
+                            $hoaDon->Tongtien + $hoaDon->GiamGia : 
+                            $hoaDon->Tongtien;
+                    }
                 @endphp
                 
                 <div class="summary-row">
@@ -454,11 +450,40 @@
                     <div>{{ number_format($originalPrice, 0, ',', '.') }} VNĐ</div>
                 </div>
                 
+                @php
+                    // Get discount amount
+                    $discountAmount = 0;
+                    $discountText = '';
+                    
+                    // First try to access direct properties
+                    if (property_exists($hoaDon, 'GiamGia') && $hoaDon->GiamGia > 0) {
+                        $discountAmount = $hoaDon->GiamGia;
+                        
+                        // Format discount text with percentage if available
+                        if (property_exists($hoaDon, 'TyLeGiamGia') && $hoaDon->TyLeGiamGia > 0) {
+                            $discountText = '(' . $hoaDon->TyLeGiamGia . '%';
+                            
+                            // Add membership rank if available
+                            if (property_exists($hoaDon, 'HangThanhVien') && !empty($hoaDon->HangThanhVien)) {
+                                $discountText .= ' - ' . $hoaDon->HangThanhVien;
+                            }
+                            
+                            $discountText .= ')';
+                        }
+                    } 
+                    // Otherwise calculate from original price and total if there's a difference
+                    else if ($originalPrice > $hoaDon->Tongtien) {
+                        $discountAmount = $originalPrice - $hoaDon->Tongtien;
+                        $discountPercentage = round(($discountAmount / $originalPrice) * 100);
+                        $discountText = '(' . $discountPercentage . '%)';
+                    }
+                @endphp
+                
                 <div class="summary-row">
                     <div>Giảm giá:</div>
                     <div>
                         @if($discountAmount > 0)
-                            {{ number_format($discountAmount, 0, ',', '.') }} VNĐ ({{ $discountPercentage }}%{{ $hoaDon->HangThanhVien ? ' - '.$hoaDon->HangThanhVien : '' }})
+                            {{ number_format($discountAmount, 0, ',', '.') }} VNĐ {{ $discountText }}
                         @else
                             0 VNĐ
                         @endif
@@ -467,7 +492,7 @@
                 
                 <div class="summary-row" style="border-top: 1px solid #ff6b8b; margin-top: 10px; padding-top: 10px; border-bottom: none;">
                     <div class="total-label" style="color: #ff6b8b; font-weight: bold;">Tổng thanh toán:</div>
-                    <div class="total-value" style="color: #ff6b8b; font-weight: bold;">{{ number_format($finalTotal, 0, ',', '.') }} VNĐ</div>
+                    <div class="total-value" style="color: #ff6b8b; font-weight: bold;">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
                 </div>
             </div>
             

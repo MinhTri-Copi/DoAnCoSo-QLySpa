@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Chat Rosa Spa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -201,20 +202,22 @@
                 <div class="message-time">Rosa Spa</div>
             </div>
             
-            @if(session('user') && session('reply'))
-            <div class="message user-message">
-                <div class="message-content">
-                    {{ session('user') }}
+            @if(session('chat_history'))
+                @foreach(session('chat_history') as $chat)
+                <div class="message user-message">
+                    <div class="message-content">
+                        {{ $chat['user'] }}
+                    </div>
+                    <div class="message-time">Bạn</div>
                 </div>
-                <div class="message-time">Bạn</div>
-            </div>
-            
-            <div class="message bot-message">
-                <div class="message-content">
-                    {!! nl2br(e(session('reply'))) !!}
+                
+                <div class="message bot-message">
+                    <div class="message-content">
+                        {!! nl2br(e($chat['reply'])) !!}
+                    </div>
+                    <div class="message-time">Rosa Spa</div>
                 </div>
-                <div class="message-time">Rosa Spa</div>
-            </div>
+                @endforeach
             @endif
             
             <div class="typing-indicator" id="typingIndicator">
@@ -226,7 +229,7 @@
             </div>
         </div>
         
-        <form class="chat-input" action="{{ route('chat.send') }}" method="POST" id="chatForm">
+        <form class="chat-input" id="chatForm">
             @csrf
             <textarea 
                 name="message" 
@@ -247,6 +250,7 @@
             const chatForm = document.getElementById('chatForm');
             const closeBtn = document.getElementById('closeBtn');
             const typingIndicator = document.getElementById('typingIndicator');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             // Auto-scroll to bottom
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -257,11 +261,28 @@
                 this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
             
+            // Xử lý Enter và Shift+Enter
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    // Nếu nhấn Shift + Enter thì xuống dòng
+                    if (e.shiftKey) {
+                        return;  // Để mặc định xuống dòng
+                    } else {
+                        // Nếu chỉ nhấn Enter thì gửi tin nhắn
+                        e.preventDefault();
+                        if (this.value.trim() !== '') {
+                            chatForm.dispatchEvent(new Event('submit'));
+                        }
+                    }
+                }
+            });
+            
             // Show user message immediately when form is submitted
             chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
                 const message = messageInput.value.trim();
                 if (!message) {
-                    e.preventDefault();
                     return;
                 }
                 
@@ -282,8 +303,72 @@
                 // Scroll to bottom
                 chatBody.scrollTop = chatBody.scrollHeight;
                 
-                // Reset input height
+                // Reset input height and clear text
+                const currentMessage = messageInput.value;
+                messageInput.value = '';
                 messageInput.style.height = '42px';
+                
+                // Send message to server via AJAX
+                fetch('/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ message: currentMessage })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide typing indicator
+                    typingIndicator.style.display = 'none';
+                    
+                    if (data.success) {
+                        // Create bot reply element
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'message bot-message';
+                        botMessage.innerHTML = `
+                            <div class="message-content">${data.reply.replace(/\n/g, '<br>')}</div>
+                            <div class="message-time">Rosa Spa</div>
+                        `;
+                        
+                        // Add to chat
+                        chatBody.appendChild(botMessage);
+                        
+                        // Scroll to bottom
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    } else {
+                        // Handle error
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'message bot-message';
+                        botMessage.innerHTML = `
+                            <div class="message-content">${data.reply.replace(/\n/g, '<br>')}</div>
+                            <div class="message-time">Rosa Spa</div>
+                        `;
+                        
+                        // Add to chat
+                        chatBody.appendChild(botMessage);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Hide typing indicator
+                    typingIndicator.style.display = 'none';
+                    
+                    // Show error message
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot-message';
+                    botMessage.innerHTML = `
+                        <div class="message-content">Xin lỗi, đã xảy ra lỗi khi gửi tin nhắn. Vui lòng thử lại sau.</div>
+                        <div class="message-time">Rosa Spa</div>
+                    `;
+                    
+                    // Add to chat
+                    chatBody.appendChild(botMessage);
+                    
+                    // Scroll to bottom
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                });
             });
             
             // Close button
