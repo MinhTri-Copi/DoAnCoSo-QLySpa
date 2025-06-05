@@ -29,6 +29,7 @@
             font-family: 'Roboto', sans-serif;
             color: var(--text-color);
             background-color: #fff;
+            padding-top: 90px; /* Thêm padding cho fixed navbar */
         }
 
         .navbar {
@@ -36,6 +37,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 18px 0;
             width: 100%;
+            z-index: 1000;
         }
 
         .nav-container {
@@ -356,6 +358,7 @@
         main {
             min-height: calc(100vh - 400px); /* Adjust based on footer height */
             padding-bottom: 30px;
+            padding-top: 20px;
         }
         
         /* Specific adjustment for profile page */
@@ -551,11 +554,13 @@
         }
 
         @yield('styles')
+
+      
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container-fluid">
             <div class="nav-container">
                 <div class="brand-section">
@@ -683,6 +688,21 @@
 
     <!-- Main Content -->
     <main>
+        <div class="alert-container container">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+        </div>
         @yield('content')
     </main>
 

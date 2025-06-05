@@ -12,6 +12,21 @@
         --border-color: #e1e1e1;
     }
 
+    /* Thiết lập thông báo hiển thị đúng */
+    .alert {
+        z-index: 2000; /* Cao hơn z-index của navbar */
+        position: relative;
+        margin-top: 20px;
+    }
+    
+    .booking-history-header {
+        margin-top: 20px;
+    }
+    
+    .booking-history-container {
+        padding-top: 20px;
+    }
+
     /* Pagination Styling */
     .pagination {
         display: flex;
@@ -431,20 +446,6 @@
         <h1><i class="fas fa-history"></i> Lịch Sử Đặt Lịch</h1>
         <p>Quản lý và theo dõi các lịch đặt của bạn một cách dễ dàng và hiệu quả</p>
     </div>
-
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
 
     <div class="filter-card">
         <form action="{{ route('customer.lichsudatlich.index') }}" method="GET">

@@ -12,9 +12,21 @@
         --border-color: #e1e1e1;
     }
 
+    /* Thiết lập để thông báo hiển thị đúng */
+    .alert {
+        z-index: 2000; /* Cao hơn z-index của navbar */
+        position: relative;
+        margin-top: 20px;
+    }
+    
+    .booking-detail-header {
+        margin-top: 20px;
+    }
+
     .booking-detail-container {
         max-width: 1000px;
         margin: 0 auto;
+        padding-top: 20px;
     }
 
     .booking-detail-header {
@@ -414,18 +426,6 @@
             {{ $booking->Trangthai_ }}
         </div>
     </div>
-
-    @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-    @endif
 
     @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && \Carbon\Carbon::parse($booking->Thoigiandatlich) > \Carbon\Carbon::now())
     <div class="countdown-container">
