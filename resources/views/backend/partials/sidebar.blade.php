@@ -13,11 +13,35 @@
     
     <div class="sidebar-profile">
         <div class="profile-image">
-            <img src="{{ asset('admin/images/admin-avatar.jpg') }}" alt="Admin Profile">
+            @if(Auth::user() && !empty(Auth::user()->avatar))
+                <img src="{{ asset(Auth::user()->avatar) }}" alt="{{ Auth::user()->Hoten ?? 'Admin' }} Profile">
+            @else
+                <div style="width: 100%; height: 100%; border-radius: 50%; background-color: #ff6b8b; display: flex; justify-content: center; align-items: center; color: white;">
+                    <i class="fas fa-user"></i>
+                </div>
+            @endif
         </div>
         <div class="profile-info">
             <p class="badge-text">Quản trị viên</p>
-            <h6>{{ Auth::user()->Hoten ?? 'Admin' }}</h6>
+            <h6>
+                @php
+                    $userName = '';
+                    if (Auth::check()) {
+                        if (isset(Auth::user()->Hoten) && !empty(Auth::user()->Hoten)) {
+                            $userName = Auth::user()->Hoten;
+                        } elseif (isset(Auth::user()->user) && isset(Auth::user()->user->Hoten) && !empty(Auth::user()->user->Hoten)) {
+                            $userName = Auth::user()->user->Hoten;
+                        } elseif (isset(Auth::user()->name) && !empty(Auth::user()->name)) {
+                            $userName = Auth::user()->name;
+                        } else {
+                            $userName = 'Quản trị viên';
+                        }
+                    } else {
+                        $userName = 'Quản trị viên';
+                    }
+                @endphp
+                {{ $userName }}
+            </h6>
         </div>
     </div>
     

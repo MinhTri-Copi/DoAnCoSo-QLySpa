@@ -444,8 +444,8 @@ class DatLichController extends Controller
         
         // Thống kê theo người dùng (top 10)
         $bookingsByUser = DatLich::whereBetween('Thoigiandatlich', [$startDate, $endDate])
-            ->select('Manguoidung', DB::raw('count(*) as count'))
-            ->groupBy('Manguoidung')
+            ->select('Manguoidung', DB::raw('count(*) as count'), 'Hoten_khach', 'SDT_khach')
+            ->groupBy('Manguoidung', 'Hoten_khach', 'SDT_khach')
             ->with('user')
             ->orderBy('count', 'desc')
             ->limit(10)

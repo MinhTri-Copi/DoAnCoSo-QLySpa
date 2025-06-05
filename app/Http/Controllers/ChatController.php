@@ -1919,9 +1919,35 @@ EOT;
         
         // Tính thời gian kết thúc dự kiến
         $endTime = "Chưa xác định";
-        if ($bookingInfo['time'] && $bookingInfo['service']) {
-            $startTime = \Carbon\Carbon::createFromFormat('H:i', $bookingInfo['time']);
-            $endTime = (clone $startTime)->addMinutes($bookingInfo['service']->Thoigian)->format('H:i');
+        if ($bookingInfo['time'] && $bookingInfo['service'] && isset($bookingInfo['service']->Thoigian)) {
+            $serviceMinutes = (int)$bookingInfo['service']->Thoigian;
+            
+            Log::info('Tính toán giờ kết thúc dịch vụ', [
+                'giờ_bắt_đầu' => $bookingInfo['time'],
+                'thời_gian_dịch_vụ' => $serviceMinutes . ' phút',
+                'tên_dịch_vụ' => $bookingInfo['service']->Tendichvu
+            ]);
+            
+            if ($serviceMinutes > 0) {
+                $startTime = \Carbon\Carbon::createFromFormat('H:i', $bookingInfo['time']);
+                $endTime = (clone $startTime)->addMinutes($serviceMinutes)->format('H:i');
+                
+                Log::info('Kết quả tính toán', [
+                    'giờ_bắt_đầu' => $startTime->format('H:i'),
+                    'giờ_kết_thúc' => $endTime,
+                    'thời_gian_dịch_vụ' => $serviceMinutes
+                ]);
+            } else {
+                // Trường hợp không có thời gian dịch vụ, dùng mặc định 60 phút
+                $startTime = \Carbon\Carbon::createFromFormat('H:i', $bookingInfo['time']);
+                $endTime = (clone $startTime)->addMinutes(60)->format('H:i');
+                
+                Log::warning('Thời gian dịch vụ bằng 0, sử dụng mặc định 60 phút', [
+                    'dịch_vụ' => $bookingInfo['service']->Tendichvu,
+                    'giờ_bắt_đầu' => $bookingInfo['time'],
+                    'giờ_kết_thúc' => $endTime
+                ]);
+            }
         }
         
         // Hiển thị thông tin ngày với ngày trong tuần

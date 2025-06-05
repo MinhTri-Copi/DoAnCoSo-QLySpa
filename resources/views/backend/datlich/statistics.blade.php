@@ -438,11 +438,15 @@ $headerActions = '
                     <td>
                         <div style="display: flex; align-items: center;">
                             <div style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary-color); font-weight: bold; margin-right: 10px;">
-                                {{ substr($userBooking->user->Hoten ?? 'N/A', 0, 1) }}
+                                {{ substr(($userBooking->user->Hoten ?? $userBooking->Hoten_khach ?? 'N/A'), 0, 1) }}
                             </div>
                             <div>
-                                <div style="font-weight: 500;">{{ $userBooking->user->Hoten ?? 'N/A' }}</div>
-                                <div style="font-size: 12px; color: #6c757d;">{{ $userBooking->user->Email ?? 'N/A' }}</div>
+                                <div style="font-weight: 500;">{{ $userBooking->user->Hoten ?? $userBooking->Hoten_khach ?? 'N/A' }}
+                                    @if(!isset($userBooking->user) || is_null($userBooking->user))
+                                        <span style="background-color: #17a2b8; color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">Khách vãng lai</span>
+                                    @endif
+                                </div>
+                                <div style="font-size: 12px; color: #6c757d;">{{ $userBooking->user->Email ?? $userBooking->SDT_khach ?? 'N/A' }}</div>
                             </div>
                         </div>
                     </td>

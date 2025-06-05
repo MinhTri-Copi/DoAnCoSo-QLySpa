@@ -87,6 +87,13 @@
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
+                    <div style="padding: 10px 15px; text-align: center;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #ff6b8b; display: flex; justify-content: center; align-items: center; color: white; margin: 0 auto 10px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div style="font-weight: bold; color: #333;">{{ Auth::user()->Hoten ?? Auth::user()->user->Hoten ?? 'Quản trị viên' }}</div>
+                        <div style="font-size: 12px; color: #777;">Quản trị viên</div>
+                    </div>
                     <div class="dropdown-divider"></div>
                     <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
                         <i class="fas fa-user me-2"></i>Thông tin cá nhân
