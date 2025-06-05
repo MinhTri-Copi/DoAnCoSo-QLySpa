@@ -934,9 +934,7 @@
                         <button type="button" class="btn btn-outline-secondary back-to-datetime">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="button" class="btn btn-info mx-2" onclick="testFormData()">
-                            Test Form
-                        </button>
+                      
                         <button type="submit" class="btn btn-primary btn-submit-booking">
                             Xác nhận đặt lịch <i class="fas fa-check"></i>
                         </button>

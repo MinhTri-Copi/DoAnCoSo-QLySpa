@@ -554,7 +554,7 @@
                         <i class="fas fa-eye"></i> Xem chi tiết
                     </a>
                     
-                    @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && !($booking->hoaDon && $booking->hoaDon->count() > 0))
+                    @if($booking->Trangthai_ == 'Chờ xác nhận' && !($booking->hoaDon && $booking->hoaDon->count() > 0))
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ $booking->MaDL }}">
                         <i class="fas fa-calendar-alt"></i> Đổi lịch
                     </button>
@@ -593,7 +593,11 @@
                                 <textarea class="form-control" id="reason{{ $booking->MaDL }}" name="reason" rows="3" required></textarea>
                             </div>
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> Lưu ý: Việc đổi lịch cần được xác nhận lại từ phía spa.
+                                <i class="fas fa-info-circle"></i> Lưu ý: Việc đổi lịch chỉ khả dụng khi trạng thái lịch đặt là "Chờ xác nhận" và cần được xác nhận lại từ phía spa.
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Mỗi khung giờ chỉ có thể đặt tối đa 2 lịch cùng loại dịch vụ. Nếu khung giờ bạn chọn đã đầy, hãy chọn khung giờ khác.
                             </div>
                         </div>
                         <div class="modal-footer">

@@ -1165,8 +1165,14 @@ use App\Models\Phong;
                                     <tbody id="booking-table-body">
                                         @forelse($recentBookings as $booking)
                                         @php
-                                            $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich);
-                                            $isUrgent = $bookingTime->diffInMinutes(now()) < 60 && $bookingTime->isFuture() && $bookingTime->isToday();
+                                            // Thiết lập múi giờ Hồ Chí Minh
+                                            $currentTime = \Carbon\Carbon::now('Asia/Ho_Chi_Minh');
+                                            // Parse thời gian đặt lịch từ database
+                                            $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich)->setTimezone('Asia/Ho_Chi_Minh');
+                                            // Kiểm tra nếu lịch đặt sẽ diễn ra trong vòng 1 giờ tới
+                                            $isUrgent = $bookingTime->greaterThan($currentTime) && 
+                                                       $bookingTime->lessThanOrEqualTo($currentTime->copy()->addHour()) && 
+                                                       $bookingTime->isToday();
                                         @endphp
                                         <tr style="border-bottom: 1px solid #f5f5f5; cursor: pointer;" 
                                             class="booking-row {{ $isUrgent ? 'urgent-booking' : '' }}" 
@@ -1179,11 +1185,11 @@ use App\Models\Phong;
                                                         @if($isUrgent)
                                                         <span class="urgent-booking-dot" title="Sắp diễn ra (dưới 1 giờ)"></span>
                                                         @endif
-                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y') }}
+                                                        {{ $bookingTime->format('d/m/Y') }}
                                                     </div>
                                                     <div style="font-size: 0.8rem; color: #888;">
                                                         <i class="far fa-clock mr-1" style="color: #db7093;"></i>
-                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('H:i') }}
+                                                        {{ $bookingTime->format('H:i') }}
                                                     </div>
                                                     <div style="margin-top: 5px;">
                                                         @if($booking->Trangthai_ == 'Đã đặt')
