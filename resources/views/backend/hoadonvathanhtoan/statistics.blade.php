@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: [
                 @foreach($invoicesByPaymentMethod as $method)
-                    '{{ $method->phuongThuc->TenPT }}',
+                    '{{ $method->phuongThuc->TenPT ?? 'Không xác định' }}',
                 @endforeach
             ],
             datasets: [{

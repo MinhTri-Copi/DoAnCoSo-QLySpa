@@ -783,6 +783,20 @@
                                     </div>
                                 </div>
                             </div>
+                        @elseif($hoaDon->datLich && ($hoaDon->datLich->Hoten_khach || $hoaDon->datLich->SDT_khach))
+                            <div class="d-flex align-items-center">
+                                <div style="width: 35px; height: 35px; border-radius: 50%; background-color: #fff8e1; display: flex; align-items: center; justify-content: center; color: #f57c00; font-weight: bold; margin-right: 10px;">
+                                    {{ substr($hoaDon->datLich->Hoten_khach ?? 'K', 0, 1) }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 500;">{{ $hoaDon->datLich->Hoten_khach }}</div>
+                                    <div style="font-size: 12px; color: #6c757d;">{{ $hoaDon->datLich->SDT_khach }}</div>
+                                    <div style="font-size: 12px; color: #f57c00;">
+                                        <i class="fas fa-user-tag"></i> 
+                                        Khách vãng lai
+                                    </div>
+                                </div>
+                            </div>
                         @else
                             <span class="text-muted">N/A</span>
                         @endif

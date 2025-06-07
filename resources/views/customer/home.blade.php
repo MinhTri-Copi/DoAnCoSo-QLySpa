@@ -426,6 +426,24 @@
 </section>
 @endif
 
+<!-- Quick Contact Float Menu -->
+<div class="quick-contact-menu">
+    <div class="quick-contact-toggle" id="toggleQuickContact">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="quick-contact-items">
+        <a href="#" class="quick-contact-item zalo-item">
+            <img src="{{ asset('images/icons/zalo-icon-removebg-preview.png') }}" alt="Zalo" onerror="this.src='https://sp-ao.shortpixel.ai/client/to_auto,q_glossy,ret_img,w_32,h_32/https://ads-network.net/wp-content/uploads/2022/06/zalo-icon.png'">
+        </a>
+        <a href="#" class="quick-contact-item messenger-item">
+            <i class="fab fa-facebook-messenger" style="border-bottom: none;"></i>
+        </a>
+        <a href="#" class="quick-contact-item phone-item">
+            <i class="fas fa-phone" style="border-bottom: none;"></i>
+        </a>
+    </div>
+</div>
+
 @endsection
 
 @section('styles')
@@ -1357,6 +1375,118 @@
     .appointment-card:hover::after {
         opacity: 1;
     }
+
+    .quick-contact-menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .quick-contact-toggle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #4a4a4a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        font-size: 24px; /* Tăng kích thước icon */
+    }
+
+    .quick-contact-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    .quick-contact-items {
+        display: flex;
+        flex-direction: row; /* Thay đổi từ column-reverse sang row để hiển thị theo chiều ngang */
+        gap: 16px; /* Khoảng cách giữa các nút */
+        position: absolute;
+        right: 80px; /* Điều chỉnh từ 70px lên 80px để tạo khoảng cách phù hợp */
+        bottom: 10px; /* Căn chỉnh theo chiều dọc */
+    }
+
+    .quick-contact-item {
+        width: 60px; /* Kích thước nút */
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateX(20px); /* Thay đổi từ translateY sang translateX */
+        pointer-events: none;
+        font-size: 28px;
+        text-decoration: none;
+    }
+    
+    .quick-contact-item i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-bottom: none;
+    }
+
+    .quick-contact-menu.active .quick-contact-item {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .zalo-item {
+        background-color: #0068ff;
+    }
+
+    .zalo-item img {
+        width: 36px;
+        height: 36px;
+        padding: 4px;
+    }
+
+    .messenger-item {
+        background-color: #0084ff;
+        color: white;
+        font-size: 30px;
+    }
+    
+    .messenger-item i {
+        margin-bottom: 0;
+    }
+
+    .phone-item {
+        background-color: #4caf50;
+        color: white;
+        font-size: 30px;
+    }
+    
+    .phone-item i {
+        margin-bottom: 0;
+    }
+
+    .quick-contact-item:hover {
+        transform: scale(1.1);
+    }
+
+    /* Timing for animations - từ phải sang trái */
+    .quick-contact-menu.active .phone-item {
+        transition-delay: 0.3s; /* Nút xa nhất */
+    }
+    
+    .quick-contact-menu.active .messenger-item {
+        transition-delay: 0.2s; /* Nút ở giữa */
+    }
+    
+    .quick-contact-menu.active .zalo-item {
+        transition-delay: 0.1s; /* Nút gần nhất */
+    }
 </style>
 @endsection
 
@@ -1559,5 +1689,32 @@
         // Cập nhật mỗi giây
         setInterval(updateCountdowns, 1000);
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const quickContactMenu = document.querySelector('.quick-contact-menu');
+        const toggleButton = document.getElementById('toggleQuickContact');
+        
+        toggleButton.addEventListener('click', function() {
+            quickContactMenu.classList.toggle('active');
+            
+            // Change icon based on state
+            const icon = toggleButton.querySelector('i');
+            if (quickContactMenu.classList.contains('active')) {
+                icon.classList.remove('fa-comments');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-comments');
+            }
+        });
+        
+        // Initial icon
+        const icon = toggleButton.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-comments');
+    });
 </script>
+
+<!-- Thêm chat widget -->
+@include('components.chat-widget')
 @endpush

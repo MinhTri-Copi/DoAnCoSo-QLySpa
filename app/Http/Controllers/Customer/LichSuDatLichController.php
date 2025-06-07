@@ -241,11 +241,25 @@ class LichSuDatLichController extends Controller
      */
     public function reschedule(Request $request, $id)
     {
-        $request->validate([
+        // Validate input
+        $validator = \Validator::make($request->all(), [
             'new_date' => 'required|date|after:today',
-            'new_time' => 'required',
+            'new_time' => 'required|string',
             'reason' => 'required|string|max:255'
+        ], [
+            'new_date.required' => 'Vui lòng chọn ngày mới.',
+            'new_date.date' => 'Ngày không hợp lệ.',
+            'new_date.after' => 'Ngày mới phải sau ngày hôm nay.',
+            'new_time.required' => 'Vui lòng chọn giờ mới.',
+            'reason.required' => 'Vui lòng nhập lý do đổi lịch.',
+            'reason.max' => 'Lý do không được vượt quá 255 ký tự.'
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
         
         // Get authenticated account
         $account = Auth::user();
@@ -261,73 +275,144 @@ class LichSuDatLichController extends Controller
             ->where('MaDL', $id)
             ->firstOrFail();
             
-        // Check if booking can be rescheduled
-        if (!in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận'])) {
+        // Check if booking can be rescheduled (only allow rescheduling if status is "Chờ xác nhận")
+        if ($booking->Trangthai_ !== 'Chờ xác nhận') {
             return redirect()->route('customer.lichsudatlich.show', $id)
-                ->with('error', 'Lịch đặt này không thể đổi lịch (đã hoàn thành, đang thực hiện hoặc đã hủy).');
+                ->with('error', 'Chỉ có thể đổi lịch khi trạng thái là "Chờ xác nhận".');
         }
         
-        // Check if the new time is available
-        $newDateTime = Carbon::parse($request->new_date . ' ' . $request->new_time);
+        // Check if the booking time has passed
+        $now = Carbon::now();
+        $bookingTime = Carbon::parse($booking->Thoigiandatlich);
+        
+        if ($bookingTime->isPast()) {
+            return redirect()->route('customer.lichsudatlich.show', $id)
+                ->with('error', 'Không thể đổi lịch đã qua thời gian đặt.');
+        }
+        
+        // Format the new date time from inputs
+        try {
+            $newDateTime = Carbon::createFromFormat('Y-m-d H:i', $request->new_date . ' ' . $request->new_time);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Định dạng thời gian không hợp lệ. Vui lòng thử lại.');
+        }
         
         // Get service information
         $dichVu = $booking->dichVu;
-        
-        // Check if service is available on selected day
-        $dayOfWeek = $newDateTime->format('l');
-        if (!$dichVu->isAvailableOn($dayOfWeek)) {
-            return back()->withInput()->withErrors([
-                'new_date' => 'Dịch vụ này không hoạt động vào ' . $dayOfWeek
-            ]);
+        if (!$dichVu) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Không tìm thấy thông tin dịch vụ.');
         }
         
-        // Check for overlapping bookings
-        $serviceTime = $dichVu->Thoigian;
+        // Check if the service is available on the selected day
+        $dayOfWeek = strtolower($newDateTime->format('l')); // Get day of week in lowercase
+        $availableDays = $dichVu->available_days ? json_decode($dichVu->available_days) : [];
+        
+        if (!empty($availableDays) && !in_array($dayOfWeek, $availableDays)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Dịch vụ này không có sẵn vào ngày ' . $newDateTime->format('l') . '.');
+        }
+        
+        // Kiểm tra giờ đặt lịch có phù hợp với giờ làm việc của spa không
+        $bookingHour = (int)$newDateTime->format('H');
+        if ($bookingHour < 8 || $bookingHour >= 18) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Giờ đặt lịch phải nằm trong khoảng từ 8:00 đến 18:00.');
+        }
+        
+        // Check if the date is not too far in the future (max 30 days)
+        $maxFutureDate = Carbon::now()->addDays(30);
+        if ($newDateTime > $maxFutureDate) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Ngày đặt lịch không được quá 30 ngày từ hôm nay.');
+        }
+        
+        // Check if the total bookings for the day does not exceed 30
+        $bookingsCountInDay = DatLich::whereDate('Thoigiandatlich', $newDateTime->format('Y-m-d'))
+            ->where('MaDL', '!=', $id)
+            ->where('Trangthai_', '!=', 'Đã hủy')
+            ->count();
+            
+        if ($bookingsCountInDay >= 30) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Đã đạt giới hạn 30 lịch đặt trong ngày này. Vui lòng chọn ngày khác.');
+        }
+        
+        // Calculate service time and end time
+        $serviceTime = $dichVu->Thoigian ?? 60; // Default to 60 minutes if not specified
         $endTime = (clone $newDateTime)->addMinutes($serviceTime);
         
+        // Check for overlapping bookings (max 2 concurrent bookings for the same service)
         $overlappingBookings = DatLich::where('MaDV', $booking->MaDV)
             ->where('MaDL', '!=', $id)
             ->where('Trangthai_', '!=', 'Đã hủy')
             ->where(function($query) use ($newDateTime, $endTime) {
+                // Booking starts during our service time
                 $query->whereBetween('Thoigiandatlich', [$newDateTime, $endTime])
+                    // Or booking ends during our service time
                     ->orWhere(function($q) use ($newDateTime, $endTime) {
                         $q->where('Thoigiandatlich', '<=', $newDateTime)
-                          ->whereRaw("DATE_ADD(Thoigiandatlich, INTERVAL (SELECT Thoigian FROM DICHVU WHERE MaDV = DATLICH.MaDV) MINUTE) >= ?", [$newDateTime]);
+                          ->whereRaw("DATE_ADD(Thoigiandatlich, INTERVAL (SELECT COALESCE(Thoigian, 60) FROM DICHVU WHERE MaDV = DATLICH.MaDV) MINUTE) >= ?", [$newDateTime]);
                     });
             })
             ->count();
             
         $maxConcurrentBookings = 2;
         if ($overlappingBookings >= $maxConcurrentBookings) {
-            return back()->withInput()->withErrors([
-                'new_time' => 'Khung giờ này đã đủ lịch đặt. Vui lòng chọn khung giờ khác.'
-            ]);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Đã có đủ ' . $maxConcurrentBookings . ' lịch đặt dịch vụ "' . $dichVu->Tendichvu . '" vào khung giờ ' . $newDateTime->format('H:i') . ' ngày ' . $newDateTime->format('d/m/Y') . '. Vui lòng chọn khung giờ khác.');
         }
         
         // Store old booking time for notification
         $oldDateTime = $booking->Thoigiandatlich;
         
-        // Update booking time
-        $booking->Thoigiandatlich = $newDateTime;
-        $booking->save();
-        
-        // Log reschedule request if the table exists
         try {
-            if (DB::select("SHOW TABLES LIKE 'LICHSU_TRANGTHAI'")) {
-                DB::table('LICHSU_TRANGTHAI')->insert([
-                    'MaDL' => $id,
-                    'TrangthaiCu' => $booking->Trangthai_,
-                    'TrangthaiMoi' => $booking->Trangthai_,
-                    'ThoigianCapNhat' => now(),
-                    'NguoiCapNhat' => $user->Manguoidung,
-                    'GhiChu' => 'Đổi lịch từ ' . $oldDateTime . ' sang ' . $newDateTime . '. Lý do: ' . $request->reason
-                ]);
+            // Begin transaction
+            DB::beginTransaction();
+            
+            // Update booking time
+            $booking->Thoigiandatlich = $newDateTime;
+            $booking->save();
+            
+            // Log reschedule request if the table exists
+            try {
+                if (DB::select("SHOW TABLES LIKE 'LICHSU_TRANGTHAI'")) {
+                    DB::table('LICHSU_TRANGTHAI')->insert([
+                        'MaDL' => $id,
+                        'TrangthaiCu' => $booking->Trangthai_,
+                        'TrangthaiMoi' => $booking->Trangthai_,
+                        'ThoigianCapNhat' => now(),
+                        'NguoiCapNhat' => $user->Manguoidung,
+                        'GhiChu' => 'Đổi lịch từ ' . Carbon::parse($oldDateTime)->format('d/m/Y H:i') . ' sang ' . $newDateTime->format('d/m/Y H:i') . '. Lý do: ' . $request->reason
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Table doesn't exist or other DB error, just continue without logging
+                \Log::error('Error logging booking status change: ' . $e->getMessage());
             }
+            
+            // Commit transaction
+            DB::commit();
+            
+            return redirect()->route('customer.lichsudatlich.show', $id)
+                ->with('success', 'Đổi lịch thành công. Vui lòng đợi xác nhận từ phía spa.');
+                
         } catch (\Exception $e) {
-            // Table doesn't exist or other DB error, just continue without logging
+            // Rollback transaction
+            DB::rollBack();
+            \Log::error('Error rescheduling booking: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Đã xảy ra lỗi khi đổi lịch: ' . $e->getMessage());
         }
-        
-        return redirect()->route('customer.lichsudatlich.show', $id)
-            ->with('success', 'Yêu cầu đổi lịch đã được gửi thành công.');
     }
 }

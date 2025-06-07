@@ -114,17 +114,73 @@
                         <div>{{ \Carbon\Carbon::parse($invoice->datLich->Thoigiandatlich ?? now())->format('d/m/Y H:i') }}</div>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
+                        <div class="text-muted">Phòng:</div>
+                        <div>{{ $invoice->datLich->phong->Tenphong ?? 'N/A' }}</div>
+                    </div>
+                    
+                    @php
+                        // Calculate original service price
+                        $originalPrice = 0;
+                        if ($invoice->datLich && $invoice->datLich->dichVu) {
+                            $originalPrice = $invoice->datLich->dichVu->Gia;
+                        }
+                        
+                        // Get user membership tier
+                        $membershipTier = null;
+                        $discountPercent = 0;
+                        $discountAmount = 0;
+                        
+                        if ($invoice->datLich && $invoice->datLich->user && $invoice->datLich->user->hangThanhVien) {
+                            $membershipTier = $invoice->datLich->user->hangThanhVien->Tenhang;
+                            
+                            // Apply discount based on membership tier
+                            switch($membershipTier) {
+                                case 'Thành viên Vàng':
+                                    $discountPercent = 5;
+                                    break;
+                                case 'Thành viên Bạch Kim':
+                                    $discountPercent = 7;
+                                    break;
+                                case 'Thành viên Kim Cương':
+                                    $discountPercent = 10;
+                                    break;
+                                default:
+                                    $discountPercent = 0;
+                            }
+                            
+                            // Calculate discount amount
+                            $discountAmount = ($originalPrice * $discountPercent) / 100;
+                        }
+                        
+                        // Account for explicitly set discount if present
+                        if (isset($invoice->Giamgia) && $invoice->Giamgia > 0) {
+                            $discountAmount = $invoice->Giamgia;
+                            // Calculate discount percentage based on discount amount
+                            $discountPercent = round(($discountAmount / $originalPrice) * 100);
+                        }
+                        
+                        // Calculate final total
+                        $totalPayment = $originalPrice - $discountAmount;
+                    @endphp
+                    
+                    <div class="d-flex justify-content-between mb-2">
                         <div class="text-muted">Giá dịch vụ:</div>
-                        <div>{{ number_format($invoice->Tongtien, 0, ',', '.') }} VNĐ</div>
+                        <div>{{ number_format($originalPrice, 0, ',', '.') }} VNĐ</div>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <div class="text-muted">Thuế VAT (10%):</div>
-                        <div>{{ number_format($invoice->Tongtien * 0.1, 0, ',', '.') }} VNĐ</div>
+                        <div class="text-muted">Giảm giá:</div>
+                        <div>
+                            @if($discountAmount > 0)
+                                {{ number_format($discountAmount, 0, ',', '.') }} VNĐ ({{ $discountPercent }}%)
+                            @else
+                                0 VNĐ
+                            @endif
+                        </div>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <div class="fw-bold">Tổng thanh toán:</div>
-                        <div class="fw-bold fs-5 text-primary">{{ number_format($invoice->Tongtien * 1.1, 0, ',', '.') }} VNĐ</div>
+                        <div class="fw-bold fs-5 text-primary">{{ number_format($totalPayment, 0, ',', '.') }} VNĐ</div>
                     </div>
 
                     <div class="alert alert-info mb-0">

@@ -12,9 +12,21 @@
         --border-color: #e1e1e1;
     }
 
+    /* Thiết lập để thông báo hiển thị đúng */
+    .alert {
+        z-index: 2000; /* Cao hơn z-index của navbar */
+        position: relative;
+        margin-top: 20px;
+    }
+    
+    .booking-detail-header {
+        margin-top: 20px;
+    }
+
     .booking-detail-container {
         max-width: 1000px;
         margin: 0 auto;
+        padding-top: 20px;
     }
 
     .booking-detail-header {
@@ -415,18 +427,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-    @endif
-
     @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']) && \Carbon\Carbon::parse($booking->Thoigiandatlich) > \Carbon\Carbon::now())
     <div class="countdown-container">
         <h4 class="countdown-title">Thời gian còn lại đến lịch hẹn</h4>
@@ -586,7 +586,7 @@
             <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </a>
         
-        @if(in_array($booking->Trangthai_, ['Chờ xác nhận', 'Đã xác nhận']))
+        @if($booking->Trangthai_ == 'Chờ xác nhận')
         <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
             <i class="fas fa-calendar-alt"></i> Đổi lịch
         </button>
@@ -624,7 +624,11 @@
                         <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
                     </div>
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> Lưu ý: Việc đổi lịch cần được xác nhận lại từ phía spa.
+                        <i class="fas fa-info-circle"></i> Lưu ý: Việc đổi lịch chỉ khả dụng khi trạng thái lịch đặt là "Chờ xác nhận" và cần được xác nhận lại từ phía spa.
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Mỗi khung giờ chỉ có thể đặt tối đa 2 lịch cùng loại dịch vụ. Nếu khung giờ bạn chọn đã đầy, hãy chọn khung giờ khác.
                     </div>
                 </div>
                 <div class="modal-footer">

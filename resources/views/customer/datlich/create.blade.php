@@ -3,7 +3,42 @@
 @section('title', 'Đặt lịch dịch vụ')
 
 @section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
+    /* CSS để ẩn các khung giờ sau 17:30 */
+    [data-time="18:00"],
+    [data-time="18:30"],
+    [data-time="19:00"],
+    [data-time="19:30"],
+    [data-time="20:00"],
+    [data-time="20:30"],
+    [data-time="21:00"],
+    [data-time="21:30"],
+    [data-time="22:00"],
+    [data-time="22:30"],
+    [data-time="23:00"],
+    [data-time="23:30"],
+    [data-time="00:00"],
+    [data-time="00:30"] {
+        display: none !important;
+    }
+    
+    /* Ẩn button với text "00:00" và các giờ sau 17:30 */
+    .btn.btn-secondary,
+    .btn.btn-pink {
+        /* Hiển thị mặc định */
+        display: inline-block;
+    }
+    
+    /* CSS nhắm đến các button cụ thể trong ảnh của bạn */
+    .time-slots .btn-secondary:last-child,
+    #time-slots-container .btn-secondary:last-child,
+    .time-slots button:contains("00:00") {
+        display: none !important; 
+    }
+    
+    /* Thêm một đoạn JavaScript để ẩn các button có text là "00:00" */
+    
     :root {
         --primary-color: #ff6b9d;
         --primary-hover: #ff4785;
@@ -260,6 +295,55 @@
         gap: 10px;
         padding-bottom: 10px;
         margin-bottom: 1.5rem;
+        scrollbar-width: thin;
+        scrollbar-color: #ff6b9d #f0f0f0;
+        -webkit-overflow-scrolling: touch; /* Cải thiện cuộn trên iOS */
+    }
+    
+    /* Tùy chỉnh thanh cuộn cho Chrome, Edge và Safari */
+    .date-selector::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .date-selector::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    
+    .date-selector::-webkit-scrollbar-thumb {
+        background-color: #ff6b9d;
+        border-radius: 10px;
+    }
+    
+    /* Thêm nút cuộn cho mobile */
+    .date-selector-container {
+        position: relative;
+    }
+    
+    .date-scroll-buttons {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .date-scroll-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .date-scroll-btn {
+            background-color: #ff6b9d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
     }
 
     .date-item {
@@ -270,6 +354,7 @@
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
+        flex-shrink: 0;
     }
 
     .date-item:hover {
@@ -292,36 +377,63 @@
     }
 
     .time-slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 10px;
-        margin-top: 1rem;
+        margin-top: 15px;
     }
 
+    .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+    }
+    
     .time-slot {
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 8px;
+        padding: 12px 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s;
+        position: relative;
+        font-weight: 500;
     }
-
-    .time-slot:hover:not(.disabled) {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-    }
-
+    
     .time-slot.active {
-        background-color: var(--primary-color);
+        background-color: #007bff;
         color: white;
-        border-color: var(--primary-color);
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
     }
-
+    
+    .time-slot:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
     .time-slot.disabled {
-        background-color: #f5f5f5;
+        background-color: #f1f1f1;
         color: #aaa;
         cursor: not-allowed;
+        opacity: 0.75;
+        position: relative;
+        text-decoration: line-through;
+        border-color: #e0e0e0;
+    }
+
+    .disabled-reason {
+        display: block;
+        font-size: 10px;
+        color: #dc3545;
+        margin-top: 4px;
+        font-weight: normal;
+        text-decoration: none;
     }
 
     .recommended-services {
@@ -443,6 +555,29 @@
         border-color: #dee2e6;
         color: #0056b3;
         z-index: 1;
+    }
+
+    /* Nút khung giờ màu hồng */
+    .btn-pink {
+        background-color: #ff6b9d;
+        color: white;
+        border-color: #ff6b9d;
+        transition: all 0.2s;
+    }
+    
+    .btn-pink:hover {
+        background-color: #ff5088;
+        border-color: #ff5088;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 107, 157, 0.3);
+    }
+    
+    .btn-pink.active {
+        background-color: #ff3975 !important;
+        border-color: #ff3975 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(255, 57, 117, 0.4) !important;
     }
 </style>
 @endsection
@@ -692,14 +827,20 @@
     <div class="mb-3">
         <strong>Ngày đã chọn:</strong> <span id="summary-date">{{ Carbon\Carbon::parse($selectedDate)->format('l, d/m/Y') }}</span>
     </div>
-                <div class="date-selector mb-4">
-                    @foreach($availableDates as $date)
-                    <div class="date-item {{ $date['date'] == $selectedDate ? 'active' : '' }}" data-date="{{ $date['date'] }}">
-                        <div class="date-day">{{ $date['day'] }}</div>
-                        <div class="date-month">{{ $date['month'] }}/{{ $date['year'] }}</div>
-                        <div class="date-weekday">{{ $date['day_short'] }}</div>
+                <div class="date-selector-container">
+                    <div class="date-scroll-buttons">
+                        <button type="button" class="date-scroll-btn scroll-left"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="date-scroll-btn scroll-right"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    @endforeach
+                    <div class="date-selector mb-4">
+                        @foreach($availableDates as $date)
+                        <div class="date-item {{ $date['date'] == $selectedDate ? 'active' : '' }}" data-date="{{ $date['date'] }}">
+                            <div class="date-day">{{ $date['day'] }}</div>
+                            <div class="date-month">{{ $date['month'] }}/{{ $date['year'] }}</div>
+                            <div class="date-weekday">{{ $date['day_short'] }}</div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div id="time-selection" class="mb-4">
@@ -793,9 +934,7 @@
                         <button type="button" class="btn btn-outline-secondary back-to-datetime">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="button" class="btn btn-info mx-2" onclick="testFormData()">
-                            Test Form
-                        </button>
+                      
                         <button type="submit" class="btn btn-primary btn-submit-booking">
                             Xác nhận đặt lịch <i class="fas fa-check"></i>
                         </button>
@@ -840,7 +979,79 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
+    // Thêm script để ẩn button 00:00 và các giờ sau 17:30
+    $(document).ready(function() {
+        // Xử lý nút cuộn danh sách ngày
+        $('.scroll-left').click(function() {
+            $('.date-selector').animate({
+                scrollLeft: "-=200px"
+            }, 300);
+        });
+        
+        $('.scroll-right').click(function() {
+            $('.date-selector').animate({
+                scrollLeft: "+=200px"
+            }, 300);
+        });
+        
+        // Tự động cuộn đến ngày đang được chọn
+        if ($('.date-item.active').length) {
+            var activeItem = $('.date-item.active');
+            var container = $('.date-selector');
+            var containerWidth = container.width();
+            var itemLeft = activeItem.position().left;
+            
+            // Cuộn để item được chọn nằm ở giữa
+            container.animate({
+                scrollLeft: itemLeft - containerWidth / 2 + activeItem.width() / 2
+            }, 300);
+        }
+        
+        // Hàm để ẩn tất cả các button hiển thị thời gian sau 17:30
+        function hideTimeAfter1730() {
+            // Lặp qua tất cả các button
+            $('button').each(function() {
+                // Lấy text content của button
+                const buttonText = $(this).text().trim();
+                
+                // Kiểm tra nếu text là các giờ sau 17:30 hoặc là 00:00
+                if (buttonText === '00:00' || 
+                    buttonText === '18:00' || 
+                    buttonText === '18:30' || 
+                    buttonText === '19:00' || 
+                    buttonText === '19:30' || 
+                    buttonText === '20:00' || 
+                    buttonText === '20:30' || 
+                    buttonText === '21:00' || 
+                    buttonText === '21:30' || 
+                    buttonText === '22:00' || 
+                    buttonText === '22:30' || 
+                    buttonText === '23:00' || 
+                    buttonText === '23:30' || 
+                    buttonText === '00:30') {
+                    // Ẩn button
+                    $(this).hide();
+                }
+            });
+        }
+        
+        // Gọi hàm ẩn ban đầu
+        hideTimeAfter1730();
+        
+        // Gọi lại hàm này mỗi khi có thay đổi trong DOM (ví dụ: khi load time slots)
+        const observer = new MutationObserver(function(mutations) {
+            hideTimeAfter1730();
+        });
+        
+        // Quan sát các thay đổi trong DOM
+        observer.observe(document.getElementById('time-slots-container'), {
+            childList: true,
+            subtree: true
+        });
+    });
+
     // Hàm test form data
     function testFormData() {
         var formData = new FormData(document.getElementById('booking-form'));
@@ -1028,82 +1239,114 @@
 
         // Load time slots
         function loadTimeSlots() {
-    if (!window.selectedService || !window.selectedDate) {
-        $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
-        return;
-    }
-
-    $('#time-slots-container').html(`
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
-        </div>
-    `);
-
-    $.ajax({
-        url: "{{ route('customer.datlich.checkAvailability') }}",
-        type: "GET",
-        data: {
-            service_id: window.selectedService.MaDV,
-            date: window.selectedDate
-        },
-        success: function(response) {
-            if (!response.available) {
-                $('#time-slots-container').html(`
-                    <div class="alert alert-warning">
-                        ${response.message}
-                    </div>
-                `);
+            if (!window.selectedService || !window.selectedDate) {
+                $('#time-slots-container').html('<div class="alert alert-warning">Vui lòng chọn dịch vụ và ngày.</div>');
                 return;
             }
 
-            let html = '';
-            if (response.timeSlots.length === 0) {
-                html = `
-                    <div class="alert alert-info">
-                        Không có khung giờ nào khả dụng cho ngày này.
-                    </div>
-                `;
-            } else {
-                response.timeSlots.forEach(slot => {
-                    html += `
-                        <div class="time-slot ${!slot.available ? 'disabled' : ''}" 
-                            data-time="${slot.time}" 
-                            ${!slot.available ? 'disabled' : ''}>
-                            ${slot.time}
-                        </div>
-                    `;
-                });
-            }
-
-            $('#time-slots-container').html(html);
-
-            $('.time-slot:not(.disabled)').click(function() {
-                $('.time-slot').removeClass('active');
-                $(this).addClass('active');
-                window.selectedTime = $(this).data('time');
-                $('#booking_time').val(window.selectedTime);
-                $('#summary-time').text(window.selectedTime);
-                $('.continue-to-confirm').prop('disabled', false);
-                
-                console.log('Time selected:', window.selectedTime);
-                console.log('booking_time value:', $('#booking_time').val());
-            });
-        },
-        error: function(xhr, status, error) {
             $('#time-slots-container').html(`
-                <div class="alert alert-danger">
-                    Đã xảy ra lỗi khi tải khung giờ: ${error}. Vui lòng thử lại.
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Đang tải các khung giờ có sẵn...</p>
                 </div>
             `);
-        },
-        complete: function() {
-            isLoading = false;
+
+            $.ajax({
+                url: "{{ route('customer.datlich.checkAvailability') }}",
+                type: "GET",
+                data: {
+                    service_id: window.selectedService.MaDV,
+                    date: window.selectedDate
+                },
+                success: function(response) {
+                    if (!response.available) {
+                        $('#time-slots-container').html(`
+                            <div class="alert alert-warning">
+                                ${response.message}
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    let html = '';
+                    if (response.timeSlots.length === 0) {
+                        html = `
+                            <div class="alert alert-info">
+                                Không có khung giờ nào khả dụng cho ngày này.
+                            </div>
+                        `;
+                    } else {
+                        // Kiểm tra nếu ngày được chọn là ngày hôm nay
+                        const today = new Date();
+                        const selectedDateObj = new Date(window.selectedDate);
+                        const isToday = selectedDateObj.toDateString() === today.toDateString();
+                        
+                        // Tạo mảng các giờ có sẵn từ 8:00 đến 17:30
+                        const availableHours = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', 
+                                              '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', 
+                                              '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', 
+                                              '17:00', '17:30'];
+                        
+                        // Tạo khung giờ dạng ban đầu (không phải dạng lưới)
+                        html += '<div class="row">';
+                        
+                        // Lọc response.timeSlots để chỉ giữ các giờ trong danh sách availableHours
+                        const filteredTimeSlots = response.timeSlots.filter(slot => 
+                            availableHours.includes(slot.time)
+                        );
+                        
+                        // Lọc và hiển thị các khung giờ
+                        filteredTimeSlots.forEach(slot => {
+                            // Kiểm tra nếu là thời gian quá khứ trong ngày hôm nay
+                            const isPast = isToday && response.current_time && slot.time < response.current_time;
+                            
+                            // Slot bị vô hiệu hóa nếu đã đạt giới hạn hoặc là thời gian quá khứ
+                            const isDisabled = slot.disabled === true || isPast;
+                            
+                            // Tạo nút khung giờ với style phù hợp
+                            // Khả dụng: nền hồng, Không khả dụng: nền xám
+                            const btnClass = isDisabled ? 'btn-secondary disabled' : 'btn-pink';
+                            
+                            html += `
+                                <div class="col-md-3 col-6 mb-3">
+                                    <button type="button" class="btn ${btnClass} w-100 ${slot.time === window.selectedTime ? 'active' : ''}" 
+                                        data-time="${slot.time}" 
+                                        ${isDisabled ? 'disabled' : ''}>
+                                        ${slot.time}
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div>';
+                    }
+
+                    $('#time-slots-container').html(html);
+
+                    // Chỉ cho phép chọn các khung giờ không bị vô hiệu hóa
+                    $('.btn-pink:not(.disabled)').click(function() {
+                        $('.btn-pink').removeClass('active');
+                        $(this).addClass('active');
+                        window.selectedTime = $(this).data('time');
+                        $('#booking_time').val(window.selectedTime);
+                        $('#summary-time').text(window.selectedTime);
+                        $('.continue-to-confirm').prop('disabled', false);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    $('#time-slots-container').html(`
+                        <div class="alert alert-danger">
+                            Đã xảy ra lỗi khi tải khung giờ: ${error}. Vui lòng thử lại.
+                        </div>
+                    `);
+                },
+                complete: function() {
+                    isLoading = false;
+                }
+            });
         }
-    });
-}
 
         // Format date for display
         function formatDate(dateString) {
@@ -1252,16 +1495,27 @@
                 data: formData,
                 success: function(response) {
                     console.log('Form submitted successfully', response);
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
-                    } else {
-                        // Nếu server không trả về URL redirect, chuyển hướng đến trang lịch sử đặt lịch
-                        if (isAuthenticated) {
-                            window.location.href = "{{ route('customer.lichsudatlich.index') }}";
+                    
+                    // Hiển thị thông báo thành công
+                    Swal.fire({
+                        title: 'Đặt lịch thành công!',
+                        text: response.message || 'Chúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#ff6b9d'
+                    }).then((result) => {
+                        // Chuyển hướng sau khi người dùng đóng thông báo
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
                         } else {
-                            window.location.href = "{{ route('welcome') }}";
+                            // Nếu server không trả về URL redirect, chuyển hướng đến trang lịch sử đặt lịch
+                            if (isAuthenticated) {
+                                window.location.href = "{{ route('customer.lichsudatlich.index') }}";
+                            } else {
+                                window.location.href = "{{ route('welcome') }}";
+                            }
                         }
-                    }
+                    });
                 },
                 error: function(xhr, status, error) {
                     console.error('Error submitting form:', error);
@@ -1274,17 +1528,35 @@
                         console.error('Detailed error:', jsonResponse);
                         
                         if (jsonResponse.message) {
-                            alert('Lỗi: ' + jsonResponse.message);
+                            Swal.fire({
+                                title: 'Lỗi',
+                                text: jsonResponse.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#ff6b9d'
+                            });
                         } else if (jsonResponse.errors) {
                             var errorMessage = 'Vui lòng kiểm tra lại thông tin:\n';
                             $.each(jsonResponse.errors, function(key, value) {
                                 errorMessage += '- ' + value[0] + '\n';
                             });
-                            alert(errorMessage);
+                            Swal.fire({
+                                title: 'Lỗi',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#ff6b9d'
+                            });
                         }
                     } catch (e) {
                         // Nếu không phải JSON
-                        alert('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại sau.');
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: 'Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại sau.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#ff6b9d'
+                        });
                     }
                     
                     // Khôi phục nút submit
@@ -1298,3 +1570,4 @@
     });
 </script>
 @endsection
+                            

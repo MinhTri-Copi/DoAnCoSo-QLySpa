@@ -26,6 +26,7 @@ use App\Http\Controllers\ProfileController;
 use App\Models\HangThanhVien;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\LinkGuestBookingsController;
+use App\Http\Controllers\ChatController;
 
 
 
@@ -220,6 +221,7 @@ Route::get('datlich-statistics', [DatLichController::class, 'statistics'])->name
 Route::get('datlich/check-availability', [DatLichController::class, 'checkAvailability'])->name('admin.datlich.checkAvailability');
 Route::post('datlich/{id}/update-status', [DatLichController::class, 'updateStatus'])->name('admin.datlich.updateStatus');
 Route::get('datlich-dashboard', [DatLichDashboardController::class, 'index'])->name('admin.datlich.dashboard');
+Route::get('datlich/update-guest-info', [DatLichController::class, 'updateGuestInfo'])->name('admin.datlich.updateGuestInfo');
 
     // Route cho quản lý trạng thái phòng (TRANGTHAIPHONG)
     Route::resource('trangthaiphong', TrangThaiPhongController::class, ['names' => 'admin.trangthaiphong']);
@@ -289,6 +291,9 @@ Route::post('hoadonvathanhtoan/update-status', [HoaDonVaThanhToanController::cla
 // API để lấy thông tin đặt lịch cho hóa đơn
 Route::get('/admin/api/datlich/{id}', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'getBookingDetails']);
 
+// API để kiểm tra hạng thành viên và tỷ lệ giảm giá
+Route::get('/admin/api/check-membership-discount', [App\Http\Controllers\HoaDonVaThanhToanController::class, 'checkMembershipDiscount']);
+
 // Routes cho profile
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
@@ -329,4 +334,9 @@ Route::get('/debug-images', function() {
 Route::get('/customer/diem-thuong', function () {
     return view('customer.diemthuong');
 })->name('customer.diemthuong.index');
+
+// Routes cho Chat
+Route::get('/chat', [ChatController::class, 'show'])->name('chat.show');
+Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+Route::post('/chat/reset', [ChatController::class, 'reset'])->name('chat.reset');
 

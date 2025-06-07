@@ -164,6 +164,19 @@ class DatLichController extends Controller
             
             \Log::info('Mã đặt lịch mới:', ['MaDL' => $suggestedMaDL]);
             
+            // Lấy thông tin khách hàng từ bảng User nếu có Manguoidung
+            $hotenKhach = null;
+            $sdtKhach = null;
+            
+            if ($request->Manguoidung) {
+                $user = User::find($request->Manguoidung);
+                if ($user) {
+                    $hotenKhach = $user->Hoten;
+                    $sdtKhach = $user->SDT;
+                    \Log::info('Đã lấy thông tin khách hàng từ User:', ['Hoten' => $hotenKhach, 'SDT' => $sdtKhach]);
+                }
+            }
+            
             // Lưu lịch đặt vào database
             DB::beginTransaction();
             
@@ -173,6 +186,8 @@ class DatLichController extends Controller
             $datLich->MaDV = $request->MaDV;
             $datLich->Thoigiandatlich = $request->Thoigiandatlich;
             $datLich->Trangthai_ = $request->Trangthai_;
+            $datLich->Hoten_khach = $hotenKhach;
+            $datLich->SDT_khach = $sdtKhach;
             $saved = $datLich->save();
             
             \Log::info('Kết quả lưu:', ['success' => $saved]);
@@ -282,11 +297,27 @@ class DatLichController extends Controller
         try {
             DB::beginTransaction();
             
+            // Cập nhật thông tin khách hàng từ User nếu Manguoidung thay đổi hoặc chưa có thông tin khách hàng
+            $hotenKhach = $datLich->Hoten_khach;
+            $sdtKhach = $datLich->SDT_khach;
+            
+            // Nếu Manguoidung thay đổi hoặc chưa có thông tin khách hàng, lấy từ User
+            if ($request->Manguoidung != $datLich->Manguoidung || empty($hotenKhach) || empty($sdtKhach)) {
+                $user = User::find($request->Manguoidung);
+                if ($user) {
+                    $hotenKhach = $user->Hoten;
+                    $sdtKhach = $user->SDT;
+                    \Log::info('Đã cập nhật thông tin khách hàng từ User:', ['Hoten' => $hotenKhach, 'SDT' => $sdtKhach]);
+                }
+            }
+            
             $datLich->update([
                 'Manguoidung' => $request->Manguoidung,
                 'Thoigiandatlich' => $request->Thoigiandatlich,
                 'Trangthai_' => $request->Trangthai_,
                 'MaDV' => $request->MaDV,
+                'Hoten_khach' => $hotenKhach,
+                'SDT_khach' => $sdtKhach,
             ]);
             
             DB::commit();
@@ -305,19 +336,71 @@ class DatLichController extends Controller
 
     public function destroy($id)
     {
-        $datLich = DatLich::findOrFail($id);
-
         try {
             DB::beginTransaction();
+            
+            $datLich = DatLich::findOrFail($id);
             $datLich->delete();
+            
             DB::commit();
-            return redirect()->route('admin.datlich.index')->with('success', 'Xóa đặt lịch thành công!');
+            return redirect()->route('admin.datlich.index')->with('success', 'Xóa lịch đặt thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('admin.datlich.index')->with('error', 'Không thể xóa đặt lịch vì có dữ liệu liên quan!');
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
     }
     
+    /**
+     * Cập nhật thông tin khách hàng (SDT_khach và Hoten_khach) cho các đặt lịch có Manguoidung
+     * 
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateGuestInfo()
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Đếm số lượng bản ghi cần cập nhật
+            $count = DatLich::whereNotNull('Manguoidung')
+                ->where(function($query) {
+                    $query->whereNull('Hoten_khach')
+                        ->orWhereNull('SDT_khach');
+                })->count();
+                
+            // Lấy tất cả đặt lịch có Manguoidung nhưng chưa có thông tin khách hàng
+            $bookings = DatLich::whereNotNull('Manguoidung')
+                ->where(function($query) {
+                    $query->whereNull('Hoten_khach')
+                        ->orWhereNull('SDT_khach');
+                })->get();
+            
+            $updatedCount = 0;
+            
+            foreach ($bookings as $booking) {
+                // Tìm thông tin người dùng
+                $user = User::find($booking->Manguoidung);
+                
+                if ($user) {
+                    // Cập nhật thông tin
+                    $booking->Hoten_khach = $user->Hoten;
+                    $booking->SDT_khach = $user->SDT;
+                    $booking->save();
+                    $updatedCount++;
+                }
+            }
+            
+            DB::commit();
+            
+            return redirect()->route('admin.datlich.index')
+                ->with('success', "Đã cập nhật thông tin cho {$updatedCount}/{$count} lịch đặt.");
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.datlich.index')
+                ->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
+        }
+    }
+
     // Thêm phương thức thống kê
     public function statistics(Request $request)
     {
@@ -361,8 +444,8 @@ class DatLichController extends Controller
         
         // Thống kê theo người dùng (top 10)
         $bookingsByUser = DatLich::whereBetween('Thoigiandatlich', [$startDate, $endDate])
-            ->select('Manguoidung', DB::raw('count(*) as count'))
-            ->groupBy('Manguoidung')
+            ->select('Manguoidung', DB::raw('count(*) as count'), 'Hoten_khach', 'SDT_khach')
+            ->groupBy('Manguoidung', 'Hoten_khach', 'SDT_khach')
             ->with('user')
             ->orderBy('count', 'desc')
             ->limit(10)

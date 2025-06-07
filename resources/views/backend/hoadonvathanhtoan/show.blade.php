@@ -601,6 +601,24 @@
                 </div>
             </div>
         </div>
+        @elseif($hoaDon->datLich && ($hoaDon->datLich->Hoten_khach || $hoaDon->datLich->SDT_khach))
+        <div class="user-card" style="background-color: #fff8e1; border-left: 3px solid #ffb300;">
+            <div class="user-avatar" style="background-color: #fff8e1; color: #f57c00;">{{ substr($hoaDon->datLich->Hoten_khach ?? 'K', 0, 1) }}</div>
+            <div class="user-info">
+                <div class="user-name">
+                    {{ $hoaDon->datLich->Hoten_khach }}
+                    <span class="badge" style="background-color: #ffb300; color: white; font-size: 0.7rem; padding: 3px 8px; margin-left: 8px; border-radius: 4px;">
+                        <i class="fas fa-user-tag mr-1"></i> Khách vãng lai
+                    </span>
+                </div>
+                <div class="user-details">
+                    <div class="user-detail">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ $hoaDon->datLich->SDT_khach ?? 'Chưa cập nhật' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
         @else
         <div class="alert alert-warning" style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px;">
             Không tìm thấy thông tin người dùng.

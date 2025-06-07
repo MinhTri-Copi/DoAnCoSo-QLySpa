@@ -99,7 +99,8 @@ class HomeController extends Controller
         // Get upcoming bookings for the user
         $upcomingBookings = DatLich::where('Manguoidung', $user->Manguoidung)
             ->where('Thoigiandatlich', '>=', Carbon::now())
-            ->where('Trangthai_', '!=', 4) // Not cancelled
+            ->where('Trangthai_', '!=', 'Đã hủy') // Not cancelled
+            ->where('Trangthai_', '!=', 'Hoàn thành') // Not completed
             ->with('dichVu')
             ->orderBy('Thoigiandatlich', 'asc')
             ->limit(3)

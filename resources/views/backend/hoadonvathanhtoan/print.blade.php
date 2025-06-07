@@ -118,6 +118,13 @@
             text-align: left;
         }
         
+        .invoice-table th:last-child, 
+        .invoice-table td:last-child,
+        .invoice-table th.text-right, 
+        .invoice-table td.text-right {
+            text-align: right;
+        }
+        
         .invoice-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #e9ecef;
@@ -144,9 +151,17 @@
             border-bottom: 1px solid #e9ecef;
         }
         
+        .summary-row div:first-child {
+            text-align: left;
+        }
+        
+        .summary-row div:last-child {
+            text-align: right;
+            min-width: 150px;
+        }
+        
         .summary-row:last-child {
             border-bottom: none;
-            border-top: 2px solid #ff6b8b;
             font-weight: bold;
             font-size: 18px;
             padding-top: 15px;
@@ -335,12 +350,29 @@
                     <div class="info-title">THÔNG TIN KHÁCH HÀNG</div>
                     <div class="info-row">
                         <div class="info-label">Họ và tên:</div>
-                        <div class="info-value">{{ $hoaDon->user->Hoten ?? 'N/A' }}</div>
+                        <div class="info-value">
+                            @if($hoaDon->user)
+                                {{ $hoaDon->user->Hoten }}
+                            @elseif($hoaDon->datLich && $hoaDon->datLich->Hoten_khach)
+                                <span style="font-weight: bold;">{{ $hoaDon->datLich->Hoten_khach }}</span>
+                            @else
+                                N/A
+                            @endif
+                        </div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Số điện thoại:</div>
-                        <div class="info-value">{{ $hoaDon->user->SDT ?? 'N/A' }}</div>
+                        <div class="info-value">
+                            @if($hoaDon->user)
+                                {{ $hoaDon->user->SDT ?? 'N/A' }}
+                            @elseif($hoaDon->datLich && $hoaDon->datLich->SDT_khach)
+                                {{ $hoaDon->datLich->SDT_khach }}
+                            @else
+                                N/A
+                            @endif
+                        </div>
                     </div>
+                    @if($hoaDon->user)
                     <div class="info-row">
                         <div class="info-label">Email:</div>
                         <div class="info-value">{{ $hoaDon->user->Email ?? 'N/A' }}</div>
@@ -349,6 +381,7 @@
                         <div class="info-label">Địa chỉ:</div>
                         <div class="info-value">{{ $hoaDon->user->DiaChi ?? 'N/A' }}</div>
                     </div>
+                    @endif
                 </div>
                 
                 <div class="payment-info">
@@ -400,21 +433,66 @@
             </table>
             
             <div class="invoice-summary">
+                @php
+                    // Calculate original service price from the service
+                    if ($hoaDon->datLich && $hoaDon->datLich->dichVu) {
+                        $originalPrice = $hoaDon->datLich->dichVu->Gia;
+                    } else {
+                        // Fallback to discount + tongtien if available
+                        $originalPrice = property_exists($hoaDon, 'GiamGia') ? 
+                            $hoaDon->Tongtien + $hoaDon->GiamGia : 
+                            $hoaDon->Tongtien;
+                    }
+                @endphp
+                
                 <div class="summary-row">
                     <div>Tổng tiền dịch vụ:</div>
-                    <div>{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
+                    <div>{{ number_format($originalPrice, 0, ',', '.') }} VNĐ</div>
                 </div>
-                <div class="summary-row">
-                    <div>Thuế VAT (10%):</div>
-                    <div>{{ number_format($hoaDon->Tongtien * 0.1, 0, ',', '.') }} VNĐ</div>
-                </div>
+                
+                @php
+                    // Get discount amount
+                    $discountAmount = 0;
+                    $discountText = '';
+                    
+                    // First try to access direct properties
+                    if (property_exists($hoaDon, 'GiamGia') && $hoaDon->GiamGia > 0) {
+                        $discountAmount = $hoaDon->GiamGia;
+                        
+                        // Format discount text with percentage if available
+                        if (property_exists($hoaDon, 'TyLeGiamGia') && $hoaDon->TyLeGiamGia > 0) {
+                            $discountText = '(' . $hoaDon->TyLeGiamGia . '%';
+                            
+                            // Add membership rank if available
+                            if (property_exists($hoaDon, 'HangThanhVien') && !empty($hoaDon->HangThanhVien)) {
+                                $discountText .= ' - ' . $hoaDon->HangThanhVien;
+                            }
+                            
+                            $discountText .= ')';
+                        }
+                    } 
+                    // Otherwise calculate from original price and total if there's a difference
+                    else if ($originalPrice > $hoaDon->Tongtien) {
+                        $discountAmount = $originalPrice - $hoaDon->Tongtien;
+                        $discountPercentage = round(($discountAmount / $originalPrice) * 100);
+                        $discountText = '(' . $discountPercentage . '%)';
+                    }
+                @endphp
+                
                 <div class="summary-row">
                     <div>Giảm giá:</div>
-                    <div>0 VNĐ</div>
+                    <div>
+                        @if($discountAmount > 0)
+                            {{ number_format($discountAmount, 0, ',', '.') }} VNĐ {{ $discountText }}
+                        @else
+                            0 VNĐ
+                        @endif
+                    </div>
                 </div>
-                <div class="summary-row">
-                    <div class="total-label">Tổng thanh toán:</div>
-                    <div class="total-value">{{ number_format($hoaDon->Tongtien * 1.1, 0, ',', '.') }} VNĐ</div>
+                
+                <div class="summary-row" style="border-top: 1px solid #ff6b8b; margin-top: 10px; padding-top: 10px; border-bottom: none;">
+                    <div class="total-label" style="color: #ff6b8b; font-weight: bold;">Tổng thanh toán:</div>
+                    <div class="total-value" style="color: #ff6b8b; font-weight: bold;">{{ number_format($hoaDon->Tongtien, 0, ',', '.') }} VNĐ</div>
                 </div>
             </div>
             
@@ -446,7 +524,15 @@
                 <div class="signature-box">
                     <div class="signature-title">Khách hàng</div>
                     <div class="signature-line"></div>
-                    <div>{{ $hoaDon->user->Hoten ?? 'Khách hàng' }}</div>
+                    <div>
+                        @if($hoaDon->user)
+                            {{ $hoaDon->user->Hoten }}
+                        @elseif($hoaDon->datLich && $hoaDon->datLich->Hoten_khach)
+                            {{ $hoaDon->datLich->Hoten_khach }}
+                        @else
+                            Khách hàng
+                        @endif
+                    </div>
                 </div>
             </div>
             

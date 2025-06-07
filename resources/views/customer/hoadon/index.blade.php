@@ -249,8 +249,75 @@
     .table td, .table th {
         padding: 1rem;
     }
+    
+    /* Enhanced pagination styling */
     .pagination {
         margin-bottom: 0;
+        gap: 5px;
+    }
+    
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        border-radius: 8px;
+    }
+    
+    .page-link {
+        color: #FF6B6B;
+        border-radius: 8px;
+        padding: 8px 15px;
+        border: 1px solid #eee;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .page-link:hover {
+        background-color: #fff5f5;
+        color: #FF6B6B;
+        border-color: #FFD3D3;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(255, 107, 107, 0.1);
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #FF9A9E, #FF6B6B);
+        border-color: #FF6B6B;
+        font-weight: bold;
+        box-shadow: 0 3px 10px rgba(255, 107, 107, 0.2);
+    }
+    
+    .page-item.disabled .page-link {
+        color: #bbbbbb;
+        border-color: #f5f5f5;
+        background-color: #fafafa;
+    }
+    
+    /* Arrow icon styling */
+    .pagination-prev-icon,
+    .pagination-next-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        position: relative;
+    }
+    
+    .pagination-prev-icon::before,
+    .pagination-next-icon::before {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-style: solid;
+        border-width: 2px 2px 0 0;
+        top: 50%;
+        left: 50%;
+    }
+    
+    .pagination-prev-icon::before {
+        transform: translate(-30%, -50%) rotate(-135deg);
+    }
+    
+    .pagination-next-icon::before {
+        transform: translate(-70%, -50%) rotate(45deg);
     }
 
     /* Status badge styling */
@@ -303,7 +370,6 @@
         }
     }
 </style>
-@endsection
 
 @push('scripts')
 <script>
@@ -319,6 +385,23 @@
         // Chuyển hướng đến trang đánh giá
         window.location.href = reviewUrl;
     }
+
+    // Enhance pagination buttons with icons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Replace text with arrow icons
+        const prevLink = document.querySelector('.pagination .page-item:first-child .page-link');
+        const nextLink = document.querySelector('.pagination .page-item:last-child .page-link');
+        
+        if (prevLink) {
+            prevLink.innerHTML = '<span class="pagination-prev-icon" title="Trang trước"></span>';
+            prevLink.setAttribute('aria-label', 'Trang trước');
+        }
+        
+        if (nextLink) {
+            nextLink.innerHTML = '<span class="pagination-next-icon" title="Trang kế"></span>';
+            nextLink.setAttribute('aria-label', 'Trang kế');
+        }
+    });
 </script>
 @endpush
 

@@ -139,7 +139,7 @@ class DatLichController extends Controller
         $maxPrice = DichVu::max('Gia');
     
         $availableDates = [];
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 30; $i++) {
             $date = now()->addDays($i);
             $availableDates[] = [
                 'date' => $date->toDateString(),
@@ -285,8 +285,8 @@ class DatLichController extends Controller
             $bookedSlots = $this->getBookedTimeSlots($service->MaDV, $bookingDate);
             \Log::info("Đã lấy các khung giờ đã đặt: ", $bookedSlots->toArray());
 
-            // Kiểm tra có trùng lịch không
-            $conflictFound = false;
+            // Kiểm tra xem khung giờ này đã đạt giới hạn chưa (tối đa 2 lịch đặt trùng giờ)
+            $overlappingBookings = 0;
             $serviceEndTime = (clone $bookingDateTime)->addMinutes($service->Thoigian);
             \Log::info("Thời gian kết thúc dịch vụ: " . $serviceEndTime->toDateTimeString());
             
@@ -300,17 +300,20 @@ class DatLichController extends Controller
                     ($serviceEndTime > $slotStart && $serviceEndTime <= $slotEnd) ||
                     ($bookingDateTime <= $slotStart && $serviceEndTime >= $slotEnd)
                 ) {
-                    \Log::warning("Phát hiện trùng lịch!");
-                    $conflictFound = true;
-                    break;
+                    $overlappingBookings++;
+                    \Log::warning("Phát hiện trùng lịch! Số lượng: {$overlappingBookings}");
                 }
             }
             
-            if ($conflictFound) {
+            // Giới hạn tối đa 2 lịch đặt trùng giờ
+            $maxConcurrentBookings = 2;
+            if ($overlappingBookings >= $maxConcurrentBookings) {
+                \Log::warning("Đã đạt giới hạn lịch đặt trùng giờ: {$overlappingBookings}/{$maxConcurrentBookings}");
+                
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Khung giờ đã được đặt. Vui lòng chọn khung giờ khác.'
+                        'message' => 'Khung giờ này đã đạt giới hạn đặt lịch. Vui lòng chọn khung giờ khác.'
                     ], 422);
                 }
                 
@@ -319,7 +322,7 @@ class DatLichController extends Controller
                         'step' => 2, 
                         'service_id' => $request->input('service_id')
                     ])
-                    ->with('error', 'Khung giờ đã được đặt. Vui lòng chọn khung giờ khác.');
+                    ->with('error', 'Khung giờ này đã đạt giới hạn đặt lịch. Vui lòng chọn khung giờ khác.');
             }
 
             // Tạo mã đặt lịch mới
@@ -343,6 +346,14 @@ class DatLichController extends Controller
                 if ($user) {
                     \Log::info("Đặt lịch cho user: {$user->Manguoidung} - {$user->Hoten}");
                     $datLich->Manguoidung = $user->Manguoidung;
+                    
+                    // Tự động cập nhật thông tin Hoten_khach và SDT_khach từ thông tin User
+                    $datLich->Hoten_khach = $user->Hoten;
+                    $datLich->SDT_khach = $user->SDT;
+                    \Log::info("Tự động cập nhật thông tin khách hàng từ User:", [
+                        'Hoten_khach' => $user->Hoten,
+                        'SDT_khach' => $user->SDT
+                    ]);
                 } else {
                     \Log::error("Không tìm thấy thông tin người dùng với MaTK: {$account->MaTK}");
                     
@@ -518,14 +529,17 @@ class DatLichController extends Controller
         // Tạo danh sách các khung giờ có sẵn (ví dụ: từ 8:00 đến 18:00, mỗi 30 phút)
         $availableTimeSlots = [];
         $startHour = 8;
-        $endHour = 18;
+        $endHour = 17;
         $interval = 30; // phút
         
         $currentTime = Carbon::parse($date)->setHour($startHour)->setMinute(0)->setSecond(0);
-        $endTime = Carbon::parse($date)->setHour($endHour)->setMinute(0)->setSecond(0);
+        $endTime = Carbon::parse($date)->setHour($endHour)->setMinute(30)->setSecond(0);
+        
+        // Thiết lập múi giờ cho Việt Nam/TP.HCM
+        $now = Carbon::now('Asia/Ho_Chi_Minh');
+        \Log::info("Thời gian hiện tại tại TP.HCM: " . $now->format('Y-m-d H:i:s'));
         
         // Nếu ngày đặt lịch là hôm nay, bỏ qua các khung giờ đã qua
-        $now = Carbon::now();
         if ($date == $now->format('Y-m-d')) {
             $currentTime = max($currentTime, $now->ceil('30 minutes'));
             \Log::info("Ngày đặt lịch là hôm nay, bắt đầu từ: " . $currentTime->format('H:i'));
@@ -561,7 +575,8 @@ class DatLichController extends Controller
             
             $availableTimeSlots[] = [
                 'time' => $timeSlot,
-                'available' => $isAvailable
+                'available' => $isAvailable,
+                'disabled' => !$isAvailable  // Thêm trường disabled để frontend biết nên disable slot này
             ];
             
             $currentTime->addMinutes($interval);
@@ -574,7 +589,8 @@ class DatLichController extends Controller
             'timeSlots' => $availableTimeSlots,
             'service_time' => $serviceTime,
             'service_name' => $dichVu->Tendichvu,
-            'service_price' => $dichVu->getFormattedPriceAttribute()
+            'service_price' => $dichVu->getFormattedPriceAttribute(),
+            'current_time' => $now->format('H:i')  // Trả về giờ hiện tại để frontend có thể so sánh
         ]);
     }
     
@@ -584,16 +600,16 @@ class DatLichController extends Controller
     private function getBookedTimeSlots($serviceId, $date, $bookingDateTime = null)
     {
         // Log thông tin đầu vào
-        \Log::info("Đang lấy các slot đã đặt cho dịch vụ ID: {$serviceId}, ngày: {$date}");
+        \Log::info("Đang lấy các slot đã đặt cho ngày: {$date}");
         
         // Lấy thông tin dịch vụ
         $dichVu = DichVu::findOrFail($serviceId);
         $serviceTime = $dichVu->Thoigian;
         \Log::info("Dịch vụ: {$dichVu->Tendichvu}, thời gian: {$serviceTime} phút");
         
-        // Lấy các khung giờ đã đặt cho dịch vụ này trong ngày
-        $query = DatLich::where('MaDV', $serviceId)
-            ->whereDate('Thoigiandatlich', $date)
+        // Lấy TẤT CẢ các khung giờ đã đặt trong ngày, không chỉ cho dịch vụ này
+        // Để đảm bảo tính chính xác khi kiểm tra số lượng đặt lịch trùng giờ
+        $query = DatLich::whereDate('Thoigiandatlich', $date)
             ->where('Trangthai_', '!=', 'Đã hủy');
             
         // Nếu đang cập nhật đặt lịch hiện có, loại trừ lịch đang cập nhật
@@ -602,13 +618,16 @@ class DatLichController extends Controller
         }
         
         $bookings = $query->get();
-        \Log::info("Số lượng booking đã tìm thấy: " . $bookings->count());
+        \Log::info("Số lượng booking đã tìm thấy trong ngày: " . $bookings->count());
         
-        $slots = $bookings->map(function($booking) use ($serviceTime) {
-            $time = Carbon::parse($booking->Thoigiandatlich);
-            $endTime = (clone $time)->addMinutes($serviceTime);
+        $slots = $bookings->map(function($booking) {
+            // Lấy thời gian dịch vụ từ dịch vụ của booking
+            $bookingServiceTime = $booking->dichVu ? $booking->dichVu->Thoigian : 60; // Mặc định 60 phút nếu không tìm thấy dịch vụ
             
-            \Log::info("Booking ID: {$booking->MaDL}, Thời gian: {$time->format('H:i')} - {$endTime->format('H:i')}");
+            $time = Carbon::parse($booking->Thoigiandatlich);
+            $endTime = (clone $time)->addMinutes($bookingServiceTime);
+            
+            \Log::info("Booking ID: {$booking->MaDL}, Dịch vụ: {$booking->MaDV}, Thời gian: {$time->format('H:i')} - {$endTime->format('H:i')}");
             
             return [
                 'start' => $time->format('H:i'),

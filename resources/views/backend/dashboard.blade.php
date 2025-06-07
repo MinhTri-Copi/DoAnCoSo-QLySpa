@@ -1165,8 +1165,14 @@ use App\Models\Phong;
                                     <tbody id="booking-table-body">
                                         @forelse($recentBookings as $booking)
                                         @php
-                                            $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich);
-                                            $isUrgent = $bookingTime->diffInMinutes(now()) < 60 && $bookingTime->isFuture() && $bookingTime->isToday();
+                                            // Thiết lập múi giờ Hồ Chí Minh
+                                            $currentTime = \Carbon\Carbon::now('Asia/Ho_Chi_Minh');
+                                            // Parse thời gian đặt lịch từ database
+                                            $bookingTime = \Carbon\Carbon::parse($booking->Thoigiandatlich)->setTimezone('Asia/Ho_Chi_Minh');
+                                            // Kiểm tra nếu lịch đặt sẽ diễn ra trong vòng 1 giờ tới
+                                            $isUrgent = $bookingTime->greaterThan($currentTime) && 
+                                                       $bookingTime->lessThanOrEqualTo($currentTime->copy()->addHour()) && 
+                                                       $bookingTime->isToday();
                                         @endphp
                                         <tr style="border-bottom: 1px solid #f5f5f5; cursor: pointer;" 
                                             class="booking-row {{ $isUrgent ? 'urgent-booking' : '' }}" 
@@ -1179,11 +1185,11 @@ use App\Models\Phong;
                                                         @if($isUrgent)
                                                         <span class="urgent-booking-dot" title="Sắp diễn ra (dưới 1 giờ)"></span>
                                                         @endif
-                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('d/m/Y') }}
+                                                        {{ $bookingTime->format('d/m/Y') }}
                                                     </div>
                                                     <div style="font-size: 0.8rem; color: #888;">
                                                         <i class="far fa-clock mr-1" style="color: #db7093;"></i>
-                                                        {{ \Carbon\Carbon::parse($booking->Thoigiandatlich)->format('H:i') }}
+                                                        {{ $bookingTime->format('H:i') }}
                                                     </div>
                                                     <div style="margin-top: 5px;">
                                                         @if($booking->Trangthai_ == 'Đã đặt')
@@ -1200,16 +1206,27 @@ use App\Models\Phong;
                                             </td>
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
-                                                    <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($booking->user->Hoten ?? 'N/A'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                                        {{ strtoupper(substr($booking->user->Hoten ?? 'N/A', 0, 1)) }}
+                                                    <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($booking->user->Hoten ?? $booking->Hoten_khach ?? 'N/A'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                                        {{ strtoupper(substr($booking->user->Hoten ?? $booking->Hoten_khach ?? 'N/A', 0, 1)) }}
                                                     </div>
                                                     <div>
                                                         <div style="font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
-                                                            {{ $booking->user->Hoten ?? 'N/A' }}
+                                                            @if($booking->user)
+                                                                {{ $booking->user->Hoten }}
+                                                            @elseif($booking->Hoten_khach)
+                                                                {{ $booking->Hoten_khach }}
+                                                                <span style="font-size: 0.7rem; background-color: #ffeeba; color: #856404; padding: 2px 5px; border-radius: 10px; margin-left: 3px;">Khách vãng lai</span>
+                                                            @else
+                                                                N/A
+                                                            @endif
                                                         </div>
                                                         @if($booking->user && $booking->user->SDT)
                                                             <div style="font-size: 0.75rem; color: #888;">
                                                                 <i class="fas fa-phone-alt mr-1" style="color: #db7093;"></i> {{ $booking->user->SDT }}
+                                                            </div>
+                                                        @elseif($booking->SDT_khach)
+                                                            <div style="font-size: 0.75rem; color: #888;">
+                                                                <i class="fas fa-phone-alt mr-1" style="color: #db7093;"></i> {{ $booking->SDT_khach }}
                                                             </div>
                                                         @endif
                                                     </div>
@@ -1280,11 +1297,20 @@ use App\Models\Phong;
                             <div style="padding: 15px 20px; border-bottom: 1px solid #f0f0f0;">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div class="d-flex align-items-center">
-                                        <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($review->user->Hoten ?? 'Khách hàng'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600;">
+                                        <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: {{ '#'.substr(md5($review->user->Hoten ?? $review->Hoten_khach ?? 'Khách hàng'), 0, 6) }}; color: white; font-size: 0.8rem; font-weight: 600;">
                                             <i class="fas fa-user"></i>
                                         </div>
                                         <div>
-                                            <div style="font-weight: 600; color: #333; font-size: 0.9rem;">{{ $review->user->Hoten ?? 'Khách hàng' }}</div>
+                                            <div style="font-weight: 600; color: #333; font-size: 0.9rem;">
+                                                @if($review->user)
+                                                    {{ $review->user->Hoten }}
+                                                @elseif($review->Hoten_khach)
+                                                    {{ $review->Hoten_khach }}
+                                                    <span style="font-size: 0.7rem; background-color: #ffeeba; color: #856404; padding: 2px 5px; border-radius: 10px; margin-left: 3px;">Khách vãng lai</span>
+                                                @else
+                                                    Khách hàng
+                                                @endif
+                                            </div>
                                             <div style="color: #888; font-size: 0.75rem;">
                                                 <i class="fas fa-clock mr-1" style="color: #db7093;"></i> {{ \Carbon\Carbon::parse($review->Ngaydanhgia)->diffForHumans() }}
                                             </div>
