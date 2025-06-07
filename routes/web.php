@@ -336,6 +336,7 @@ Route::get('/customer/diem-thuong', function () {
 })->name('customer.diemthuong.index');
 
 // Routes cho Chat
-Route::get('/chat', [App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
+Route::get('/chat', [ChatController::class, 'show'])->name('chat.show');
+Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+Route::post('/chat/reset', [ChatController::class, 'reset'])->name('chat.reset');
 

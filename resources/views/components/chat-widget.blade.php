@@ -1,7 +1,7 @@
 <!-- Chat Widget Component -->
 <div class="chat-widget" id="chatWidget">
     <button id="chatToggleBtn" class="chat-toggle-btn">
-        <i class="fas fa-comments"></i>
+        <i class="fas fa-robot"></i>
     </button>
     
     <div class="chat-popup" id="chatPopup">
@@ -12,8 +12,8 @@
 <style>
     .chat-widget {
         position: fixed;
-        bottom: 30px;
-        right: 30px;
+        bottom: 110px;
+        right: 20px;
         z-index: 9999;
     }
     
@@ -41,7 +41,7 @@
     .chat-popup {
         position: fixed;
         bottom: 100px;
-        right: 30px;
+        right: 100px;
         width: 350px;
         height: 500px;
         border-radius: 15px;
@@ -50,13 +50,13 @@
         display: none;
         transition: all 0.3s ease;
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateX(20px);
     }
     
     .chat-popup.active {
         display: block;
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
     
     .chat-popup iframe {
@@ -98,6 +98,10 @@
             font-size: 20px;
             right: 20px;
             bottom: 20px;
+        }
+        
+        .chat-widget {
+            bottom: 100px;
         }
     }
 </style>

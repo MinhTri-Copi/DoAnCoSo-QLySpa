@@ -2025,4 +2025,35 @@ EOT;
         
         return $basicInfo;
     }
+
+    /**
+     * Xóa lịch sử chat và thông tin đặt lịch từ session
+     */
+    public function reset()
+    {
+        try {
+            // Xóa lịch sử chat từ session
+            session()->forget('chat_history');
+            
+            // Xóa thông tin đặt lịch một phần
+            session()->forget('partial_booking_info');
+            
+            // Xóa thông tin đặt lịch thành công gần đây
+            session()->forget('last_successful_booking');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã làm mới cuộc trò chuyện'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi làm mới cuộc trò chuyện', [
+                'message' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể khởi tạo cuộc trò chuyện mới'
+            ], 500);
+        }
+    }
 }

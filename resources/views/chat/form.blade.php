@@ -181,6 +181,25 @@
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-5px); }
         }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -189,9 +208,14 @@
             <div class="chat-title">
                 <i class="fas fa-spa"></i> Rosa Spa Assistant
             </div>
-            <button class="close-btn" id="closeBtn">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="header-actions">
+                <button class="action-btn" id="newChatBtn" title="Cuộc trò chuyện mới">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="close-btn" id="closeBtn" title="Đóng">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         
         <div class="chat-body" id="chatBody">
@@ -374,6 +398,40 @@
             // Close button
             closeBtn.addEventListener('click', function() {
                 window.parent.postMessage('closeChat', '*');
+            });
+            
+            // New Chat button
+            const newChatBtn = document.getElementById('newChatBtn');
+            newChatBtn.addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn bắt đầu cuộc trò chuyện mới? Tất cả tin nhắn hiện tại sẽ bị xóa.')) {
+                    // Gửi yêu cầu reset chat
+                    fetch('/chat/reset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Xóa tất cả tin nhắn trừ tin nhắn chào mừng đầu tiên
+                            const welcomeMessage = chatBody.firstElementChild;
+                            chatBody.innerHTML = '';
+                            chatBody.appendChild(welcomeMessage);
+                            
+                            // Scroll to bottom
+                            chatBody.scrollTop = chatBody.scrollHeight;
+                        } else {
+                            alert('Không thể khởi tạo cuộc trò chuyện mới: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi khi khởi tạo cuộc trò chuyện mới.');
+                    });
+                }
             });
         });
     </script>

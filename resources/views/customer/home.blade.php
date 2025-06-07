@@ -1380,23 +1380,19 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 999;
-        display: flex;
-        flex-direction: column-reverse;
-        align-items: center;
+        z-index: 1000;
     }
 
     .quick-contact-toggle {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background-color: #1a237e;
+        background-color: #4a4a4a;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        margin-bottom: 10px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         transition: all 0.3s ease;
         font-size: 24px; /* Tăng kích thước icon */
@@ -1408,14 +1404,16 @@
 
     .quick-contact-items {
         display: flex;
-        flex-direction: column-reverse; /* Đảo ngược hướng từ trên xuống thành từ dưới lên */
-        gap: 16px; /* Tăng khoảng cách giữa các nút từ 12px lên 16px */
-        margin-top: 14px; /* Tăng margin-top từ 10px lên 14px */
+        flex-direction: row; /* Thay đổi từ column-reverse sang row để hiển thị theo chiều ngang */
+        gap: 16px; /* Khoảng cách giữa các nút */
+        position: absolute;
+        right: 80px; /* Điều chỉnh từ 70px lên 80px để tạo khoảng cách phù hợp */
+        bottom: 10px; /* Căn chỉnh theo chiều dọc */
     }
 
     .quick-contact-item {
-        width: 60px; /* Tăng kích thước từ 48px lên 60px */
-        height: 60px; /* Tăng kích thước từ 48px lên 60px */
+        width: 60px; /* Kích thước nút */
+        height: 60px;
         border-radius: 50%;
         display: flex;
         justify-content: center;
@@ -1423,10 +1421,10 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         transition: all 0.3s ease;
         opacity: 0;
-        transform: translateY(-20px); /* Thay đổi hướng từ lên xuống thành từ dưới lên */
+        transform: translateX(20px); /* Thay đổi từ translateY sang translateX */
         pointer-events: none;
-        font-size: 28px; /* Tăng kích thước icon */
-        text-decoration: none; /* Loại bỏ đường gạch ngang dưới */
+        font-size: 28px;
+        text-decoration: none;
     }
     
     .quick-contact-item i {
@@ -1439,25 +1437,24 @@
 
     .quick-contact-menu.active .quick-contact-item {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
         pointer-events: auto;
     }
 
     .zalo-item {
         background-color: #0068ff;
-        margin-bottom: 8px; /* Thêm khoảng cách với nút phía dưới */
     }
 
     .zalo-item img {
-        width: 36px; /* Tăng kích thước từ 28px lên 36px */
-        height: 36px; /* Tăng kích thước từ 28px lên 36px */
-        padding: 4px; /* Thêm khoảng cách trong icon */
+        width: 36px;
+        height: 36px;
+        padding: 4px;
     }
 
     .messenger-item {
         background-color: #0084ff;
         color: white;
-        font-size: 30px; /* Tăng kích thước từ 24px lên 30px */
+        font-size: 30px;
     }
     
     .messenger-item i {
@@ -1467,7 +1464,7 @@
     .phone-item {
         background-color: #4caf50;
         color: white;
-        font-size: 30px; /* Tăng kích thước từ 24px lên 30px */
+        font-size: 30px;
     }
     
     .phone-item i {
@@ -1478,17 +1475,17 @@
         transform: scale(1.1);
     }
 
-    /* Timing for animations - ngược lại thứ tự */
+    /* Timing for animations - từ phải sang trái */
     .quick-contact-menu.active .phone-item {
-        transition-delay: 0.1s;
+        transition-delay: 0.3s; /* Nút xa nhất */
     }
     
     .quick-contact-menu.active .messenger-item {
-        transition-delay: 0.2s;
+        transition-delay: 0.2s; /* Nút ở giữa */
     }
     
     .quick-contact-menu.active .zalo-item {
-        transition-delay: 0.3s;
+        transition-delay: 0.1s; /* Nút gần nhất */
     }
 </style>
 @endsection
