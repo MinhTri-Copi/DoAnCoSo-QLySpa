@@ -209,7 +209,7 @@ class HoaDonVaThanhToanController extends Controller
                 $tyLeGiam = 0.05; // 5% discount
                 break;
             case 'Thành viên Bạch Kim':
-                $tyLeGiam = 0.075; // 7.5% discount
+                $tyLeGiam = 0.07; // 7.5% discount
                 break;
             case 'Thành viên Kim Cương':
                 $tyLeGiam = 0.1; // 10% discount
